@@ -11,6 +11,8 @@ namespace TapPaymentIntegration.Areas.Identity.Data;
 public class ApplicationUser : IdentityUser
 {
     public string Password { get; set; }
+    public string PaymentSource { get; set; }
+    public string GYMName { get; set; }
     public string FullName { get; set; }
     public string UserType { get; set; }
     public string Frequency { get; set; } 

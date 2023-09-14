@@ -382,6 +382,7 @@ namespace TapPaymentIntegration.Controllers
                 users.Tap_Card_ID = Deserialized_savecard.payment_agreement.contract.id;
                 users.SubscribeID = Convert.ToInt32(SubscriptionId);
                 users.Tap_Agreement_ID = Deserialized_savecard.payment_agreement.id;
+                users.PaymentSource = Deserialized_savecard.source.payment_method;
                 _context.Users.Update(users);
                 _context.SaveChanges();
 
@@ -578,12 +579,13 @@ namespace TapPaymentIntegration.Controllers
                 ViewBag.SubscriptionList = _context.subscriptions.Select(x => new SelectListItem { Value = x.SubscriptionId.ToString(), Text = x.Name + " " + "-" + " " + x.Amount });
                 ModelState.AddModelError(string.Empty, "Please Enter The Password...!");
             }
-            if (applicationUser.Country == "Bahrain")
+            var subscriptions = _context.subscriptions.Where(x => x.SubscriptionId == applicationUser.SubscribeID).FirstOrDefault();
+            if (subscriptions.Countries == "Bahrain")
             {
                 applicationUser.PublicKey = BHD_Public_Key;
                 applicationUser.SecertKey = BHD_Test_Key;
             }
-            else if (applicationUser.Country == "KSA")
+            else if (subscriptions.Countries == "KSA")
             {
                 applicationUser.PublicKey = KSA_Public_Key;
                 applicationUser.SecertKey = KSA_Test_Key;
@@ -595,7 +597,6 @@ namespace TapPaymentIntegration.Controllers
                 string max_user_id = _context.Users.Where(x=>x.Email == applicationUser.Email).Select(x=>x.Id).FirstOrDefault();
                 //Create Invoice
                // var users = GetCurrentUserAsync().Result;
-                var subscriptions = _context.subscriptions.Where(x => x.Status == true && x.SubscriptionId == applicationUser.SubscribeID).FirstOrDefault();
                 var Amount = subscriptions.Amount;
                 int days = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
                 int finalamount = 0;
@@ -947,6 +948,8 @@ namespace TapPaymentIntegration.Controllers
                              SubscribeName = sub.Name + " " + "-" + " " + "(" + sub.Amount + ")",
                              SubscribeID = um.SubscribeID,
                              Status = um.Status,
+                             PaymentSource = um.PaymentSource,
+                             GYMName = um.GYMName
                          });
             return View(users);
         }
@@ -1000,9 +1003,9 @@ namespace TapPaymentIntegration.Controllers
         }
         #endregion
         #region Gym Customer Registration
-        public IActionResult AddGymCustomer()
+        public IActionResult AddGymCustomer(int id)
         {
-            ViewBag.SubscriptionList = _context.subscriptions.Select(x => new SelectListItem { Value = x.SubscriptionId.ToString(), Text = x.Name + " " + "-" + " " + x.Amount });
+            ViewBag.SubscriptionList = id;
             return View();
         }
         [HttpPost]
@@ -1041,6 +1044,7 @@ namespace TapPaymentIntegration.Controllers
                 currencycode = "OMR";
             }
             applicationUser.Currency = currencycode;
+            var selectsub_country = _context.subscriptions.Where(x => x.SubscriptionId == applicationUser.SubscribeID).Select(x => x.Countries).FirstOrDefault();
             // save data to database
             var subid = applicationUser.SubscribeID;
             applicationUser.FullName = applicationUser.FullName;
@@ -1058,12 +1062,13 @@ namespace TapPaymentIntegration.Controllers
                 ViewBag.SubscriptionList = _context.subscriptions.Select(x => new SelectListItem { Value = x.SubscriptionId.ToString(), Text = x.Name + " " + "-" + " " + x.Amount });
                 ModelState.AddModelError(string.Empty, "Please Enter The Password...!");
             }
-            if(applicationUser.Country == "Bahrain")
+
+            if (selectsub_country == "Bahrain")
             {
                 applicationUser.PublicKey = BHD_Public_Key;
-                applicationUser.SecertKey = BHD_Test_Key; 
+                applicationUser.SecertKey = BHD_Test_Key;
             }
-            else if(applicationUser.Country == "KSA")
+            else if (selectsub_country == "KSA")
             {
                 applicationUser.PublicKey = KSA_Public_Key;
                 applicationUser.SecertKey = KSA_Test_Key;

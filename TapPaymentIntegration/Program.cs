@@ -88,7 +88,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapRazorPages();
     endpoints.MapControllers();
     endpoints.MapHangfireDashboard();
-    RecurringJob.AddOrUpdate<DailyRecurreningJob>(x => x.AutoChargeJob(), "* 9 * * *");
+   // RecurringJob.AddOrUpdate<DailyRecurreningJob>(x => x.AutoChargeJob(), "* 9 * * *");
     //RecurringJob.AddOrUpdate<DailyRecurreningJob>(x => x.AutoChargeJob(), Cron.MinuteInterval(1));
 });
 

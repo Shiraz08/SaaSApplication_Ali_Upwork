@@ -7,6 +7,8 @@
         public string FullName { get; set; }
         public string UserType { get; set; }
         public string Email { get; set; }
+        public string PaymentSource { get; set; }
+        public string GYMName { get; set; }
         public string PhoneNumber { get; set; }
         public bool Status { get; set; }
         public string SubscribeName  { get; set; }

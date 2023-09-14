@@ -13,6 +13,14 @@
             <p class="login-box-msg">Sign up to start your session</p>
                 @using (Html.BeginForm("AddCustomer", "Home", FormMethod.Post))
                 {
+                    <div class="input-group mb-3">
+                    <input type="text" class="form-control" asp-for="GYMName" placeholder="Enter The GYM Name" required="required">
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-users"></span>
+                        </div>
+                    </div>
+                </div>
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" asp-for="FullName" placeholder="Enter The Name" required="required">
                     <div class="input-group-append">
