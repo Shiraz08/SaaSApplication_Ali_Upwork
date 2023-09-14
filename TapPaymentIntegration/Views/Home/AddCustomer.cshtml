@@ -1,0 +1,109 @@
+﻿@model TapPaymentIntegration.Areas.Identity.Data.ApplicationUser
+@{
+    ViewData["Title"] = "AddCustomer";
+    Layout = "~/Views/Shared/_IdentityLayout.cshtml";
+}
+<div class="login-box">
+    <!-- /.login-logo -->
+    <div class="card card-outline card-primary">
+        <div class="card-header text-center">
+            <a href="#" class="h1"><b>Tamarran</b>تمران</a>
+        </div>
+        <div class="card-body">
+            <p class="login-box-msg">Sign up to start your session</p>
+                @using (Html.BeginForm("AddCustomer", "Home", FormMethod.Post))
+                {
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" asp-for="FullName" placeholder="Enter The Name" required="required">
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-users"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="email" class="form-control" asp-for="UserName" placeholder="Enter The Email" required="required">
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-envelope"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" asp-for="PhoneNumber" placeholder="Enter The Phone Number" required="required">
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-phone"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group mb-3">
+                    <select name="Country" class="form-control" id="Country" asp-for="Country" required="required">
+                        <option value=" " label="Select a Country" selected="selected">Select a Country</option>
+                        <option value="Bahrain" label="Bahrain">Bahrain</option>
+                        <option value="KSA" label="KSA">KSA</option>
+                        <option value="Kuwait" label="Kuwait">Kuwait</option>
+                        <option value="UAE" label="UAE">UAE</option>
+                        <option value="Qatar" label="Qatar">Qatar</option>
+                        <option value="Oman" label="Oman">Oman</option>
+                        </select>
+                </div>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" asp-for="City" placeholder="Enter The City" >
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-city"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group mb-3">
+                    @Html.DropDownList("SubscribeID" ,(IEnumerable  <SelectListItem>)ViewBag.SubscriptionList, new {  @class="form-control",@required="required"})
+                </div>
+                <div class="input-group mb-3">
+                    <input id="password-field" type="password" class="form-control" asp-for="Password" placeholder="Enter The Password" required="required">
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-eye toggle-password" toggle="#password-field"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-8">
+                        <div class="icheck-primary">
+                            <input type="checkbox" id="agreeTerms" name="terms" value="agree" required="required">
+                            <label for="agreeTerms">
+                                I agree to the <a href="#">terms</a>
+                            </label>
+                        </div>
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-4">
+                        <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
+                    </div>
+                    <!-- /.col -->
+                </div>
+            }
+            <p class="mb-1">
+                <div asp-validation-summary="All" class="text-danger"></div>
+            </p>
+        </div>
+        <!-- /.card-body -->
+    </div>
+    <!-- /.card -->
+</div>
+
+    <partial name="_ValidationScriptsPartial" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+        $(".toggle-password").click(function () {
+
+            $(this).toggleClass("fa-eye fa-eye-slash");
+            if ($('#password-field').attr("type") == "password") {
+                $('#password-field').attr("type", "text");
+            }
+            else {
+                $('#password-field').attr("type", "password");
+            }
+        });
+    </script>
+ 
