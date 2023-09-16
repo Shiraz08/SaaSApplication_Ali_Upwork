@@ -486,7 +486,9 @@ namespace TapPaymentIntegration.Controllers
         }
         #endregion
 
+        #region Tap API
 
+        #endregion
         #region Admin Dashboard
         public async Task<IActionResult> Logout()
         {
