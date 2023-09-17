@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using TapPaymentIntegration.Areas.Identity.Data;
+using TapPaymentIntegration.Models.Card;
 using TapPaymentIntegration.Models.InvoiceDTO;
 using TapPaymentIntegration.Models.PaymentDTO;
 
@@ -17,6 +18,7 @@ public class TapPaymentIntegrationContext : IdentityDbContext<ApplicationUser>
     public DbSet<ChargeResponse>  chargeResponses { get; set; }
     public DbSet<Invoice>  invoices { get; set; }
     public DbSet<RecurringCharge>  recurringCharges { get; set; } 
+    public DbSet<ChangeCardInfo> changeCardInfos { get; set; } 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

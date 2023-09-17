@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TapPaymentIntegration.Data;
 
@@ -11,9 +12,10 @@ using TapPaymentIntegration.Data;
 namespace TapPaymentIntegration.Migrations
 {
     [DbContext(typeof(TapPaymentIntegrationContext))]
-    partial class TapPaymentIntegrationContextModelSnapshot : ModelSnapshot
+    [Migration("20230917082435_init")]
+    partial class init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -310,37 +312,6 @@ namespace TapPaymentIntegration.Migrations
                     b.HasKey("SubscriptionId");
 
                     b.ToTable("subscriptions");
-                });
-
-            modelBuilder.Entity("TapPaymentIntegration.Models.Card.ChangeCardInfo", b =>
-                {
-                    b.Property<int>("ChangeCardId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ChangeCardId"), 1L, 1);
-
-                    b.Property<DateTime>("ChangeCardDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NewCardName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("OldCardName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SubscriptionName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ChangeCardId");
-
-                    b.ToTable("changeCardInfos");
                 });
 
             modelBuilder.Entity("TapPaymentIntegration.Models.InvoiceDTO.Invoice", b =>

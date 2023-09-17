@@ -1,10 +1,7 @@
-﻿using GemBox.Email.Calendar;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
-using TapPaymentIntegration.Areas.Identity.Data;
 using TapPaymentIntegration.Controllers;
 using TapPaymentIntegration.Data;
-using TapPaymentIntegration.Migrations;
 using TapPaymentIntegration.Models.Email;
 using TapPaymentIntegration.Models.InvoiceDTO;
 using TapPaymentIntegration.Models.PaymentDTO;
@@ -66,7 +63,7 @@ namespace TapPaymentIntegration.Models.HangFire
                             var request = new HttpRequestMessage(HttpMethod.Post, "https://api.tap.company/v2/charges");
                             request.Headers.Add("Authorization", "Bearer " + getuserinfo.SecertKey);
                             request.Headers.Add("accept", "application/json");
-                            var content = new StringContent("\r\n{\r\n  \"amount\": " + Decimal.Round(finalamount) + ",\r\n  \"currency\": \"" + getsubinfo.Currency + "\",\r\n  \"customer_initiated\": false,\r\n  \"threeDSecure\": true,\r\n  \"save_card\": false,\r\n  \"payment_agreement\": {\r\n    \"contract\": {\r\n      \"id\": \"" + getuserinfo.Tap_Card_ID + "\"\r\n    },\r\n    \"id\": \"" + getuserinfo.Tap_Agreement_ID + "\"\r\n  },\r\n  \"receipt\": {\r\n    \"email\": true,\r\n    \"sms\": true\r\n  },\"reference\": {\r\n    \"transaction\": \"" + TransNo + "\",\r\n    \"order\": \"" + OrderNo + "\"\r\n  },\r\n  \"customer\": {\r\n    \"id\": \"" + getuserinfo.Tap_CustomerID + "\"\r\n  },\r\n  \"merchant\": {\r\n    \"id\": \"22116401\"\r\n  },\r\n  \"source\": {\r\n    \"id\": \"" + Deserialized_savecard.id + "\"\r\n  },\r\n  \"redirect\": {\r\n    \"url\": \"https://1f3b186efe31e8696c144578816c5443.m.pipedream.net/\"\r\n  }\r\n}\r\n", null, "application/json");
+                            var content = new StringContent("\r\n{\r\n  \"amount\": " + Decimal.Round(finalamount) + ",\r\n  \"currency\": \"" + getsubinfo.Currency + "\",\r\n  \"customer_initiated\": false,\r\n  \"threeDSecure\": true,\r\n  \"save_card\": false,\r\n  \"payment_agreement\": {\r\n    \"contract\": {\r\n      \"id\": \"" + getuserinfo.Tap_Card_ID + "\"\r\n    },\r\n    \"id\": \"" + getuserinfo.Tap_Agreement_ID + "\"\r\n  },\r\n  \"receipt\": {\r\n    \"email\": true,\r\n    \"sms\": true\r\n  },\"reference\": {\r\n    \"transaction\": \"" + TransNo + "\",\r\n    \"order\": \"" + OrderNo + "\"\r\n  },\r\n  \"customer\": {\r\n    \"id\": \"" + getuserinfo.Tap_CustomerID + "\"\r\n  },\r\n  \"merchant\": {\r\n    \"id\": \"22116401\"\r\n  },\r\n  \"source\": {\r\n    \"id\": \"" + Deserialized_savecard.id + "\"\r\n  },\r\n  \"redirect\": {\r\n    \"url\": \"https://test.com/\"\r\n  }\r\n}\r\n", null, "application/json");
                             request.Content = content;
                             var response = await client.SendAsync(request);
                             var bodys = await response.Content.ReadAsStringAsync();
@@ -109,7 +106,7 @@ namespace TapPaymentIntegration.Models.HangFire
                             // Create a charge
                             var client = new HttpClient();
                             var request = new HttpRequestMessage(HttpMethod.Post, "https://api.tap.company/v2/charges");
-                            request.Headers.Add("Authorization", "Bearer sk_test_1SU5woL8vZe6JXrBHipQu9Dn");
+                            request.Headers.Add("Authorization", "Bearer " + getuserinfo.SecertKey);
                             request.Headers.Add("accept", "application/json");
                             var content = new StringContent("\r\n{\r\n  \"amount\": " + Decimal.Round(finalamount) + ",\r\n  \"currency\": \"" + getsubinfo.Currency + "\",\r\n  \"customer_initiated\": false,\r\n  \"threeDSecure\": true,\r\n  \"save_card\": false,\r\n  \"payment_agreement\": {\r\n    \"contract\": {\r\n      \"id\": \"" + getuserinfo.Tap_Card_ID + "\"\r\n    },\r\n    \"id\": \"" + getuserinfo.Tap_Agreement_ID + "\"\r\n  },\r\n  \"receipt\": {\r\n    \"email\": true,\r\n    \"sms\": true\r\n  },\"reference\": {\r\n    \"transaction\": \"" + TransNo + "\",\r\n    \"order\": \"" + OrderNo + "\"\r\n  },\r\n  \"customer\": {\r\n    \"id\": \"" + getuserinfo.Tap_CustomerID + "\"\r\n  },\r\n  \"merchant\": {\r\n    \"id\": \"22116401\"\r\n  },\r\n  \"source\": {\r\n    \"id\": \"" + Deserialized_savecard.id + "\"\r\n  },\r\n  \"redirect\": {\r\n    \"url\": \"https://1f3b186efe31e8696c144578816c5443.m.pipedream.net/\"\r\n  }\r\n}\r\n", null, "application/json");
                             request.Content = content;
@@ -154,7 +151,7 @@ namespace TapPaymentIntegration.Models.HangFire
                             // Create a charge
                             var client = new HttpClient();
                             var request = new HttpRequestMessage(HttpMethod.Post, "https://api.tap.company/v2/charges");
-                            request.Headers.Add("Authorization", "Bearer sk_test_1SU5woL8vZe6JXrBHipQu9Dn");
+                            request.Headers.Add("Authorization", "Bearer " + getuserinfo.SecertKey);
                             request.Headers.Add("accept", "application/json");
                             var content = new StringContent("\r\n{\r\n  \"amount\": " + Decimal.Round(finalamount) + ",\r\n  \"currency\": \"" + getsubinfo.Currency + "\",\r\n  \"customer_initiated\": false,\r\n  \"threeDSecure\": true,\r\n  \"save_card\": false,\r\n  \"payment_agreement\": {\r\n    \"contract\": {\r\n      \"id\": \"" + getuserinfo.Tap_Card_ID + "\"\r\n    },\r\n    \"id\": \"" + getuserinfo.Tap_Agreement_ID + "\"\r\n  },\r\n  \"receipt\": {\r\n    \"email\": true,\r\n    \"sms\": true\r\n  },\"reference\": {\r\n    \"transaction\": \"" + TransNo + "\",\r\n    \"order\": \"" + OrderNo + "\"\r\n  },\r\n  \"customer\": {\r\n    \"id\": \"" + getuserinfo.Tap_CustomerID + "\"\r\n  },\r\n  \"merchant\": {\r\n    \"id\": \"22116401\"\r\n  },\r\n  \"source\": {\r\n    \"id\": \"" + Deserialized_savecard.id + "\"\r\n  },\r\n  \"redirect\": {\r\n    \"url\": \"https://1f3b186efe31e8696c144578816c5443.m.pipedream.net/\"\r\n  }\r\n}\r\n", null, "application/json");
                             request.Content = content;
@@ -199,7 +196,7 @@ namespace TapPaymentIntegration.Models.HangFire
                             // Create a charge
                             var client = new HttpClient();
                             var request = new HttpRequestMessage(HttpMethod.Post, "https://api.tap.company/v2/charges");
-                            request.Headers.Add("Authorization", "Bearer sk_test_1SU5woL8vZe6JXrBHipQu9Dn");
+                            request.Headers.Add("Authorization", "Bearer " + getuserinfo.SecertKey);
                             request.Headers.Add("accept", "application/json");
                             var content = new StringContent("\r\n{\r\n  \"amount\": " + Decimal.Round(finalamount) + ",\r\n  \"currency\": \"" + getsubinfo.Currency + "\",\r\n  \"customer_initiated\": false,\r\n  \"threeDSecure\": true,\r\n  \"save_card\": false,\r\n  \"payment_agreement\": {\r\n    \"contract\": {\r\n      \"id\": \"" + getuserinfo.Tap_Card_ID + "\"\r\n    },\r\n    \"id\": \"" + getuserinfo.Tap_Agreement_ID + "\"\r\n  },\r\n  \"receipt\": {\r\n    \"email\": true,\r\n    \"sms\": true\r\n  },\"reference\": {\r\n    \"transaction\": \"" + TransNo + "\",\r\n    \"order\": \"" + OrderNo + "\"\r\n  },\r\n  \"customer\": {\r\n    \"id\": \"" + getuserinfo.Tap_CustomerID + "\"\r\n  },\r\n  \"merchant\": {\r\n    \"id\": \"22116401\"\r\n  },\r\n  \"source\": {\r\n    \"id\": \"" + Deserialized_savecard.id + "\"\r\n  },\r\n  \"redirect\": {\r\n    \"url\": \"https://1f3b186efe31e8696c144578816c5443.m.pipedream.net/\"\r\n  }\r\n}\r\n", null, "application/json");
                             request.Content = content;
@@ -244,7 +241,7 @@ namespace TapPaymentIntegration.Models.HangFire
                             // Create a charge
                             var client = new HttpClient();
                             var request = new HttpRequestMessage(HttpMethod.Post, "https://api.tap.company/v2/charges");
-                            request.Headers.Add("Authorization", "Bearer sk_test_1SU5woL8vZe6JXrBHipQu9Dn");
+                            request.Headers.Add("Authorization", "Bearer " + getuserinfo.SecertKey);
                             request.Headers.Add("accept", "application/json");
                             var content = new StringContent("\r\n{\r\n  \"amount\": " + Decimal.Round(finalamount) + ",\r\n  \"currency\": \"" + getsubinfo.Currency + "\",\r\n  \"customer_initiated\": false,\r\n  \"threeDSecure\": true,\r\n  \"save_card\": false,\r\n  \"payment_agreement\": {\r\n    \"contract\": {\r\n      \"id\": \"" + getuserinfo.Tap_Card_ID + "\"\r\n    },\r\n    \"id\": \"" + getuserinfo.Tap_Agreement_ID + "\"\r\n  },\r\n  \"receipt\": {\r\n    \"email\": true,\r\n    \"sms\": true\r\n  },\"reference\": {\r\n    \"transaction\": \"" + TransNo + "\",\r\n    \"order\": \"" + OrderNo + "\"\r\n  },\r\n  \"customer\": {\r\n    \"id\": \"" + getuserinfo.Tap_CustomerID + "\"\r\n  },\r\n  \"merchant\": {\r\n    \"id\": \"22116401\"\r\n  },\r\n  \"source\": {\r\n    \"id\": \"" + Deserialized_savecard.id + "\"\r\n  },\r\n  \"redirect\": {\r\n    \"url\": \"https://1f3b186efe31e8696c144578816c5443.m.pipedream.net/\"\r\n  }\r\n}\r\n", null, "application/json");
                             request.Content = content;
@@ -290,7 +287,7 @@ namespace TapPaymentIntegration.Models.HangFire
                             // Create a charge
                             var client = new HttpClient();
                             var request = new HttpRequestMessage(HttpMethod.Post, "https://api.tap.company/v2/charges");
-                            request.Headers.Add("Authorization", "Bearer sk_test_1SU5woL8vZe6JXrBHipQu9Dn");
+                            request.Headers.Add("Authorization", "Bearer " + getuserinfo.SecertKey);
                             request.Headers.Add("accept", "application/json");
                             var content = new StringContent("\r\n{\r\n  \"amount\": " + Decimal.Round(finalamount) + ",\r\n  \"currency\": \"" + getsubinfo.Currency + "\",\r\n  \"customer_initiated\": false,\r\n  \"threeDSecure\": true,\r\n  \"save_card\": false,\r\n  \"payment_agreement\": {\r\n    \"contract\": {\r\n      \"id\": \"" + getuserinfo.Tap_Card_ID + "\"\r\n    },\r\n    \"id\": \"" + getuserinfo.Tap_Agreement_ID + "\"\r\n  },\r\n  \"receipt\": {\r\n    \"email\": true,\r\n    \"sms\": true\r\n  },\"reference\": {\r\n    \"transaction\": \"" + TransNo + "\",\r\n    \"order\": \"" + OrderNo + "\"\r\n  },\r\n  \"customer\": {\r\n    \"id\": \"" + getuserinfo.Tap_CustomerID + "\"\r\n  },\r\n  \"merchant\": {\r\n    \"id\": \"22116401\"\r\n  },\r\n  \"source\": {\r\n    \"id\": \"" + Deserialized_savecard.id + "\"\r\n  },\r\n  \"redirect\": {\r\n    \"url\": \"https://1f3b186efe31e8696c144578816c5443.m.pipedream.net/\"\r\n  }\r\n}\r\n", null, "application/json");
                             request.Content = content;

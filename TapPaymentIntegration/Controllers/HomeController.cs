@@ -1,33 +1,16 @@
-﻿using Amazon.SimpleEmail;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.DotNet.MSIdentity.Shared;
-using Microsoft.DotNet.Scaffolding.Shared.CodeModifier.CodeChange;
 using Newtonsoft.Json;
-using System.Diagnostics;
-using Microsoft.AspNetCore.Http;
-using System.Net;
-using System.Net.Http.Headers;
-using System.Net.Mail;
 using TapPaymentIntegration.Areas.Identity.Data;
 using TapPaymentIntegration.Data;
 using TapPaymentIntegration.Models.Email;
 using TapPaymentIntegration.Models.InvoiceDTO;
 using TapPaymentIntegration.Models.PaymentDTO;
 using TapPaymentIntegration.Models.UserDTO;
-using TapPaymentIntegration.Models.InvoiceGenerator;
-using iTextSharp.text.html.simpleparser;
-using iTextSharp.text;
-using System.IO;
-using iTextSharp.text.pdf;
 using TapPaymentIntegration.Models.Card;
-using static iTextSharp.text.pdf.AcroFields;
-using TapPaymentIntegration.Migrations;
 using ApplicationUser = TapPaymentIntegration.Areas.Identity.Data.ApplicationUser;
-using System.Runtime.InteropServices;
-using GemBox.Email.Calendar;
 using System.Text.Encodings.Web;
 
 namespace TapPaymentIntegration.Controllers
@@ -42,10 +25,12 @@ namespace TapPaymentIntegration.Controllers
         private IWebHostEnvironment _environment; 
         private Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
         EmailSender _emailSender = new EmailSender();
+        // Change Your Keys & URL's Here
         public readonly string BHD_Public_Key = "pk_test_7sAiZNXvdpKax26RuJMwbIen"; 
         public readonly string BHD_Test_Key = "sk_test_Tgoy8HbxdQ40l6Ea9SIDci7B";
         public readonly string KSA_Public_Key = "pk_test_j3yKfvbxws8khDpFQOX5JeWc"; 
         public readonly string KSA_Test_Key = "sk_test_1SU5woL8vZe6JXrBHipQu9Dn";
+        public readonly string RedirectURL = "https://localhost:7279";
         public HomeController(IWebHostEnvironment Environment, ILogger<HomeController> logger, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, TapPaymentIntegrationContext context, IUserStore<ApplicationUser> userStore)
         {
             _logger = logger;
@@ -62,7 +47,6 @@ namespace TapPaymentIntegration.Controllers
             var subscriptions = _context.subscriptions.Where(x => x.Status == true).ToList();
             return View(subscriptions); 
         }
-
         public async Task<IActionResult> Subscription(int id,string link,string userid)
         {
             if(link != null)
@@ -74,13 +58,22 @@ namespace TapPaymentIntegration.Controllers
             var users = _context.Users.Where(x => x.Status == true && x.SubscribeID == id).FirstOrDefault();
             return View(subscriptions);
         }
+        public async Task<IActionResult> Logout()
+        {
+            var returnUrl = Url.Action("Index", "Home");
+            await _signInManager.SignOutAsync();
+            return LocalRedirect(returnUrl);
+        }
+        #endregion
+
+        #region Tap Charge API
         [HttpPost]
         public async Task<IActionResult> CreateInvoice()
         {
             var Frequency = Request.Form.Where(x => x.Key == "Frequency").FirstOrDefault().Value.ToString();
-            var TotalPlanfee =Request.Form.Where(x => x.Key == "TotalPlanfee").FirstOrDefault().Value.ToString();
-            var SubscriptionId = Request.Form.Where(x => x.Key == "SubscriptionId").FirstOrDefault().Value.ToString(); 
-            var Token = Request.Form.Where(x => x.Key == "Token").FirstOrDefault().Value.ToString(); 
+            var TotalPlanfee = Request.Form.Where(x => x.Key == "TotalPlanfee").FirstOrDefault().Value.ToString();
+            var SubscriptionId = Request.Form.Where(x => x.Key == "SubscriptionId").FirstOrDefault().Value.ToString();
+            var Token = Request.Form.Where(x => x.Key == "Token").FirstOrDefault().Value.ToString();
             if (SubscriptionId != null && Frequency != null)
             {
                 var userinfo = _context.Users.Where(x => x.Id == GetCurrentUserAsync().Result.Id).FirstOrDefault();
@@ -89,17 +82,17 @@ namespace TapPaymentIntegration.Controllers
                 var TransNo = "Txn_" + rnd.Next(10000000, 99999999);
                 var OrderNo = "Ord_" + rnd.Next(10000000, 99999999);
                 var currency = userinfo.Currency;
-                var amount =  decimal.Round(Convert.ToDecimal(TotalPlanfee));
+                var amount = decimal.Round(Convert.ToDecimal(TotalPlanfee));
                 var description = subscriptions.Frequency;
                 Reference reference = new Reference();
                 reference.transaction = TransNo;
                 reference.order = OrderNo;
 
                 Redirect redirect = new Redirect();
-                redirect.url = "https://localhost:7279/Home/CardVerify";
+                redirect.url = RedirectURL + "/Home/CardVerify";
 
                 Post post = new Post();
-                post.url = "https://localhost:7279/Home/CardVerify";
+                post.url = RedirectURL + "/Home/CardVerify";
 
 
                 var countrycode = "";
@@ -160,7 +153,7 @@ namespace TapPaymentIntegration.Controllers
 
                 FillChargeModel fillChargeModel = new FillChargeModel();
                 fillChargeModel.threeDSecure = true;
-                fillChargeModel.amount =Convert.ToInt32(amount);
+                fillChargeModel.amount = Convert.ToInt32(amount);
                 fillChargeModel.save_card = true;
                 fillChargeModel.currency = currency;
                 fillChargeModel.redirect = redirect;
@@ -175,7 +168,7 @@ namespace TapPaymentIntegration.Controllers
                 var jsonmodel = JsonConvert.SerializeObject(fillChargeModel);
                 var client_charge = new HttpClient();
                 var request_charge = new HttpRequestMessage(HttpMethod.Post, "https://api.tap.company/v2/charges");
-                request_charge.Headers.Add("Authorization", "Bearer "+ GetCurrentUserAsync().Result.SecertKey);
+                request_charge.Headers.Add("Authorization", "Bearer " + GetCurrentUserAsync().Result.SecertKey);
                 request_charge.Headers.Add("accept", "application/json");
                 var content_charge = new StringContent(jsonmodel, null, "application/json");
                 request_charge.Content = content_charge;
@@ -198,7 +191,7 @@ namespace TapPaymentIntegration.Controllers
                 _context.SaveChanges();
                 //update user 
                 userinfo.Tap_CustomerID = deserialized_CreateCharge.customer.id;
-                userinfo.Frequency = Frequency; 
+                userinfo.Frequency = Frequency;
                 _context.Users.Update(userinfo);
                 _context.SaveChanges();
                 return Json(deserialized_CreateCharge.transaction.url);
@@ -221,9 +214,9 @@ namespace TapPaymentIntegration.Controllers
                 var result_ChargeDetail = await response_ChargeDetail.Content.ReadAsStringAsync();
                 Deserialized_savecard = JsonConvert.DeserializeObject<ChargeDetail>(result_ChargeDetail);
             }
-            var SubscriptionId = HttpContext.Session.GetString("SubscriptionId"); 
+            var SubscriptionId = HttpContext.Session.GetString("SubscriptionId");
             var Frequency = HttpContext.Session.GetString("Frequency");
-            if(Deserialized_savecard.id != null)
+            if (Deserialized_savecard.id != null)
             {
                 //Create Invoice
                 var users = GetCurrentUserAsync().Result;
@@ -461,48 +454,25 @@ namespace TapPaymentIntegration.Controllers
             {
                 //Update Charge Response;
                 int getchargesresposemodel = _context.chargeResponses.Max(x => x.ChargeResponseId);
-                var chargeresponse = _context.chargeResponses.Where(x=>x.ChargeResponseId == getchargesresposemodel).FirstOrDefault();
+                var chargeresponse = _context.chargeResponses.Where(x => x.ChargeResponseId == getchargesresposemodel).FirstOrDefault();
                 _context.chargeResponses.Remove(chargeresponse);
                 _context.SaveChanges();
             }
             return View();
         }
-        public IActionResult ShowInvoice(string PaymentStatus)
-        {
-            if (PaymentStatus == "All")
-            {
-                var invoices = _context.invoices.Where(x => x.UserId == GetCurrentUserAsync().Result.Id).OrderByDescending(x => x.InvoiceStartDate).ToList();
-                return View(invoices);
-            }
-            else
-            {
-                var invoices = _context.invoices.Where(x => x.UserId == GetCurrentUserAsync().Result.Id && x.Status == PaymentStatus).OrderByDescending(x => x.InvoiceStartDate).ToList();
-                return View(invoices);
-            }
-        }
-        public IActionResult Contact()
-        {
-            return View();
-        }
-        #endregion
-
-        #region Tap API
-
         #endregion
         #region Admin Dashboard
-        public async Task<IActionResult> Logout()
-        {
-            var returnUrl = Url.Action("Index", "Home");
-            await _signInManager.SignOutAsync();
-            return LocalRedirect(returnUrl);
-        }
+
         [Authorize]
         public IActionResult Dashboard()
         {
             ViewBag.CustomerCount = _userManager.Users.Where(x => x.Status == true).ToList().Count();
             ViewBag.InvoiceCount = _context.invoices.Where(x => x.Status == "Payment Captured").ToList().Count();
+            ViewBag.ChangeCardCount = _context.changeCardInfos.ToList().Count();
+            ViewBag.SubscriptionCount = _context.subscriptions.Where(x=>x.Status==true).ToList().Count();
             return View();
         }
+        //Customer Section
         [Authorize]
         public IActionResult ViewCustomer()
         {
@@ -683,7 +653,7 @@ namespace TapPaymentIntegration.Controllers
                 string pdfpath = _environment.ContentRootPath + "/TamrranInvoice.pdf";
                 byte[] bytes = System.IO.File.ReadAllBytes(pdfpath);
                 var callbackUrl =  @Url.Action("Subscription", "Home" ,new { id = applicationUser.SubscribeID, link= "Yes", userid = max_user_id });
-                var websiteurl  =  HtmlEncoder.Default.Encode("https://localhost:7279" + callbackUrl);
+                var websiteurl  =  HtmlEncoder.Default.Encode(RedirectURL + callbackUrl);
                 _ = _emailSender.SendEmailWithFIle(bytes, applicationUser.Email, "Un-Paid Invoice", "Hi..! <br /> Your Tamarran Credentials is here. <br /> Username: "+ applicationUser.UserName+" and <br /> Password: "+applicationUser.Password+" <br /> Payment URL: "+ websiteurl + "");
                 var remove_invoice = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).FirstOrDefault();
                 _context.invoices.Remove(remove_invoice);
@@ -733,7 +703,7 @@ namespace TapPaymentIntegration.Controllers
             _context.SaveChanges();
             return RedirectToAction("CreateInvoice", "Home", new { PaymentStatus = "All" });
         }
-
+        //Subscription Section
         [Authorize]
         public IActionResult Viewsubscription()
         {
@@ -762,6 +732,7 @@ namespace TapPaymentIntegration.Controllers
             {
                 subscription.CreatedDate = DateTime.Now;
                 subscription.Status = true;
+                subscription.Frequency = "MONTHLY";
                 _context.subscriptions.Add(subscription);
                 _context.SaveChanges();
                 return RedirectToAction("Viewsubscription", "Home");
@@ -828,133 +799,18 @@ namespace TapPaymentIntegration.Controllers
                          }).ToList();
             return View(users);
         }
-        public async Task<IActionResult> ChargeDone() 
+        public ActionResult UnSubscribeSubscription(string id) 
         {
-            string tap_id = HttpContext.Request.Query["tap_id"].ToString();
-            if(tap_id != null)
-            {
-                //Invoice Update
-                Invoice invoice_info = _context.invoices.Where(x => x.ChargeId == tap_id).FirstOrDefault();
-                invoice_info.ChargeId = tap_id;
-                invoice_info.Status = "Payment Captured";
-                invoice_info.ModifiedDate = DateTime.Now;
-                invoice_info.ChargeResponseId = _context.chargeResponses.Max(x => x.ChargeResponseId);
-                _context.invoices.Update(invoice_info);
-                _context.SaveChanges();
+            var userinfo = _context.Users.Where(x => x.Id == id).FirstOrDefault();
+            userinfo.SubscribeID = 0;
+            _context.Users.Update(userinfo);
+            _context.SaveChanges();
 
-                string body = string.Empty;
-                _environment.WebRootPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-                string contentRootPath = _environment.WebRootPath + "/htmltopdf.html";
-                string contentRootPath1 = _environment.WebRootPath + "/css/bootstrap.min.css";
-                //Generate PDF
-                var cr = _context.chargeResponses.Where(x => x.ChargeId == tap_id).FirstOrDefault();
-                var userinfo = _context.Users.Where(x => x.Id == cr.UserId).FirstOrDefault();
-                var sub_id = HttpContext.Session.GetString("SubscriptionId");
-                var sub_info = _context.subscriptions.Where(x=>x.SubscriptionId== Convert.ToInt32(sub_id)).FirstOrDefault();
-                using (StreamReader reader = new StreamReader(contentRootPath))
-                {
-                    body = reader.ReadToEnd();
-                }
-                //Fill EMail By Parameter
-                body = body.Replace("{title}", "Tamarran Payment Invoice");
-                body = body.Replace("{currentdate}", DateTime.Now.ToString());
-
-                body = body.Replace("{InvocieStatus}", "Payment Captured");
-                body = body.Replace("{InvoiceID}", "Inv" + "233");
-                body = body.Replace("{InvoiceAmount}", "23");
-
-
-                body = body.Replace("{User_Name}", userinfo.FullName);
-                body = body.Replace("{User_Email}", userinfo.Email);
-                body = body.Replace("{User_Country}", userinfo.Country);
-                body = body.Replace("{User_Phone}", userinfo.PhoneNumber);
-
-
-                body = body.Replace("{SubscriptionName}", sub_info.Name);
-                body = body.Replace("{SubscriptionPeriod}", sub_info.Frequency);
-                body = body.Replace("{VAT}", "0.00");
-                body = body.Replace("{SetupFee}", sub_info.SetupFee);
-                int amount =Convert.ToInt32(sub_info.Amount) + Convert.ToInt32(sub_info.SetupFee);
-                body = body.Replace("{Total}", amount.ToString());
-                body = body.Replace("{SubscriptionAmount}", sub_info.Amount);
-
-                var renderer = new ChromePdfRenderer();
-                // Many rendering options to use to customize!
-                renderer.RenderingOptions.SetCustomPaperSizeInInches(6.9, 12);
-                renderer.RenderingOptions.PaperOrientation = IronPdf.Rendering.PdfPaperOrientation.Portrait;
-                renderer.RenderingOptions.Title = "My PDF Document Name";
-                renderer.RenderingOptions.EnableJavaScript = true;
-                renderer.RenderingOptions.Zoom = 100;
-
-                // Supports margin customization!
-                renderer.RenderingOptions.MarginTop = 0; //millimeters
-                renderer.RenderingOptions.MarginLeft = 0; //millimeters
-                renderer.RenderingOptions.MarginRight = 0; //millimeters
-                renderer.RenderingOptions.MarginBottom = 0; //millimeters
-
-                // Can set FirstPageNumber if you have a cover page
-                renderer.RenderingOptions.FirstPageNumber = 1;
-
-                // Settings have been set, we can render:
-                var pdf = renderer.RenderHtmlAsPdf(body);
-                pdf.SaveAs("TamrranInvoice.pdf");
-
-
-                string pdfpath = _environment.ContentRootPath + "/TamrranInvoice.pdf";
-                byte[] bytes = System.IO.File.ReadAllBytes(pdfpath);
-
-                _ = _emailSender.SendEmailWithFIle(bytes, userinfo.Email, "Payment Captured", "Your Payment has been received successfully. Thank you.");
-
-
-                cr.status = "Payment Captured";
-                _context.chargeResponses.Update(cr);
-                _context.SaveChanges();
-                
-
-                
-                //Get Charge Detail
-                var client = new HttpClient();
-                var request = new HttpRequestMessage(HttpMethod.Get, "https://api.tap.company/v2/charges/" + tap_id);
-                request.Headers.Add("Authorization", "Bearer sk_test_XKokBfNWv6FIYuTMg5sLPjhJ");
-                request.Headers.Add("accept", "application/json");
-                var response = await client.SendAsync(request);
-                var result = await response.Content.ReadAsStringAsync();
-                ChargeDetail Deserialized_savecard = JsonConvert.DeserializeObject<ChargeDetail>(result);
-                
-                
-
-                userinfo.SubscribeID = Convert.ToInt32(sub_id);
-                userinfo.Tap_Agreement_ID = Deserialized_savecard.payment_agreement.id;
-                userinfo.Tap_Card_ID = Deserialized_savecard.payment_agreement.contract.id;
-                _context.Users.Update(userinfo);
-                _context.SaveChanges();
-            }
-            return View();
+            // Send Email
+            _ = _emailSender.SendEmailAsync(userinfo.Email, "Un-Subscribe", "You Un-Subscribe the subscription successfully. Thank you for choosing us.");
+            return RedirectToAction("ViewGYMCustomer");
         }
-        [Authorize]
-        public IActionResult ViewGYMCustomer()
-        {
-            var users = (from um in _context.Users
-                         join sub in _context.subscriptions on um.SubscribeID equals sub.SubscriptionId into ps
-                         from sub in ps.DefaultIfEmpty()
-                         where um.Id == GetCurrentUserAsync().Result.Id
-                         select new UserInfoDTO
-                         {
-                             Id = um.Id,
-                             FullName = um.FullName,
-                             Email = um.Email,
-                             PhoneNumber = um.PhoneNumber,
-                             Country = um.Country,
-                             City = um.City,
-                             Currency = um.Currency,
-                             SubscribeName = sub.Name + " " + "-" + " " + "(" + sub.Amount + ")",
-                             SubscribeID = um.SubscribeID,
-                             Status = um.Status,
-                             PaymentSource = um.PaymentSource,
-                             GYMName = um.GYMName
-                         });
-            return View(users);
-        }
+        //List Section
         public ActionResult ViewSubinfo()
         {
             var users = (from um in _context.Users
@@ -976,18 +832,6 @@ namespace TapPaymentIntegration.Controllers
                          });
             return View(users);
         }
-        public ActionResult UnSubscribeSubscription(string id) 
-        {
-            var userinfo = _context.Users.Where(x => x.Id == id).FirstOrDefault();
-            userinfo.SubscribeID = 0;
-            _context.Users.Update(userinfo);
-            _context.SaveChanges();
-
-            // Send Email
-            _ = _emailSender.SendEmailAsync(userinfo.Email, "Un-Subscribe", "You Un-Subscribe the subscription successfully. Thank you for choosing us.");
-            return RedirectToAction("ViewGYMCustomer");
-        }
-
         public async Task<IActionResult> ViewInvoice(string id, int sub_id) 
         {
             //Get Charge Detail
@@ -1002,6 +846,19 @@ namespace TapPaymentIntegration.Controllers
             Deserialized_savecard.Subscriptions = subscription_info;
             ViewBag.Frequency = GetCurrentUserAsync().Result.Frequency;
             return View(Deserialized_savecard);
+        }
+        public IActionResult ShowInvoice(string PaymentStatus)
+        {
+            if (PaymentStatus == "All")
+            {
+                var invoices = _context.invoices.Where(x => x.UserId == GetCurrentUserAsync().Result.Id).OrderByDescending(x => x.InvoiceStartDate).ToList();
+                return View(invoices);
+            }
+            else
+            {
+                var invoices = _context.invoices.Where(x => x.UserId == GetCurrentUserAsync().Result.Id && x.Status == PaymentStatus).OrderByDescending(x => x.InvoiceStartDate).ToList();
+                return View(invoices);
+            }
         }
         #endregion
         #region Gym Customer Registration
@@ -1049,7 +906,6 @@ namespace TapPaymentIntegration.Controllers
             var selectsub_country = _context.subscriptions.Where(x => x.SubscriptionId == applicationUser.SubscribeID).Select(x => x.Countries).FirstOrDefault();
             // save data to database
             var subid = applicationUser.SubscribeID;
-            applicationUser.FullName = applicationUser.FullName;
             applicationUser.Email = applicationUser.UserName;
             applicationUser.Status = true;
             applicationUser.UserType = "Customer";
@@ -1087,6 +943,30 @@ namespace TapPaymentIntegration.Controllers
                 ModelState.AddModelError(string.Empty, error.Description);
             }
             return View();
+        }
+        [Authorize]
+        public IActionResult ViewGYMCustomer()
+        {
+            var users = (from um in _context.Users
+                         join sub in _context.subscriptions on um.SubscribeID equals sub.SubscriptionId into ps
+                         from sub in ps.DefaultIfEmpty()
+                         where um.Id == GetCurrentUserAsync().Result.Id
+                         select new UserInfoDTO
+                         {
+                             Id = um.Id,
+                             FullName = um.FullName,
+                             Email = um.Email,
+                             PhoneNumber = um.PhoneNumber,
+                             Country = um.Country,
+                             City = um.City,
+                             Currency = um.Currency,
+                             SubscribeName = sub.Name + " " + "-" + " " + "(" + sub.Amount + ")",
+                             SubscribeID = um.SubscribeID,
+                             Status = um.Status,
+                             PaymentSource = um.PaymentSource,
+                             GYMName = um.GYMName
+                         });
+            return View(users);
         }
         #endregion
 

@@ -49,6 +49,7 @@ namespace TapPaymentIntegration.Models
                 EmailConfirmed = true,
                 PhoneNumberConfirmed = true,
                 UserType = "SuperAdmin",
+                GYMName = "Super Admin",
                 Status = true,
                 Password = "Pass@123",
                 Country= "Bahrain",
