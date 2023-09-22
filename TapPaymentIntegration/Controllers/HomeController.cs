@@ -30,7 +30,7 @@ namespace TapPaymentIntegration.Controllers
         public readonly string BHD_Test_Key = "sk_test_Tgoy8HbxdQ40l6Ea9SIDci7B";
         public readonly string KSA_Public_Key = "pk_test_j3yKfvbxws8khDpFQOX5JeWc"; 
         public readonly string KSA_Test_Key = "sk_test_1SU5woL8vZe6JXrBHipQu9Dn";
-        public readonly string RedirectURL = "https://localhost:7279";
+        public readonly string RedirectURL = "https://softsolutionlogix.com/";
         public HomeController(IWebHostEnvironment Environment, ILogger<HomeController> logger, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, TapPaymentIntegrationContext context, IUserStore<ApplicationUser> userStore)
         {
             _logger = logger;
@@ -89,10 +89,10 @@ namespace TapPaymentIntegration.Controllers
                 reference.order = OrderNo;
 
                 Redirect redirect = new Redirect();
-                redirect.url = RedirectURL + "/Home/CardVerify";
+                redirect.url = RedirectURL + "Home/CardVerify";
 
                 Post post = new Post();
-                post.url = RedirectURL + "/Home/CardVerify";
+                post.url = RedirectURL + "Home/CardVerifyurl";
 
 
                 var countrycode = "";
@@ -536,16 +536,15 @@ namespace TapPaymentIntegration.Controllers
                 currencycode = "OMR";
             }
             applicationUser.Currency = currencycode;
+            var email = applicationUser.UserName;
             // save data to database
-            applicationUser.FullName = applicationUser.FullName;
-            applicationUser.Email = applicationUser.UserName;
+            applicationUser.Email = email;
             applicationUser.Status = true; 
             applicationUser.UserType = "Customer"; 
             applicationUser.EmailConfirmed = true; 
             applicationUser.PhoneNumberConfirmed = true; 
             applicationUser.Password = applicationUser.Password;
             applicationUser.Tap_CustomerID =null;
-            await _userStore.SetUserNameAsync(applicationUser, applicationUser.Email, CancellationToken.None);
             if(applicationUser.Password != null)
             {
                 ViewBag.SubscriptionList = _context.subscriptions.Select(x => new SelectListItem { Value = x.SubscriptionId.ToString(), Text = x.Name + " " + "-" + " " + x.Amount });
@@ -914,7 +913,6 @@ namespace TapPaymentIntegration.Controllers
             applicationUser.Password = applicationUser.Password;
             applicationUser.Tap_CustomerID = null;
             applicationUser.SubscribeID = 0;
-            await _userStore.SetUserNameAsync(applicationUser, applicationUser.Email, CancellationToken.None);
             if (applicationUser.Password == null)
             {
                 ViewBag.SubscriptionList = _context.subscriptions.Select(x => new SelectListItem { Value = x.SubscriptionId.ToString(), Text = x.Name + " " + "-" + " " + x.Amount });
