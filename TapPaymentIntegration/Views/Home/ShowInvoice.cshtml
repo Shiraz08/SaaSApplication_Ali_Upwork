@@ -18,11 +18,12 @@
                         <table id="example1" class="table table-bordered table-striped table-responsive-xl">
                             <thead>
                                 <tr style="text-align:center!important">
+                                    <th>Subscription Name</th>
                                     <th>Invoice Start Date</th>
                                     <th>Invoice End Date</th>
-                                    <th>Amount</th>
+                                    <th>Subscription Currency</th>
+                                    <th>Subscription Amount</th>
                                     <th>Status</th>
-                                    <th>Subscription Name</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -30,6 +31,7 @@
                                 @foreach (var user in Model)
                                 {
                                     <tr>
+                                        <td style="text-align:center!important">@user.SubscriptionName</td>
                                         <td style="text-align:center!important">
                                             @{
                                                 DateTime sdateTime = Convert.ToDateTime(user.InvoiceStartDate);
@@ -42,6 +44,7 @@
                                                 <span>@edateTime.ToShortDateString()</span>
                                             }
                                         </td>
+                                        <td style="text-align:center!important">@user.Currency</td>
                                         <td style="text-align:center!important">@user.SubscriptionAmount</td>
                                         @if (user.Status == "Payment Captured")
                                         {
@@ -51,7 +54,6 @@
                                         {
                                             <td style="text-align:center!important">@user.Status</td>
                                         }
-                                        <td style="text-align:center!important">@user.SubscriptionName</td>
                                         <td style="text-align:center!important">
                                             @if (user.Status != "Payment Captured")
                                             {
@@ -60,7 +62,7 @@
                                             }
                                             else
                                             {
-                                                <a class="btn btn-success" href="@Url.Action("ViewInvoice","Home",new {id = user.ChargeId, sub_id = user.SubscriptionId, userid = user.UserId})">View Invoice</a>
+                                                <a class="btn btn-success" href="@Url.Action("ViewInvoice","Home",new {id = user.ChargeId, sub_id = user.SubscriptionId, userid = user.UserId,invoiceid = user.InvoiceId})">View Invoice</a>
                                             }
                                         </td>
                                     </tr>

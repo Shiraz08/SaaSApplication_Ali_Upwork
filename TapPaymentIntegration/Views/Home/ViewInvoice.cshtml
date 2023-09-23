@@ -36,8 +36,8 @@
                             <address>
                                 <strong>@Model.customer.first_name</strong><br>
                                 ID: @Model.customer.id<br>
-                                Phone: @Model.customer.phone.country_code @Model.customer.phone.number<br>
-                                Email: @Model.customer.email
+                                <b>Phone: @Model.customer.phone.country_code @Model.customer.phone.number</b><br>
+                                <b>Email: @Model.customer.email</b>
                             </address>
                         </div>
                         <!-- /.col -->
@@ -52,15 +52,15 @@
                         </div>
                         <!-- /.col -->
                         <div class="col-sm-4 invoice-col">
-                            <b>Invoice #007612</b><br>
+                            <b>Invoice No: @ViewBag.InvoiceID</b><br>
                             <br>
-                            <b>Order ID:</b> @Model.reference.order<br>
-                            <b>Transaction ID:</b> @Model.reference.transaction<br>
+                            <b>Order ID: @Model.reference.order</b><br>
+                            <b>Transaction ID: @Model.reference.transaction</b><br>
                             @{
                                 double ticks = double.Parse(Model.transaction.created);
                                 TimeSpan time = TimeSpan.FromMilliseconds(ticks);
                                 DateTime paydate = new DateTime(time.Ticks);
-                                <b>Pay Date:</b> @paydate
+                                <b>Pay Date: @paydate</b>
                             }          
                         </div>
                         <!-- /.col -->
@@ -73,8 +73,8 @@
                                 <thead>
                                     <tr>
                                         <th>Subscription Name</th>
-                                        <th>Subscription Fee</th>
                                         <th>Subscription Currency</th>
+                                        <th>Subscription Fee</th>
                                         <th>Subscription Frequency</th>
                                         <th>Subscription Country</th>
                                     </tr>
@@ -82,8 +82,8 @@
                                 <tbody>
                                     <tr>
                                         <td>@Model.Subscriptions.Name</td>
-                                        <td>@Model.Subscriptions.Amount</td>
                                         <td>@Model.Subscriptions.Currency</td>
+                                        <td>@Model.Subscriptions.Amount</td>
                                         <td>@ViewBag.Frequency</td>
                                         <td>@Model.Subscriptions.Countries</td>
                                     </tr>

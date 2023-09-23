@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json;
+using TapPaymentIntegration.Areas.Identity.Data;
 using TapPaymentIntegration.Controllers;
 using TapPaymentIntegration.Data;
 using TapPaymentIntegration.Models.Email;
@@ -77,6 +78,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     AddedDate = DateTime.Now,
                                     AddedBy = getuserinfo.FullName,
                                     SubscriptionAmount = finalamount,
+                                    Currency = getsubinfo.Currency,
                                     SubscriptionId = getsubinfo.SubscriptionId,
                                     Status = "Payment Captured",
                                     IsDeleted = false,
@@ -119,6 +121,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                 {
                                     InvoiceStartDate = DateTime.Now,
                                     InvoiceEndDate = DateTime.Now.AddDays(7),
+                                    Currency = getsubinfo.Currency,
                                     AddedDate = DateTime.Now,
                                     AddedBy = getuserinfo.FullName,
                                     SubscriptionAmount = finalamount,
@@ -168,6 +171,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     AddedBy = getuserinfo.FullName,
                                     SubscriptionAmount = finalamount,
                                     SubscriptionId = getsubinfo.SubscriptionId,
+                                    Currency = getsubinfo.Currency,
                                     Status = "Payment Captured",
                                     IsDeleted = false,
                                     Description = "Invoice Create - Frequency(" + getuserinfo.Frequency + ")",
@@ -211,6 +215,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     InvoiceEndDate = DateTime.Now.AddMonths(3),
                                     AddedDate = DateTime.Now,
                                     AddedBy = getuserinfo.FullName,
+                                    Currency = getsubinfo.Currency,
                                     SubscriptionAmount = finalamount,
                                     SubscriptionId = getsubinfo.SubscriptionId,
                                     Status = "Payment Captured",
@@ -257,6 +262,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     AddedDate = DateTime.Now,
                                     AddedBy = getuserinfo.FullName,
                                     SubscriptionAmount = finalamount,
+                                    Currency = getsubinfo.Currency,
                                     SubscriptionId = getsubinfo.SubscriptionId,
                                     Status = "Payment Captured",
                                     IsDeleted = false,
@@ -306,6 +312,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     SubscriptionId = getsubinfo.SubscriptionId,
                                     Status = "Payment Captured",
                                     IsDeleted = false,
+                                    Currency = getsubinfo.Currency,
                                     Description = "Invoice Create - Frequency(" + getuserinfo.Frequency + ")",
                                     SubscriptionName = getsubinfo.Name,
                                     UserId = getuserinfo.Id,
@@ -360,19 +367,19 @@ namespace TapPaymentIntegration.Models.HangFire
                         body = body.Replace("{SubscriptionPeriod}", getuserinfo.Frequency);
                         body = body.Replace("{SetupFee}", getsubinfo.SetupFee);
                         int amount = Convert.ToInt32(incoice_info.SubscriptionAmount);
-                        body = body.Replace("{SubscriptionAmount}", incoice_info.SubscriptionAmount.ToString());
+                        body = body.Replace("{SubscriptionAmount}", incoice_info.SubscriptionAmount.ToString() + " " + getsubinfo.Currency);
                         //Calculate VAT
                         if (getsubinfo.VAT == null)
                         {
                             body = body.Replace("{VAT}", "0.00");
-                            body = body.Replace("{Total}", amount.ToString());
+                            body = body.Replace("{Total}", amount.ToString() + " " + getsubinfo.Currency);
                             body = body.Replace("{InvoiceAmount}", amount.ToString() + " " + getsubinfo.Currency);
                         }
                         else
                         {
                             int vat_percentage = Convert.ToInt32(getsubinfo.VAT);
                             var per = (amount / 100) * vat_percentage;
-                            body = body.Replace("{VAT}", decimal.Round(per).ToString());
+                            body = body.Replace("{VAT}", decimal.Round(per).ToString() + " " + getsubinfo.Currency);
                             var All_tottal = amount + per;
                             body = body.Replace("{Total}", All_tottal.ToString());
                             body = body.Replace("{InvoiceAmount}", All_tottal.ToString() + " " + getsubinfo.Currency);

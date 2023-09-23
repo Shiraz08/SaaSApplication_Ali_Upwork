@@ -116,7 +116,7 @@ namespace TapPaymentIntegration.Controllers
             userinfo.PaymentSource = Deserialized_savecard.source.payment_method;
             _context.Users.Update(userinfo);
             _context.SaveChanges();
-            return RedirectToAction("Dashboard", "Home");
+            return View();
         }
         public ActionResult ViewChangeCardInfo()
         {

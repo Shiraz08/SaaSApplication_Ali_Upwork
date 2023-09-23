@@ -231,6 +231,7 @@ namespace TapPaymentIntegration.Controllers
                     {
                         InvoiceStartDate = DateTime.Now,
                         InvoiceEndDate = DateTime.Now,
+                        Currency = subscriptions.Currency,
                         AddedDate = DateTime.Now,
                         AddedBy = users.FullName,
                         SubscriptionAmount = finalamount + Convert.ToInt32(subscriptions.SetupFee),
@@ -252,6 +253,7 @@ namespace TapPaymentIntegration.Controllers
                     {
                         InvoiceStartDate = DateTime.Now,
                         InvoiceEndDate = DateTime.Now.AddDays(7),
+                        Currency = subscriptions.Currency,
                         AddedDate = DateTime.Now,
                         AddedBy = users.FullName,
                         SubscriptionAmount = finalamount + Convert.ToInt32(subscriptions.SetupFee),
@@ -273,6 +275,7 @@ namespace TapPaymentIntegration.Controllers
                     {
                         InvoiceStartDate = DateTime.Now,
                         InvoiceEndDate = DateTime.Now.AddMonths(1),
+                        Currency = subscriptions.Currency,
                         AddedDate = DateTime.Now,
                         AddedBy = users.FullName,
                         SubscriptionAmount = finalamount + Convert.ToInt32(subscriptions.SetupFee),
@@ -294,6 +297,7 @@ namespace TapPaymentIntegration.Controllers
                     {
                         InvoiceStartDate = DateTime.Now,
                         InvoiceEndDate = DateTime.Now.AddMonths(3),
+                        Currency = subscriptions.Currency,
                         AddedDate = DateTime.Now,
                         AddedBy = users.FullName,
                         SubscriptionAmount = finalamount + Convert.ToInt32(subscriptions.SetupFee),
@@ -315,6 +319,7 @@ namespace TapPaymentIntegration.Controllers
                     {
                         InvoiceStartDate = DateTime.Now,
                         InvoiceEndDate = DateTime.Now.AddMonths(6),
+                        Currency = subscriptions.Currency,
                         AddedDate = DateTime.Now,
                         AddedBy = users.FullName,
                         SubscriptionAmount = finalamount + Convert.ToInt32(subscriptions.SetupFee),
@@ -337,6 +342,7 @@ namespace TapPaymentIntegration.Controllers
                     {
                         InvoiceStartDate = DateTime.Now,
                         InvoiceEndDate = DateTime.Now.AddMonths(12),
+                        Currency = subscriptions.Currency,
                         AddedDate = DateTime.Now,
                         AddedBy = users.FullName,
                         SubscriptionAmount = finalamount + Convert.ToInt32(subscriptions.SetupFee),
@@ -423,7 +429,7 @@ namespace TapPaymentIntegration.Controllers
                 if(sub_info.VAT == null)
                 {
                     body = body.Replace("{VAT}", "0.00");
-                    body = body.Replace("{Total}", amount.ToString());
+                    body = body.Replace("{Total}", amount.ToString() + " " + sub_info.Currency);
                     body = body.Replace("{InvoiceAmount}", amount.ToString()+ " " + sub_info.Currency);
                 }
                 else
@@ -432,7 +438,7 @@ namespace TapPaymentIntegration.Controllers
                     var per = (amount / 100) * vat_percentage;
                     body = body.Replace("{VAT}", decimal.Round(per).ToString());
                     var All_tottal = amount + per;
-                    body = body.Replace("{Total}", All_tottal.ToString());
+                    body = body.Replace("{Total}", All_tottal.ToString() + " " + sub_info.Currency);
                     body = body.Replace("{InvoiceAmount}", All_tottal.ToString() + " " + sub_info.Currency);
                 }
 
@@ -857,7 +863,7 @@ namespace TapPaymentIntegration.Controllers
                          });
             return View(users);
         }
-        public async Task<IActionResult> ViewInvoice(string id, int sub_id,string userid) 
+        public async Task<IActionResult> ViewInvoice(string id, int sub_id,string userid,string invoiceid) 
         {
             //Get Charge Detail
             var client_ChargeDetail = new HttpClient();
@@ -869,7 +875,8 @@ namespace TapPaymentIntegration.Controllers
             ChargeDetail Deserialized_savecard = JsonConvert.DeserializeObject<ChargeDetail>(result_ChargeDetail);
             var subscription_info = _context.subscriptions.Where(x => x.SubscriptionId == sub_id).FirstOrDefault();
             Deserialized_savecard.Subscriptions = subscription_info;
-            ViewBag.Frequency = _userManager.Users.Where(x=>x.Id == userid).FirstOrDefault();
+            ViewBag.Frequency = _userManager.Users.Where(x=>x.Id == userid).Select(x => x.Frequency).FirstOrDefault();
+            ViewBag.InvoiceID = _context.invoices.Where(x=>x.InvoiceId == Convert.ToInt32(invoiceid)).Select(x=>x.InvoiceId).FirstOrDefault();
             return View(Deserialized_savecard);
         }
         public IActionResult ShowInvoice(string PaymentStatus)
