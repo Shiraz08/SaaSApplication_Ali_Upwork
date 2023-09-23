@@ -20,6 +20,7 @@
                                     <th>System UserID</th>
                                     <th>Tap UserID</th>
                                     <th>Full Name</th>
+                                    <th>GYM Name</th>
                                     <th>Email</th>
                                     <th>Country</th>
                                     <th>City</th>
@@ -38,6 +39,7 @@
                                                 <td style="text-align:center!important">@user.UserId</td>
                                                 <td style="text-align:center!important">@user.Tap_CustomerID</td>
                                                 <td style="text-align:center!important">@user.FullName</td>
+                                                <td style="text-align:center!important">@user.GYMName</td>
                                                 <td style="text-align:center!important">@user.Email</td>
                                                 <td style="text-align:center!important">@user.Country</td>
                                                 <td style="text-align:center!important">@user.City</td>
@@ -46,7 +48,7 @@
                                                 <td style="text-align:center!important">
                                                     @{
                                                         DateTime dateTime = Convert.ToDateTime(user.PaymentDate);
-                                                        @dateTime.ToShortDateString()
+                                                        @dateTime.ToShortDateString() @dateTime.ToShortTimeString();
                                                     }
                                                 </td>
                                             </tr>

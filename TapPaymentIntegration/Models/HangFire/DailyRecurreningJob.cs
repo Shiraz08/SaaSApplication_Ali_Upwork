@@ -29,8 +29,8 @@ namespace TapPaymentIntegration.Models.HangFire
         }
         public async System.Threading.Tasks.Task AutoChargeJob() 
         {
-            var recurringCharges_list = _context.recurringCharges.Where(x => x.JobRunDate.Date == DateTime.Now.Date && x.IsRun == false).ToList();
-            //var recurringCharges_list = _context.recurringCharges.Where(x => x.JobRunDate.Date == DateTime.Now.AddDays(1).Date && x.IsRun == false).ToList();
+            //var recurringCharges_list = _context.recurringCharges.Where(x => x.JobRunDate.Date == DateTime.Now.Date && x.IsRun == false).ToList();
+            var recurringCharges_list = _context.recurringCharges.Where(x => x.JobRunDate.Date == DateTime.Now.AddDays(1).Date && x.IsRun == false).ToList();
             foreach (var item in recurringCharges_list)
             {
                 var getsubinfo = _context.subscriptions.Where(x => x.SubscriptionId == item.SubscriptionId).FirstOrDefault();
@@ -332,10 +332,11 @@ namespace TapPaymentIntegration.Models.HangFire
                         _context.recurringCharges.Update(recurreningjob);
                         _context.SaveChanges();
                         //Send Email
-                        // Send Email
+                        int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
+                        var incoice_info = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).FirstOrDefault();
                         string body = string.Empty;
                         _environment.WebRootPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-                        string contentRootPath = _environment.WebRootPath + "/htmltopdf.html";
+                        string contentRootPath = _environment.WebRootPath + "/htmltopdfRecurrening.html";
                         string contentRootPath1 = _environment.WebRootPath + "/css/bootstrap.min.css";
                         //Generate PDF
                         using (StreamReader reader = new StreamReader(contentRootPath))
@@ -346,24 +347,37 @@ namespace TapPaymentIntegration.Models.HangFire
                         body = body.Replace("{title}", "Tamarran Payment Invoice");
                         body = body.Replace("{currentdate}", DateTime.Now.ToString());
 
-                        body = body.Replace("{InvocieStatus}", "Recurrening Payment Captured");
-                        body = body.Replace("{InvoiceID}", "Inv" + "233");
-                        body = body.Replace("{InvoiceAmount}", "23");
+                        body = body.Replace("{InvocieStatus}", "Subscription Renewal Payment Captured");
+                        body = body.Replace("{InvoiceID}", "Inv" + max_invoice_id);
 
 
                         body = body.Replace("{User_Name}", getuserinfo.FullName);
                         body = body.Replace("{User_Email}", getuserinfo.Email);
-                        body = body.Replace("{User_Country}", getuserinfo.Country);
+                        body = body.Replace("{User_GYM}", getuserinfo.GYMName);
                         body = body.Replace("{User_Phone}", getuserinfo.PhoneNumber);
 
-
                         body = body.Replace("{SubscriptionName}", getsubinfo.Name);
-                        body = body.Replace("{SubscriptionPeriod}", getsubinfo.Frequency);
-                        body = body.Replace("{VAT}", "0.00");
-                        body = body.Replace("{SetupFee}", "0.00");
-                        int amount = Convert.ToInt32(getsubinfo.Amount);
-                        body = body.Replace("{Total}", amount.ToString());
-                        body = body.Replace("{SubscriptionAmount}", getsubinfo.Amount);
+                        body = body.Replace("{SubscriptionPeriod}", getuserinfo.Frequency);
+                        body = body.Replace("{SetupFee}", getsubinfo.SetupFee);
+                        int amount = Convert.ToInt32(incoice_info.SubscriptionAmount);
+                        body = body.Replace("{SubscriptionAmount}", incoice_info.SubscriptionAmount.ToString());
+                        //Calculate VAT
+                        if (getsubinfo.VAT == null)
+                        {
+                            body = body.Replace("{VAT}", "0.00");
+                            body = body.Replace("{Total}", amount.ToString());
+                            body = body.Replace("{InvoiceAmount}", amount.ToString() + " " + getsubinfo.Currency);
+                        }
+                        else
+                        {
+                            int vat_percentage = Convert.ToInt32(getsubinfo.VAT);
+                            var per = (amount / 100) * vat_percentage;
+                            body = body.Replace("{VAT}", decimal.Round(per).ToString());
+                            var All_tottal = amount + per;
+                            body = body.Replace("{Total}", All_tottal.ToString());
+                            body = body.Replace("{InvoiceAmount}", All_tottal.ToString() + " " + getsubinfo.Currency);
+                        }
+
 
                         var renderer = new ChromePdfRenderer();
                         // Many rendering options to use to customize!
@@ -390,7 +404,7 @@ namespace TapPaymentIntegration.Models.HangFire
                         string pdfpath = _environment.ContentRootPath + "/TamrranInvoice.pdf";
                         byte[] bytes = System.IO.File.ReadAllBytes(pdfpath);
 
-                        _ = _emailSender.SendEmailWithFIle(bytes, getuserinfo.Email, "Recurring Recurrening Payment Captured", "Your Recurring Payment has been received successfully. Thank you.");
+                        _ = _emailSender.SendEmailWithFIle(bytes, getuserinfo.Email, "Subscription Renewal Payment Captured", "Your Recurring Payment has been received successfully. Thank you.");
                     }
                 }
             }

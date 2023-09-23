@@ -12,6 +12,7 @@ namespace TapPaymentIntegration.Areas.Identity.Data
         public string Countries { get; set; }
         public string SetupFee { get; set; }
         public string Amount { get; set; }
+        public string VAT { get; set; } 
         public bool Status { get; set; }
         public DateTime CreatedDate { get; set; }
     }

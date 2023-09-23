@@ -204,6 +204,35 @@
                                     </li>
                                 </ul>
                             </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa fa-file-text"></i>
+                                    <p>
+                                        Invoice
+                                        <i class="fas fa-angle-left right"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="@Url.Action("ShowInvoice","Home", new {PaymentStatus = "All"})" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>All Invoice</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="@Url.Action("ShowInvoice","Home", new {PaymentStatus = "Payment Captured"})" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Paid Invoice</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="@Url.Action("ShowInvoice","Home", new {PaymentStatus = "Un-Paid"})" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Un-Paid Invoice</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
              }
             else
             {
@@ -252,6 +281,23 @@
                                         </a>
                                     </li>
                                 </ul>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-address-card"></i>
+                                    <p>
+                                        Subscription
+                                        <i class="fas fa-angle-left right"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="@Url.Action("ViewSubinfo","Home", new { id = user.Id })" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i> 
+                                            <p>View Subscription Info</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
                             </li>
                             <li class="nav-item">
                                 <a href="#" class="nav-link">
@@ -266,23 +312,6 @@
                                         <a href="@Url.Action("ChangeCard","TapPayment", new { id=user.Id })" class="nav-link">
                                             <i class="far fa-circle nav-icon"></i>
                                             <p>Change Card</p>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="nav-icon fas fa-address-card"></i>
-                                    <p>
-                                        Subscription
-                                        <i class="fas fa-angle-left right"></i>
-                                    </p>
-                                </a>
-                                <ul class="nav nav-treeview">
-                                    <li class="nav-item">
-                                        <a href="@Url.Action("ViewSubinfo","Home", new { id = user.Id })" class="nav-link">
-                                            <i class="far fa-circle nav-icon"></i> 
-                                            <p>View Subscription Info</p>
                                         </a>
                                     </li>
                                 </ul>

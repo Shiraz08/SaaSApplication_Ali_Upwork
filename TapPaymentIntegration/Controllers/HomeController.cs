@@ -30,7 +30,7 @@ namespace TapPaymentIntegration.Controllers
         public readonly string BHD_Test_Key = "sk_test_Tgoy8HbxdQ40l6Ea9SIDci7B";
         public readonly string KSA_Public_Key = "pk_test_j3yKfvbxws8khDpFQOX5JeWc"; 
         public readonly string KSA_Test_Key = "sk_test_1SU5woL8vZe6JXrBHipQu9Dn";
-        public readonly string RedirectURL = "https://softsolutionlogix.com/";
+        public readonly string RedirectURL = "https://localhost:7279/";
         public HomeController(IWebHostEnvironment Environment, ILogger<HomeController> logger, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, TapPaymentIntegrationContext context, IUserStore<ApplicationUser> userStore)
         {
             _logger = logger;
@@ -404,23 +404,38 @@ namespace TapPaymentIntegration.Controllers
                 body = body.Replace("{currentdate}", DateTime.Now.ToString());
 
                 body = body.Replace("{InvocieStatus}", "Payment Captured");
-                body = body.Replace("{InvoiceID}", "Inv" + "233");
+                body = body.Replace("{InvoiceID}", "Inv" + invoice_info.InvoiceId);
                 body = body.Replace("{InvoiceAmount}", "23");
 
 
                 body = body.Replace("{User_Name}", userinfo.FullName);
                 body = body.Replace("{User_Email}", userinfo.Email);
-                body = body.Replace("{User_Country}", userinfo.Country);
+                body = body.Replace("{User_GYM}", userinfo.GYMName);
                 body = body.Replace("{User_Phone}", userinfo.PhoneNumber);
 
 
                 body = body.Replace("{SubscriptionName}", sub_info.Name);
-                body = body.Replace("{SubscriptionPeriod}", sub_info.Frequency);
-                body = body.Replace("{VAT}", "0.00");
+                body = body.Replace("{SubscriptionPeriod}", userinfo.Frequency);
                 body = body.Replace("{SetupFee}", sub_info.SetupFee);
                 int amount = Convert.ToInt32(finalamount) + Convert.ToInt32(sub_info.SetupFee);
-                body = body.Replace("{Total}", amount.ToString());
                 body = body.Replace("{SubscriptionAmount}", finalamount.ToString());
+                //Calculate VAT
+                if(sub_info.VAT == null)
+                {
+                    body = body.Replace("{VAT}", "0.00");
+                    body = body.Replace("{Total}", amount.ToString());
+                    body = body.Replace("{InvoiceAmount}", amount.ToString()+ " " + sub_info.Currency);
+                }
+                else
+                {
+                    int vat_percentage = Convert.ToInt32(sub_info.VAT);
+                    var per = (amount / 100) * vat_percentage;
+                    body = body.Replace("{VAT}", decimal.Round(per).ToString());
+                    var All_tottal = amount + per;
+                    body = body.Replace("{Total}", All_tottal.ToString());
+                    body = body.Replace("{InvoiceAmount}", All_tottal.ToString() + " " + sub_info.Currency);
+                }
+
 
                 var renderer = new ChromePdfRenderer();
                 // Many rendering options to use to customize!
@@ -729,6 +744,15 @@ namespace TapPaymentIntegration.Controllers
         {
             if(ModelState.IsValid)
             {
+                bool vat = string.IsNullOrWhiteSpace(subscription.VAT);
+                if(vat == true)
+                {
+                    subscription = null;
+                }
+                if (subscription.VAT == "0")
+                {
+                    subscription = null;
+                }
                 subscription.CreatedDate = DateTime.Now;
                 subscription.Status = true;
                 subscription.Frequency = "MONTHLY";
@@ -794,7 +818,8 @@ namespace TapPaymentIntegration.Controllers
                              ChargeId = cr.ChargeId,
                              status = cr.Status,
                              PaymentDate = cr.AddedDate,
-                             amount = cr.SubscriptionAmount
+                             amount = cr.SubscriptionAmount,
+                             GYMName = um.GYMName
                          }).ToList();
             return View(users);
         }
@@ -828,10 +853,11 @@ namespace TapPaymentIntegration.Controllers
                              SubscribeName = sub.Name + " " + "-" + " " + "(" + sub.Amount + ")",
                              SubscribeID = um.SubscribeID,
                              Status = um.Status,
+                             GYMName = um.GYMName
                          });
             return View(users);
         }
-        public async Task<IActionResult> ViewInvoice(string id, int sub_id) 
+        public async Task<IActionResult> ViewInvoice(string id, int sub_id,string userid) 
         {
             //Get Charge Detail
             var client_ChargeDetail = new HttpClient();
@@ -843,20 +869,37 @@ namespace TapPaymentIntegration.Controllers
             ChargeDetail Deserialized_savecard = JsonConvert.DeserializeObject<ChargeDetail>(result_ChargeDetail);
             var subscription_info = _context.subscriptions.Where(x => x.SubscriptionId == sub_id).FirstOrDefault();
             Deserialized_savecard.Subscriptions = subscription_info;
-            ViewBag.Frequency = GetCurrentUserAsync().Result.Frequency;
+            ViewBag.Frequency = _userManager.Users.Where(x=>x.Id == userid).FirstOrDefault();
             return View(Deserialized_savecard);
         }
         public IActionResult ShowInvoice(string PaymentStatus)
         {
-            if (PaymentStatus == "All")
+            var current_user = GetCurrentUserAsync().Result;
+            if (current_user.UserType == "SuperAdmin")
             {
-                var invoices = _context.invoices.Where(x => x.UserId == GetCurrentUserAsync().Result.Id).OrderByDescending(x => x.InvoiceStartDate).ToList();
-                return View(invoices);
+                if (PaymentStatus == "All")
+                {
+                    var invoices = _context.invoices.OrderByDescending(x => x.InvoiceStartDate).ToList();
+                    return View(invoices);
+                }
+                else
+                {
+                    var invoices = _context.invoices.Where(x => x.Status == PaymentStatus).OrderByDescending(x => x.InvoiceStartDate).ToList();
+                    return View(invoices);
+                }
             }
             else
             {
-                var invoices = _context.invoices.Where(x => x.UserId == GetCurrentUserAsync().Result.Id && x.Status == PaymentStatus).OrderByDescending(x => x.InvoiceStartDate).ToList();
-                return View(invoices);
+                if (PaymentStatus == "All")
+                {
+                    var invoices = _context.invoices.Where(x => x.UserId == current_user.Id).OrderByDescending(x => x.InvoiceStartDate).ToList();
+                    return View(invoices);
+                }
+                else
+                {
+                    var invoices = _context.invoices.Where(x => x.UserId == current_user.Id && x.Status == PaymentStatus).OrderByDescending(x => x.InvoiceStartDate).ToList();
+                    return View(invoices);
+                }
             }
         }
         #endregion

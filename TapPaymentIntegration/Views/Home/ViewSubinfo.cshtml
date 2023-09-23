@@ -18,6 +18,7 @@
                         <table id="example1" class="table table-bordered table-striped table-responsive-xl">
                             <thead>
                                 <tr style="text-align:center!important">
+                                    <th>GYM Name</th>
                                     <th>Full Name</th>
                                     <th>Email</th>
                                     <th>Phone Number</th>
@@ -25,7 +26,7 @@
                                     <th>City</th>
                                     <th>Currency</th>
                                     <th>Subscription</th>
-                                    <th>Status</th>
+                                    <th>Account Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -33,6 +34,7 @@
                                 @foreach (var user in Model)
                                 {
                                     <tr>
+                                        <td style="text-align:center!important">@user.GYMName</td>
                                         <td style="text-align:center!important">@user.FullName</td>
                                         <td style="text-align:center!important">@user.Email</td>
                                         <td style="text-align:center!important">@user.PhoneNumber</td>
@@ -66,7 +68,7 @@
                                       <td>
                                         @if (user.SubscribeID > 0)
                                         {
-                                           <a class="btn btn-danger" asp-controller="Home" asp-action="UnSubscribeSubscription" asp-route-id="@user.Id">Un-Subscribe</a>
+                                           <a class="btn btn-danger" asp-controller="Home" asp-action="UnSubscribeSubscription" asp-route-id="@user.Id">Unsubscribe</a>
                                         }
                                       </td>
                                     </tr>

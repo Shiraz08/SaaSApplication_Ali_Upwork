@@ -7,6 +7,7 @@
         public double amount { get; set; }
         public string currency { get; set; }
         public string FullName { get; set; }
+        public string GYMName { get; set; }
         public string Email { get; set; }
         public string status { get; set; }
         public string Country { get; set; }

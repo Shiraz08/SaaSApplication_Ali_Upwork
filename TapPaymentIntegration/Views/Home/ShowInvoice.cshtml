@@ -60,7 +60,7 @@
                                             }
                                             else
                                             {
-                                                <a class="btn btn-success" href="@Url.Action("ViewInvoice","Home",new {id = user.ChargeId, sub_id = user.SubscriptionId})">View Invoice</a>
+                                                <a class="btn btn-success" href="@Url.Action("ViewInvoice","Home",new {id = user.ChargeId, sub_id = user.SubscriptionId, userid = user.UserId})">View Invoice</a>
                                             }
                                         </td>
                                     </tr>
