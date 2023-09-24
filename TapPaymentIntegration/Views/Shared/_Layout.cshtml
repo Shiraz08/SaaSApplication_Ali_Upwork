@@ -36,8 +36,8 @@
     <link href="img/favicon.ico" rel="icon">
 
     <!-- Google Web Fonts -->
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+@*     <link rel="preconnect" href="https://fonts.gstatic.com"> *@
+@*     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"> *@
 
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/~/Website/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
@@ -49,12 +49,74 @@
 
     <!-- Customized Bootstrap Stylesheet -->
     <link href="~/Website/css/style.css" rel="stylesheet">
-
+    <style type="text/css" id="cst_font_data">
+@@font-face {
+font-family: 'Silka';
+font-weight: 100;
+src: url('https://ispeciaprojects.xyz/wp-content/uploads/2023/08/Silka-Thin.otf') format('OpenType');
+}
+@@font-face {
+font-family: 'Silka';
+font-weight: 600;
+src: url('https://ispeciaprojects.xyz/wp-content/uploads/2023/08/Silka-SemiBold.otf') format('OpenType');
+}
+@@font-face {
+font-family: 'Silka';
+font-weight: 400;
+src: url('https://ispeciaprojects.xyz/wp-content/uploads/2023/08/Silka-Regular-1.otf') format('OpenType');
+}
+@@font-face {
+font-family: 'Silka';
+font-weight: 500;
+src: url('https://ispeciaprojects.xyz/wp-content/uploads/2023/08/Silka-Medium.otf') format('OpenType');
+}
+@@font-face {
+font-family: 'Silka';
+font-weight: 300;
+src: url('https://ispeciaprojects.xyz/wp-content/uploads/2023/08/Silka-Light.otf') format('OpenType');
+}
+@@font-face {
+font-family: 'Silka';
+font-weight: 200;
+src: url('https://ispeciaprojects.xyz/wp-content/uploads/2023/08/Silka-Extra-Light.otf') format('OpenType');
+}
+@@font-face {
+font-family: 'Silka';
+font-weight: 700;
+src: url('https://ispeciaprojects.xyz/wp-content/uploads/2023/08/Silka-Bold.otf') format('OpenType');
+}
+@@font-face {
+font-family: 'Silka';
+font-weight: 800;
+src: url('https://ispeciaprojects.xyz/wp-content/uploads/2023/08/Silka-Black.otf') format('OpenType');
+}
+@@font-face {
+font-family: 'silka semi bold';
+font-weight: 400;
+src: url('https://ispeciaprojects.xyz/wp-content/uploads/2023/08/Silka-SemiBold.otf') format('OpenType');
+}
+@@font-face {
+font-family: 'silka bold';
+font-weight: 400;
+src: url('https://ispeciaprojects.xyz/wp-content/uploads/2023/08/Silka-Bold.otf') format('OpenType');
+}
+@@font-face {
+font-family: 'ITC TAPIOCA';
+font-weight: 100;
+font-display: auto;
+src: url('http://ispeciaprojects.xyz/wp-content/uploads/2021/06/tapioca-itc.otf') format('OpenType');
+}
+@@font-face {
+font-family: 'ITC TAPIOCA';
+font-weight: 100;
+font-display: auto;
+src: url('http://ispeciaprojects.xyz/wp-content/uploads/2021/06/tapioca-itc.otf') format('OpenType');
+}					</style>
 </head>
 
 <body>
     <!-- Topbar Start -->
-    <div class="container-fluid bg-light d-none d-lg-block" style="background-color: forestgreen!important;color: black;font-weight: bold;font-size: 18px;">
+    <div class="container-fluid d-none d-lg-block" style="background-color:#efd41c!important;color: black;font-weight: bold;font-size: 18px;">
         <div class="row py-2 px-lg-5">
             <div class="col-lg-6 text-left mb-2 mb-lg-0">
                 <div class="d-inline-flex align-items-center">
@@ -66,7 +128,7 @@
             <div class="col-lg-6 text-right">
                 <div class="d-inline-flex align-items-center">
                     <a class="text-primary px-2" href="">
-                        <small style="color:black!important">@displayName</small>
+                        <small style="color:black!important">Hello @displayName</small>
                     </a>
                     <a class="text-primary px-2" href="">
                         <i class="fab fa-linkedin-in"></i>
@@ -129,10 +191,10 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6 text-center text-md-left mb-3 mb-md-0">
-                    <p class="m-0">&copy; <a href="https://tamarran.com/bh-en" style="color:white!important">Tamarran</a>. All Rights Reserved.</p>
+                    <p class="m-0" style="color:black!important">&copy; <a href="https://tamarran.com/bh-en">Tamarran</a>. All Rights Reserved.</p>
                 </div>
                 <div class="col-md-6 text-center text-md-right">
-                    <p class="m-0 ">Designed by <a href="https://tamarran.com/bh-en" style="color:white!important">Tamarran</a></p>
+                    <p class="m-0 " style="color:black!important">Designed by <a href="https://tamarran.com/bh-en" >Tamarran</a></p>
                 </div>
             </div>
         </div>
