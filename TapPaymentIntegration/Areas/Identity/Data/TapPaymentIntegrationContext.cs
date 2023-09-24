@@ -22,5 +22,12 @@ public class TapPaymentIntegrationContext : IdentityDbContext<ApplicationUser>
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        builder.Entity<ApplicationUser>(b =>
+        {
+            b.Property(p => p.Id)
+                .HasMaxLength(36);
+        });
+
     }
 }

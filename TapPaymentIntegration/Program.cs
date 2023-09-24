@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Serialization;
+using System;
 using TapPaymentIntegration.Areas.Identity.Data;
 using TapPaymentIntegration.Data;
 using TapPaymentIntegration.Models;
@@ -14,7 +15,11 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("TapPaymentIntegrationContextConnection") ?? throw new InvalidOperationException("Connection string 'TapPaymentIntegrationContextConnection' not found.");
 builder.Services.AddDbContext<TapPaymentIntegrationContext>(options =>options.UseSqlServer(connectionString));
 builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true).AddRoles<IdentityRole>().AddEntityFrameworkStores<TapPaymentIntegrationContext>();
-
+builder.Services.AddDbContext<TapPaymentIntegrationContext>(options =>
+{
+    options.UseSqlServer(connectionString);
+    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+});
 
 // Add other services
 builder.Services.AddControllersWithViews();
@@ -73,6 +78,7 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+app.UseDeveloperExceptionPage();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAuthentication();

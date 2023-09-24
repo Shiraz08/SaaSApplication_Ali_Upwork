@@ -70,416 +70,434 @@ namespace TapPaymentIntegration.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateInvoice()
         {
-            var Frequency = Request.Form.Where(x => x.Key == "Frequency").FirstOrDefault().Value.ToString();
-            var TotalPlanfee = Request.Form.Where(x => x.Key == "TotalPlanfee").FirstOrDefault().Value.ToString();
-            var SubscriptionId = Request.Form.Where(x => x.Key == "SubscriptionId").FirstOrDefault().Value.ToString();
-            var Token = Request.Form.Where(x => x.Key == "Token").FirstOrDefault().Value.ToString();
-            if (SubscriptionId != null && Frequency != null)
+            try
             {
-                var userinfo = _context.Users.Where(x => x.Id == GetCurrentUserAsync().Result.Id).FirstOrDefault();
-                var subscriptions = _context.subscriptions.Where(x => x.Status == true && x.SubscriptionId == Convert.ToInt32(SubscriptionId)).FirstOrDefault();
-                Random rnd = new Random();
-                var TransNo = "Txn_" + rnd.Next(10000000, 99999999);
-                var OrderNo = "Ord_" + rnd.Next(10000000, 99999999);
-                var currency = userinfo.Currency;
-                var amount = decimal.Round(Convert.ToDecimal(TotalPlanfee));
-                var description = subscriptions.Frequency;
-                Reference reference = new Reference();
-                reference.transaction = TransNo;
-                reference.order = OrderNo;
+				var Frequency = Request.Form.Where(x => x.Key == "Frequency").FirstOrDefault().Value.ToString();
+				var VAT = Request.Form.Where(x => x.Key == "VAT").FirstOrDefault().Value.ToString();
+				var TotalPlanfee = Request.Form.Where(x => x.Key == "TotalPlanfee").FirstOrDefault().Value.ToString();
+				var SubscriptionId = Request.Form.Where(x => x.Key == "SubscriptionId").FirstOrDefault().Value.ToString();
+				var Token = Request.Form.Where(x => x.Key == "Token").FirstOrDefault().Value.ToString();
+				if (SubscriptionId != null && Frequency != null)
+				{
+					var userinfo = _context.Users.Where(x => x.Id == GetCurrentUserAsync().Result.Id).FirstOrDefault();
+					var subscriptions = _context.subscriptions.Where(x => x.Status == true && x.SubscriptionId == Convert.ToInt32(SubscriptionId)).FirstOrDefault();
+					Random rnd = new Random();
+					var TransNo = "Txn_" + rnd.Next(10000000, 99999999);
+					var OrderNo = "Ord_" + rnd.Next(10000000, 99999999);
+					var currency = userinfo.Currency;
+					var amount = decimal.Round(Convert.ToDecimal(TotalPlanfee));
+					var description = subscriptions.Frequency;
+					Reference reference = new Reference();
+					reference.transaction = TransNo;
+					reference.order = OrderNo;
 
-                Redirect redirect = new Redirect();
-                redirect.url = RedirectURL + "Home/CardVerify";
+					Redirect redirect = new Redirect();
+					redirect.url = RedirectURL + "Home/CardVerify";
 
-                Post post = new Post();
-                post.url = RedirectURL + "Home/CardVerifyurl";
-
-
-                var countrycode = "";
-                var currencycode = "";
-                if (userinfo.Country == "Bahrain")
-                {
-                    countrycode = "+973";
-                    currencycode = "BHD";
-                }
-                else if (userinfo.Country == "KSA")
-                {
-                    countrycode = "+966";
-                    currencycode = "SAR";
-                }
-                else if (userinfo.Country == "Kuwait")
-                {
-                    countrycode = "+965";
-                    currencycode = "KWD";
-                }
-                else if (userinfo.Country == "UAE")
-                {
-                    countrycode = "+971";
-                    currencycode = "AED";
-                }
-                else if (userinfo.Country == "Qatar")
-                {
-                    countrycode = "+974";
-                    currencycode = "QAR";
-                }
-                else if (userinfo.Country == "Oman")
-                {
-                    countrycode = "+968";
-                    currencycode = "OMR";
-                }
-                Phone phone = new Phone();
-                phone.number = userinfo.PhoneNumber;
-                phone.country_code = countrycode;
+					Post post = new Post();
+					post.url = RedirectURL + "Home/CardVerifyurl";
 
 
+					var countrycode = "";
+					var currencycode = "";
+					if (userinfo.Country == "Bahrain")
+					{
+						countrycode = "+973";
+						currencycode = "BHD";
+					}
+					else if (userinfo.Country == "KSA")
+					{
+						countrycode = "+966";
+						currencycode = "SAR";
+					}
+					else if (userinfo.Country == "Kuwait")
+					{
+						countrycode = "+965";
+						currencycode = "KWD";
+					}
+					else if (userinfo.Country == "UAE")
+					{
+						countrycode = "+971";
+						currencycode = "AED";
+					}
+					else if (userinfo.Country == "Qatar")
+					{
+						countrycode = "+974";
+						currencycode = "QAR";
+					}
+					else if (userinfo.Country == "Oman")
+					{
+						countrycode = "+968";
+						currencycode = "OMR";
+					}
+					Phone phone = new Phone();
+					phone.number = userinfo.PhoneNumber;
+					phone.country_code = countrycode;
 
-                Customer customer = new Customer();
-                customer.first_name = GetCurrentUserAsync().Result.FullName;
-                customer.email = GetCurrentUserAsync().Result.Email;
-                customer.phone = phone;
 
-                Receipt receipt = new Receipt();
-                receipt.sms = true;
-                receipt.email = true;
 
-                Metadata metadata = new Metadata();
-                metadata.udf1 = "Metadata 1";
+					Customer customer = new Customer();
+					customer.first_name = GetCurrentUserAsync().Result.FullName;
+					customer.email = GetCurrentUserAsync().Result.Email;
+					customer.phone = phone;
 
-                Source source = new Source();
-                source.id = Token;
+					Receipt receipt = new Receipt();
+					receipt.sms = true;
+					receipt.email = true;
 
-                Merchant merchant = new Merchant();
-                merchant.id = "22116401";
+					Metadata metadata = new Metadata();
+					metadata.udf1 = "Metadata 1";
 
-                FillChargeModel fillChargeModel = new FillChargeModel();
-                fillChargeModel.threeDSecure = true;
-                fillChargeModel.amount = Convert.ToInt32(amount);
-                fillChargeModel.save_card = true;
-                fillChargeModel.currency = currency;
-                fillChargeModel.redirect = redirect;
-                fillChargeModel.post = post;
-                fillChargeModel.customer = customer;
-                fillChargeModel.metadata = metadata;
-                fillChargeModel.reference = reference;
-                fillChargeModel.receipt = receipt;
-                fillChargeModel.source = source;
-                fillChargeModel.merchant = merchant;
-                fillChargeModel.customer_initiated = true;
-                var jsonmodel = JsonConvert.SerializeObject(fillChargeModel);
-                var client_charge = new HttpClient();
-                var request_charge = new HttpRequestMessage(HttpMethod.Post, "https://api.tap.company/v2/charges");
-                request_charge.Headers.Add("Authorization", "Bearer " + GetCurrentUserAsync().Result.SecertKey);
-                request_charge.Headers.Add("accept", "application/json");
-                var content_charge = new StringContent(jsonmodel, null, "application/json");
-                request_charge.Content = content_charge;
-                var response_charge = await client_charge.SendAsync(request_charge);
-                var body = await response_charge.Content.ReadAsStringAsync();
-                CreateCharge deserialized_CreateCharge = JsonConvert.DeserializeObject<CreateCharge>(body);
+					Source source = new Source();
+					source.id = Token;
 
-                HttpContext.Session.SetString("SubscriptionId", SubscriptionId);
-                HttpContext.Session.SetString("Frequency", Frequency);
-                HttpContext.Session.SetString("Token", Token);
-                ChargeResponse chargeResponse = new ChargeResponse
-                {
-                    UserId = userinfo.Id,
-                    ChargeId = deserialized_CreateCharge.id,
-                    amount = deserialized_CreateCharge.amount,
-                    currency = currency,
-                    status = deserialized_CreateCharge.status,
-                };
-                _context.chargeResponses.Add(chargeResponse);
-                _context.SaveChanges();
-                //update user 
-                userinfo.Tap_CustomerID = deserialized_CreateCharge.customer.id;
-                userinfo.Frequency = Frequency;
-                _context.Users.Update(userinfo);
-                _context.SaveChanges();
-                return Json(deserialized_CreateCharge.transaction.url);
+					Merchant merchant = new Merchant();
+					merchant.id = "22116401";
+
+					FillChargeModel fillChargeModel = new FillChargeModel();
+					fillChargeModel.threeDSecure = true;
+					fillChargeModel.amount = Convert.ToInt32(amount);
+					fillChargeModel.save_card = true;
+					fillChargeModel.currency = currency;
+					fillChargeModel.redirect = redirect;
+					fillChargeModel.post = post;
+					fillChargeModel.customer = customer;
+					fillChargeModel.metadata = metadata;
+					fillChargeModel.reference = reference;
+					fillChargeModel.receipt = receipt;
+					fillChargeModel.source = source;
+					fillChargeModel.merchant = merchant;
+					fillChargeModel.customer_initiated = true;
+					var jsonmodel = JsonConvert.SerializeObject(fillChargeModel);
+					var client_charge = new HttpClient();
+					var request_charge = new HttpRequestMessage(HttpMethod.Post, "https://api.tap.company/v2/charges");
+					request_charge.Headers.Add("Authorization", "Bearer " + GetCurrentUserAsync().Result.SecertKey);
+					request_charge.Headers.Add("accept", "application/json");
+					var content_charge = new StringContent(jsonmodel, null, "application/json");
+					request_charge.Content = content_charge;
+					var response_charge = await client_charge.SendAsync(request_charge);
+					var body = await response_charge.Content.ReadAsStringAsync();
+					CreateCharge deserialized_CreateCharge = JsonConvert.DeserializeObject<CreateCharge>(body);
+
+					HttpContext.Session.SetString("SubscriptionId", SubscriptionId);
+					HttpContext.Session.SetString("Frequency", Frequency);
+					HttpContext.Session.SetString("Token", Token);
+					ChargeResponse chargeResponse = new ChargeResponse
+					{
+						UserId = userinfo.Id,
+						ChargeId = deserialized_CreateCharge.id,
+						amount = deserialized_CreateCharge.amount,
+						currency = currency,
+						status = deserialized_CreateCharge.status,
+					};
+					_context.chargeResponses.Add(chargeResponse);
+					_context.SaveChanges();
+					//update user 
+					userinfo.Tap_CustomerID = deserialized_CreateCharge.customer.id;
+					userinfo.Frequency = Frequency;
+					userinfo.VAT = VAT;
+					_context.Users.Update(userinfo);
+					_context.SaveChanges();
+					return Json(deserialized_CreateCharge.transaction.url);
+				}
+				return Json(false);
+			}
+            catch (Exception e)
+            {
+
+                throw;
             }
-            return Json(false);
         }
         public async Task<IActionResult> CardVerify()
         {
-            string tap_id = HttpContext.Request.Query["tap_id"].ToString();
-            ChargeDetail Deserialized_savecard = null;
-            if (tap_id != null)
+            try
+            {
+				string tap_id = HttpContext.Request.Query["tap_id"].ToString();
+				ChargeDetail Deserialized_savecard = null;
+				if (tap_id != null)
+				{
+
+					//Get Charge Detail
+					var client_ChargeDetail = new HttpClient();
+					var request_ChargeDetail = new HttpRequestMessage(HttpMethod.Get, "https://api.tap.company/v2/charges/" + tap_id);
+					request_ChargeDetail.Headers.Add("Authorization", "Bearer " + GetCurrentUserAsync().Result.SecertKey);
+					request_ChargeDetail.Headers.Add("accept", "application/json");
+					var response_ChargeDetail = await client_ChargeDetail.SendAsync(request_ChargeDetail);
+					var result_ChargeDetail = await response_ChargeDetail.Content.ReadAsStringAsync();
+					Deserialized_savecard = JsonConvert.DeserializeObject<ChargeDetail>(result_ChargeDetail);
+				}
+				var SubscriptionId = HttpContext.Session.GetString("SubscriptionId");
+				var Frequency = HttpContext.Session.GetString("Frequency");
+				if (Deserialized_savecard.id != null)
+				{
+					//Create Invoice
+					var users = GetCurrentUserAsync().Result;
+					var subscriptions = _context.subscriptions.Where(x => x.Status == true && x.SubscriptionId == Convert.ToInt32(SubscriptionId)).FirstOrDefault();
+					var Amount = subscriptions.Amount;
+					int days = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
+					int finalamount = 0;
+					if (Frequency == "DAILY")
+					{
+						finalamount = Convert.ToInt32(subscriptions.Amount) / days;
+						Invoice invoices = new Invoice
+						{
+							InvoiceStartDate = DateTime.Now,
+							InvoiceEndDate = DateTime.Now,
+							Currency = subscriptions.Currency,
+							AddedDate = DateTime.Now,
+							AddedBy = users.FullName,
+							SubscriptionAmount = finalamount + Convert.ToInt32(subscriptions.SetupFee),
+							SubscriptionId = Convert.ToInt32(SubscriptionId),
+							Status = "Un-Paid",
+							IsDeleted = false,
+							Description = "Invoice Create - Frequency(" + Frequency + ")",
+							SubscriptionName = subscriptions.Name,
+							UserId = users.Id,
+							ChargeId = tap_id,
+						};
+						_context.invoices.Add(invoices);
+						_context.SaveChanges();
+					}
+					else if (Frequency == "WEEKLY")
+					{
+						finalamount = Convert.ToInt32(subscriptions.Amount) / 4;
+						Invoice invoices = new Invoice
+						{
+							InvoiceStartDate = DateTime.Now,
+							InvoiceEndDate = DateTime.Now.AddDays(7),
+							Currency = subscriptions.Currency,
+							AddedDate = DateTime.Now,
+							AddedBy = users.FullName,
+							SubscriptionAmount = finalamount + Convert.ToInt32(subscriptions.SetupFee),
+							SubscriptionId = Convert.ToInt32(SubscriptionId),
+							Status = "Un-Paid",
+							IsDeleted = false,
+							Description = "Invoice Create - Frequency(" + Frequency + ")",
+							SubscriptionName = subscriptions.Name,
+							UserId = users.Id,
+							ChargeId = tap_id,
+						};
+						_context.invoices.Add(invoices);
+						_context.SaveChanges();
+					}
+					else if (Frequency == "MONTHLY")
+					{
+						finalamount = Convert.ToInt32(subscriptions.Amount) / 1;
+						Invoice invoices = new Invoice
+						{
+							InvoiceStartDate = DateTime.Now,
+							InvoiceEndDate = DateTime.Now.AddMonths(1),
+							Currency = subscriptions.Currency,
+							AddedDate = DateTime.Now,
+							AddedBy = users.FullName,
+							SubscriptionAmount = finalamount + Convert.ToInt32(subscriptions.SetupFee),
+							SubscriptionId = Convert.ToInt32(SubscriptionId),
+							Status = "Un-Paid",
+							IsDeleted = false,
+							Description = "Invoice Create - Frequency(" + Frequency + ")",
+							SubscriptionName = subscriptions.Name,
+							UserId = users.Id,
+							ChargeId = tap_id,
+						};
+						_context.invoices.Add(invoices);
+						_context.SaveChanges();
+					}
+					else if (Frequency == "QUARTERLY")
+					{
+						finalamount = (Convert.ToInt32(subscriptions.Amount) * 3) / 1;
+						Invoice invoices = new Invoice
+						{
+							InvoiceStartDate = DateTime.Now,
+							InvoiceEndDate = DateTime.Now.AddMonths(3),
+							Currency = subscriptions.Currency,
+							AddedDate = DateTime.Now,
+							AddedBy = users.FullName,
+							SubscriptionAmount = finalamount + Convert.ToInt32(subscriptions.SetupFee),
+							SubscriptionId = Convert.ToInt32(SubscriptionId),
+							Status = "Un-Paid",
+							IsDeleted = false,
+							Description = "Invoice Create - Frequency(" + Frequency + ")",
+							SubscriptionName = subscriptions.Name,
+							UserId = users.Id,
+							ChargeId = tap_id,
+						};
+						_context.invoices.Add(invoices);
+						_context.SaveChanges();
+					}
+					else if (Frequency == "HALFYEARLY")
+					{
+						finalamount = (Convert.ToInt32(subscriptions.Amount) * 6) / 1;
+						Invoice invoices = new Invoice
+						{
+							InvoiceStartDate = DateTime.Now,
+							InvoiceEndDate = DateTime.Now.AddMonths(6),
+							Currency = subscriptions.Currency,
+							AddedDate = DateTime.Now,
+							AddedBy = users.FullName,
+							SubscriptionAmount = finalamount + Convert.ToInt32(subscriptions.SetupFee),
+							SubscriptionId = Convert.ToInt32(SubscriptionId),
+							Status = "Un-Paid",
+							IsDeleted = false,
+							Description = "Invoice Create - Frequency(" + Frequency + ")",
+							SubscriptionName = subscriptions.Name,
+							UserId = users.Id,
+							ChargeId = tap_id,
+						};
+						_context.invoices.Add(invoices);
+						_context.SaveChanges();
+					}
+					else if (Frequency == "YEARLY")
+					{
+						var discount_amount = (Convert.ToInt32(subscriptions.Amount) / 100) * 10;
+						finalamount = (Convert.ToInt32(subscriptions.Amount) - discount_amount) * 12;
+						Invoice invoices = new Invoice
+						{
+							InvoiceStartDate = DateTime.Now,
+							InvoiceEndDate = DateTime.Now.AddMonths(12),
+							Currency = subscriptions.Currency,
+							AddedDate = DateTime.Now,
+							AddedBy = users.FullName,
+							SubscriptionAmount = finalamount + Convert.ToInt32(subscriptions.SetupFee),
+							SubscriptionId = Convert.ToInt32(SubscriptionId),
+							Status = "Un-Paid",
+							IsDeleted = false,
+							Description = "Invoice Create - Frequency(" + Frequency + ")",
+							SubscriptionName = subscriptions.Name,
+							UserId = users.Id,
+							ChargeId = tap_id,
+						};
+						_context.invoices.Add(invoices);
+						_context.SaveChanges();
+					}
+					// Update Recurring Job data
+					int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
+					DateTime nextrecurringdate = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).Select(x => x.InvoiceEndDate).FirstOrDefault();
+					RecurringCharge recurringCharge = new RecurringCharge();
+					recurringCharge.Amount = Convert.ToDecimal(finalamount);
+					recurringCharge.SubscriptionId = subscriptions.SubscriptionId;
+					recurringCharge.UserID = users.Id;
+					recurringCharge.Tap_CustomerId = users.Tap_CustomerID;
+					recurringCharge.ChargeId = tap_id;
+					recurringCharge.IsRun = false;
+					recurringCharge.JobRunDate = nextrecurringdate.AddDays(1);
+					_context.recurringCharges.Add(recurringCharge);
+					_context.SaveChanges();
+
+
+					var userinfo = _context.Users.Where(x => x.Id == users.Id).FirstOrDefault();
+					var invoice = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).FirstOrDefault();
+
+
+					//update user 
+					users.Tap_CustomerID = Deserialized_savecard.payment_agreement.contract.customer_id;
+					users.Tap_Card_ID = Deserialized_savecard.payment_agreement.contract.id;
+					users.SubscribeID = Convert.ToInt32(SubscriptionId);
+					users.Tap_Agreement_ID = Deserialized_savecard.payment_agreement.id;
+					users.PaymentSource = Deserialized_savecard.source.payment_method;
+					_context.Users.Update(users);
+					_context.SaveChanges();
+
+					int getchargesresposemodel = _context.chargeResponses.Max(x => x.ChargeResponseId);
+					Invoice invoice_info = _context.invoices.Find(max_invoice_id);
+					invoice_info.ChargeId = tap_id;
+					invoice_info.Status = "Payment Captured";
+					invoice_info.ChargeResponseId = getchargesresposemodel;
+					_context.invoices.Update(invoice_info);
+					_context.SaveChanges();
+					// Send Email
+					string body = string.Empty;
+					_environment.WebRootPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+					string contentRootPath = _environment.WebRootPath + "/htmltopdf.html";
+					string contentRootPath1 = _environment.WebRootPath + "/css/bootstrap.min.css";
+					//Generate PDF
+					var cr = _context.chargeResponses.Where(x => x.ChargeId == tap_id).FirstOrDefault();
+					var sub_id = HttpContext.Session.GetString("SubscriptionId");
+					var sub_info = _context.subscriptions.Where(x => x.SubscriptionId == Convert.ToInt32(sub_id)).FirstOrDefault();
+					using (StreamReader reader = new StreamReader(contentRootPath))
+					{
+						body = reader.ReadToEnd();
+					}
+					//Fill EMail By Parameter
+					body = body.Replace("{title}", "Tamarran Payment Invoice");
+					body = body.Replace("{currentdate}", DateTime.Now.ToString());
+
+					body = body.Replace("{InvocieStatus}", "Payment Captured");
+					body = body.Replace("{InvoiceID}", "Inv" + invoice_info.InvoiceId);
+					body = body.Replace("{InvoiceAmount}", "23");
+
+
+					body = body.Replace("{User_Name}", userinfo.FullName);
+					body = body.Replace("{User_Email}", userinfo.Email);
+					body = body.Replace("{User_GYM}", userinfo.GYMName);
+					body = body.Replace("{User_Phone}", userinfo.PhoneNumber);
+
+
+					body = body.Replace("{SubscriptionName}", sub_info.Name);
+					body = body.Replace("{SubscriptionPeriod}", userinfo.Frequency);
+					body = body.Replace("{SetupFee}", sub_info.SetupFee);
+					int amount = Convert.ToInt32(finalamount) + Convert.ToInt32(sub_info.SetupFee);
+					body = body.Replace("{SubscriptionAmount}", finalamount.ToString());
+					//Calculate VAT
+					if (sub_info.VAT == null)
+					{
+						body = body.Replace("{VAT}", "0.00");
+						body = body.Replace("{Total}", amount.ToString() + " " + sub_info.Currency);
+						body = body.Replace("{InvoiceAmount}", amount.ToString() + " " + sub_info.Currency);
+					}
+					else
+					{
+						int vat_percentage = Convert.ToInt32(sub_info.VAT);
+						var per = (amount / 100) * vat_percentage;
+						body = body.Replace("{VAT}", decimal.Round(per).ToString());
+						var All_tottal = amount + per;
+						body = body.Replace("{Total}", All_tottal.ToString() + " " + sub_info.Currency);
+						body = body.Replace("{InvoiceAmount}", All_tottal.ToString() + " " + sub_info.Currency);
+					}
+
+
+					var renderer = new ChromePdfRenderer();
+					// Many rendering options to use to customize!
+					renderer.RenderingOptions.SetCustomPaperSizeInInches(6.9, 12);
+					renderer.RenderingOptions.PaperOrientation = IronPdf.Rendering.PdfPaperOrientation.Portrait;
+					renderer.RenderingOptions.Title = "My PDF Document Name";
+					renderer.RenderingOptions.EnableJavaScript = true;
+					renderer.RenderingOptions.Zoom = 100;
+
+					// Supports margin customization!
+					renderer.RenderingOptions.MarginTop = 0; //millimeters
+					renderer.RenderingOptions.MarginLeft = 0; //millimeters
+					renderer.RenderingOptions.MarginRight = 0; //millimeters
+					renderer.RenderingOptions.MarginBottom = 0; //millimeters
+
+					// Can set FirstPageNumber if you have a cover page
+					renderer.RenderingOptions.FirstPageNumber = 1;
+
+					// Settings have been set, we can render:
+					var pdf = renderer.RenderHtmlAsPdf(body);
+					pdf.SaveAs("TamrranInvoice.pdf");
+
+
+					string pdfpath = _environment.ContentRootPath + "/TamrranInvoice.pdf";
+					byte[] bytes = System.IO.File.ReadAllBytes(pdfpath);
+
+					_ = _emailSender.SendEmailWithFIle(bytes, userinfo.Email, "Payment Captured", "Your Payment has been received successfully. Thank you.");
+					return RedirectToAction("ShowInvoice", "Home", new { PaymentStatus = "All" });
+				}
+				else
+				{
+					//Update Charge Response;
+					int getchargesresposemodel = _context.chargeResponses.Max(x => x.ChargeResponseId);
+					var chargeresponse = _context.chargeResponses.Where(x => x.ChargeResponseId == getchargesresposemodel).FirstOrDefault();
+					_context.chargeResponses.Remove(chargeresponse);
+					_context.SaveChanges();
+				}
+				return View();
+			}
+            catch (Exception e)
             {
 
-                //Get Charge Detail
-                var client_ChargeDetail = new HttpClient();
-                var request_ChargeDetail = new HttpRequestMessage(HttpMethod.Get, "https://api.tap.company/v2/charges/" + tap_id);
-                request_ChargeDetail.Headers.Add("Authorization", "Bearer " + GetCurrentUserAsync().Result.SecertKey);
-                request_ChargeDetail.Headers.Add("accept", "application/json");
-                var response_ChargeDetail = await client_ChargeDetail.SendAsync(request_ChargeDetail);
-                var result_ChargeDetail = await response_ChargeDetail.Content.ReadAsStringAsync();
-                Deserialized_savecard = JsonConvert.DeserializeObject<ChargeDetail>(result_ChargeDetail);
+                throw;
             }
-            var SubscriptionId = HttpContext.Session.GetString("SubscriptionId");
-            var Frequency = HttpContext.Session.GetString("Frequency");
-            if (Deserialized_savecard.id != null)
-            {
-                //Create Invoice
-                var users = GetCurrentUserAsync().Result;
-                var subscriptions = _context.subscriptions.Where(x => x.Status == true && x.SubscriptionId == Convert.ToInt32(SubscriptionId)).FirstOrDefault();
-                var Amount = subscriptions.Amount;
-                int days = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
-                int finalamount = 0;
-                if (Frequency == "DAILY")
-                {
-                    finalamount = Convert.ToInt32(subscriptions.Amount) / days;
-                    Invoice invoices = new Invoice
-                    {
-                        InvoiceStartDate = DateTime.Now,
-                        InvoiceEndDate = DateTime.Now,
-                        Currency = subscriptions.Currency,
-                        AddedDate = DateTime.Now,
-                        AddedBy = users.FullName,
-                        SubscriptionAmount = finalamount + Convert.ToInt32(subscriptions.SetupFee),
-                        SubscriptionId = Convert.ToInt32(SubscriptionId),
-                        Status = "Un-Paid",
-                        IsDeleted = false,
-                        Description = "Invoice Create - Frequency(" + Frequency + ")",
-                        SubscriptionName = subscriptions.Name,
-                        UserId = users.Id,
-                        ChargeId = tap_id,
-                    };
-                    _context.invoices.Add(invoices);
-                    _context.SaveChanges();
-                }
-                else if (Frequency == "WEEKLY")
-                {
-                    finalamount = Convert.ToInt32(subscriptions.Amount) / 4;
-                    Invoice invoices = new Invoice
-                    {
-                        InvoiceStartDate = DateTime.Now,
-                        InvoiceEndDate = DateTime.Now.AddDays(7),
-                        Currency = subscriptions.Currency,
-                        AddedDate = DateTime.Now,
-                        AddedBy = users.FullName,
-                        SubscriptionAmount = finalamount + Convert.ToInt32(subscriptions.SetupFee),
-                        SubscriptionId = Convert.ToInt32(SubscriptionId),
-                        Status = "Un-Paid",
-                        IsDeleted = false,
-                        Description = "Invoice Create - Frequency(" + Frequency + ")",
-                        SubscriptionName = subscriptions.Name,
-                        UserId = users.Id,
-                        ChargeId = tap_id,
-                    };
-                    _context.invoices.Add(invoices);
-                    _context.SaveChanges();
-                }
-                else if (Frequency == "MONTHLY")
-                {
-                    finalamount = Convert.ToInt32(subscriptions.Amount) / 1;
-                    Invoice invoices = new Invoice
-                    {
-                        InvoiceStartDate = DateTime.Now,
-                        InvoiceEndDate = DateTime.Now.AddMonths(1),
-                        Currency = subscriptions.Currency,
-                        AddedDate = DateTime.Now,
-                        AddedBy = users.FullName,
-                        SubscriptionAmount = finalamount + Convert.ToInt32(subscriptions.SetupFee),
-                        SubscriptionId = Convert.ToInt32(SubscriptionId),
-                        Status = "Un-Paid",
-                        IsDeleted = false,
-                        Description = "Invoice Create - Frequency(" + Frequency + ")",
-                        SubscriptionName = subscriptions.Name,
-                        UserId = users.Id,
-                        ChargeId = tap_id,
-                    };
-                    _context.invoices.Add(invoices);
-                    _context.SaveChanges();
-                }
-                else if (Frequency == "QUARTERLY")
-                {
-                    finalamount = (Convert.ToInt32(subscriptions.Amount) * 3) / 1;
-                    Invoice invoices = new Invoice
-                    {
-                        InvoiceStartDate = DateTime.Now,
-                        InvoiceEndDate = DateTime.Now.AddMonths(3),
-                        Currency = subscriptions.Currency,
-                        AddedDate = DateTime.Now,
-                        AddedBy = users.FullName,
-                        SubscriptionAmount = finalamount + Convert.ToInt32(subscriptions.SetupFee),
-                        SubscriptionId = Convert.ToInt32(SubscriptionId),
-                        Status = "Un-Paid",
-                        IsDeleted = false,
-                        Description = "Invoice Create - Frequency(" + Frequency + ")",
-                        SubscriptionName = subscriptions.Name,
-                        UserId = users.Id,
-                        ChargeId = tap_id,
-                    };
-                    _context.invoices.Add(invoices);
-                    _context.SaveChanges();
-                }
-                else if (Frequency == "HALFYEARLY")
-                {
-                    finalamount = (Convert.ToInt32(subscriptions.Amount) * 6) / 1;
-                    Invoice invoices = new Invoice
-                    {
-                        InvoiceStartDate = DateTime.Now,
-                        InvoiceEndDate = DateTime.Now.AddMonths(6),
-                        Currency = subscriptions.Currency,
-                        AddedDate = DateTime.Now,
-                        AddedBy = users.FullName,
-                        SubscriptionAmount = finalamount + Convert.ToInt32(subscriptions.SetupFee),
-                        SubscriptionId = Convert.ToInt32(SubscriptionId),
-                        Status = "Un-Paid",
-                        IsDeleted = false,
-                        Description = "Invoice Create - Frequency(" + Frequency + ")",
-                        SubscriptionName = subscriptions.Name,
-                        UserId = users.Id,
-                        ChargeId = tap_id,
-                    };
-                    _context.invoices.Add(invoices);
-                    _context.SaveChanges();
-                }
-                else if (Frequency == "YEARLY")
-                {
-                    var discount_amount = (Convert.ToInt32(subscriptions.Amount) / 100) * 10;
-                    finalamount = (Convert.ToInt32(subscriptions.Amount) - discount_amount) * 12;
-                    Invoice invoices = new Invoice
-                    {
-                        InvoiceStartDate = DateTime.Now,
-                        InvoiceEndDate = DateTime.Now.AddMonths(12),
-                        Currency = subscriptions.Currency,
-                        AddedDate = DateTime.Now,
-                        AddedBy = users.FullName,
-                        SubscriptionAmount = finalamount + Convert.ToInt32(subscriptions.SetupFee),
-                        SubscriptionId = Convert.ToInt32(SubscriptionId),
-                        Status = "Un-Paid",
-                        IsDeleted = false,
-                        Description = "Invoice Create - Frequency(" + Frequency + ")",
-                        SubscriptionName = subscriptions.Name,
-                        UserId = users.Id,
-                        ChargeId = tap_id,
-                    };
-                    _context.invoices.Add(invoices);
-                    _context.SaveChanges();
-                }
-                // Update Recurring Job data
-                int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
-                DateTime nextrecurringdate = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).Select(x => x.InvoiceEndDate).FirstOrDefault();
-                RecurringCharge recurringCharge = new RecurringCharge();
-                recurringCharge.Amount = Convert.ToDecimal(finalamount);
-                recurringCharge.SubscriptionId = subscriptions.SubscriptionId;
-                recurringCharge.UserID = users.Id;
-                recurringCharge.Tap_CustomerId = users.Tap_CustomerID;
-                recurringCharge.ChargeId = tap_id;
-                recurringCharge.IsRun = false;
-                recurringCharge.JobRunDate = nextrecurringdate.AddDays(1);
-                _context.recurringCharges.Add(recurringCharge);
-                _context.SaveChanges();
-
-
-                var userinfo = _context.Users.Where(x => x.Id == users.Id).FirstOrDefault();
-                var invoice = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).FirstOrDefault();
-
-
-                //update user 
-                users.Tap_CustomerID = Deserialized_savecard.payment_agreement.contract.customer_id;
-                users.Tap_Card_ID = Deserialized_savecard.payment_agreement.contract.id;
-                users.SubscribeID = Convert.ToInt32(SubscriptionId);
-                users.Tap_Agreement_ID = Deserialized_savecard.payment_agreement.id;
-                users.PaymentSource = Deserialized_savecard.source.payment_method;
-                _context.Users.Update(users);
-                _context.SaveChanges();
-
-                int getchargesresposemodel = _context.chargeResponses.Max(x => x.ChargeResponseId);
-                Invoice invoice_info = _context.invoices.Find(max_invoice_id);
-                invoice_info.ChargeId = tap_id;
-                invoice_info.Status = "Payment Captured";
-                invoice_info.ChargeResponseId = getchargesresposemodel;
-                _context.invoices.Update(invoice_info);
-                _context.SaveChanges();
-                // Send Email
-                string body = string.Empty;
-                _environment.WebRootPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-                string contentRootPath = _environment.WebRootPath + "/htmltopdf.html";
-                string contentRootPath1 = _environment.WebRootPath + "/css/bootstrap.min.css";
-                //Generate PDF
-                var cr = _context.chargeResponses.Where(x => x.ChargeId == tap_id).FirstOrDefault();
-                var sub_id = HttpContext.Session.GetString("SubscriptionId");
-                var sub_info = _context.subscriptions.Where(x => x.SubscriptionId == Convert.ToInt32(sub_id)).FirstOrDefault();
-                using (StreamReader reader = new StreamReader(contentRootPath))
-                {
-                    body = reader.ReadToEnd();
-                }
-                //Fill EMail By Parameter
-                body = body.Replace("{title}", "Tamarran Payment Invoice");
-                body = body.Replace("{currentdate}", DateTime.Now.ToString());
-
-                body = body.Replace("{InvocieStatus}", "Payment Captured");
-                body = body.Replace("{InvoiceID}", "Inv" + invoice_info.InvoiceId);
-                body = body.Replace("{InvoiceAmount}", "23");
-
-
-                body = body.Replace("{User_Name}", userinfo.FullName);
-                body = body.Replace("{User_Email}", userinfo.Email);
-                body = body.Replace("{User_GYM}", userinfo.GYMName);
-                body = body.Replace("{User_Phone}", userinfo.PhoneNumber);
-
-
-                body = body.Replace("{SubscriptionName}", sub_info.Name);
-                body = body.Replace("{SubscriptionPeriod}", userinfo.Frequency);
-                body = body.Replace("{SetupFee}", sub_info.SetupFee);
-                int amount = Convert.ToInt32(finalamount) + Convert.ToInt32(sub_info.SetupFee);
-                body = body.Replace("{SubscriptionAmount}", finalamount.ToString());
-                //Calculate VAT
-                if(sub_info.VAT == null)
-                {
-                    body = body.Replace("{VAT}", "0.00");
-                    body = body.Replace("{Total}", amount.ToString() + " " + sub_info.Currency);
-                    body = body.Replace("{InvoiceAmount}", amount.ToString()+ " " + sub_info.Currency);
-                }
-                else
-                {
-                    int vat_percentage = Convert.ToInt32(sub_info.VAT);
-                    var per = (amount / 100) * vat_percentage;
-                    body = body.Replace("{VAT}", decimal.Round(per).ToString());
-                    var All_tottal = amount + per;
-                    body = body.Replace("{Total}", All_tottal.ToString() + " " + sub_info.Currency);
-                    body = body.Replace("{InvoiceAmount}", All_tottal.ToString() + " " + sub_info.Currency);
-                }
-
-
-                var renderer = new ChromePdfRenderer();
-                // Many rendering options to use to customize!
-                renderer.RenderingOptions.SetCustomPaperSizeInInches(6.9, 12);
-                renderer.RenderingOptions.PaperOrientation = IronPdf.Rendering.PdfPaperOrientation.Portrait;
-                renderer.RenderingOptions.Title = "My PDF Document Name";
-                renderer.RenderingOptions.EnableJavaScript = true;
-                renderer.RenderingOptions.Zoom = 100;
-
-                // Supports margin customization!
-                renderer.RenderingOptions.MarginTop = 0; //millimeters
-                renderer.RenderingOptions.MarginLeft = 0; //millimeters
-                renderer.RenderingOptions.MarginRight = 0; //millimeters
-                renderer.RenderingOptions.MarginBottom = 0; //millimeters
-
-                // Can set FirstPageNumber if you have a cover page
-                renderer.RenderingOptions.FirstPageNumber = 1;
-
-                // Settings have been set, we can render:
-                var pdf = renderer.RenderHtmlAsPdf(body);
-                pdf.SaveAs("TamrranInvoice.pdf");
-
-
-                string pdfpath = _environment.ContentRootPath + "/TamrranInvoice.pdf";
-                byte[] bytes = System.IO.File.ReadAllBytes(pdfpath);
-
-                _ = _emailSender.SendEmailWithFIle(bytes, userinfo.Email, "Payment Captured", "Your Payment has been received successfully. Thank you.");
-                return RedirectToAction("ShowInvoice", "Home", new { PaymentStatus = "All" });
-            }
-            else
-            {
-                //Update Charge Response;
-                int getchargesresposemodel = _context.chargeResponses.Max(x => x.ChargeResponseId);
-                var chargeresponse = _context.chargeResponses.Where(x => x.ChargeResponseId == getchargesresposemodel).FirstOrDefault();
-                _context.chargeResponses.Remove(chargeresponse);
-                _context.SaveChanges();
-            }
-            return View();
         }
         #endregion
         #region Admin Dashboard
@@ -512,6 +530,7 @@ namespace TapPaymentIntegration.Controllers
                          SubscribeName = sub.Name + " " + "-" + " " +"(" + sub.Amount + ")",
                          SubscribeID= um.SubscribeID,
                          Status = um.Status,
+                         GYMName=um.GYMName
                      });
             return View(users);
         }
@@ -582,6 +601,9 @@ namespace TapPaymentIntegration.Controllers
                 applicationUser.PublicKey = KSA_Public_Key;
                 applicationUser.SecertKey = KSA_Test_Key;
             }
+            Guid guid = Guid.NewGuid();
+            string str = guid.ToString();
+            applicationUser.Id = str;
             var result = await _userManager.CreateAsync(applicationUser, applicationUser.Password);
             if(result.Succeeded)
             {
@@ -748,8 +770,6 @@ namespace TapPaymentIntegration.Controllers
         [HttpPost]
         public IActionResult Addsubscription(Subscriptions subscription)
         {
-            if(ModelState.IsValid)
-            {
                 bool vat = string.IsNullOrWhiteSpace(subscription.VAT);
                 if(vat == true)
                 {
@@ -765,11 +785,6 @@ namespace TapPaymentIntegration.Controllers
                 _context.subscriptions.Add(subscription);
                 _context.SaveChanges();
                 return RedirectToAction("Viewsubscription", "Home");
-            }
-            else
-            {
-                return View(subscription);
-            }
         }
         public IActionResult Editsubscription(string userId)
         {
@@ -876,6 +891,7 @@ namespace TapPaymentIntegration.Controllers
             var subscription_info = _context.subscriptions.Where(x => x.SubscriptionId == sub_id).FirstOrDefault();
             Deserialized_savecard.Subscriptions = subscription_info;
             ViewBag.Frequency = _userManager.Users.Where(x=>x.Id == userid).Select(x => x.Frequency).FirstOrDefault();
+            ViewBag.VAT = _userManager.Users.Where(x=>x.Id == userid).Select(x => x.VAT).FirstOrDefault();
             ViewBag.InvoiceID = _context.invoices.Where(x=>x.InvoiceId == Convert.ToInt32(invoiceid)).Select(x=>x.InvoiceId).FirstOrDefault();
             return View(Deserialized_savecard);
         }
@@ -979,6 +995,9 @@ namespace TapPaymentIntegration.Controllers
                 applicationUser.PublicKey = KSA_Public_Key;
                 applicationUser.SecertKey = KSA_Test_Key;
             }
+            Guid guid = Guid.NewGuid();
+            string str = guid.ToString();
+            applicationUser.Id = str;
             var result = await _userManager.CreateAsync(applicationUser, applicationUser.Password);
             if (result.Succeeded)
             {

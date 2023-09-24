@@ -17,6 +17,7 @@ public class ApplicationUser : IdentityUser
     public string UserType { get; set; }
     public string Frequency { get; set; } 
     public string PublicKey { get; set; } 
+    public string VAT { get; set; } 
     public string SecertKey { get; set; } 
     public bool Status  { get; set; }
     public int SubscribeID { get; set; }

@@ -17,6 +17,7 @@
                         <table id="example1" class="table table-bordered table-striped table-responsive-xl">
                             <thead>
                                 <tr style="text-align:center!important">
+                                    <th>GYM Name</th>
                                     <th>Full Name</th>
                                     <th>Email</th>
                                     <th>Phone Number</th>
@@ -32,6 +33,7 @@
                                 @foreach (var user in Model)
                                 {
                                     <tr>
+                                        <td style="text-align:center!important">@user.GYMName</td>
                                         <td style="text-align:center!important">@user.FullName</td>
                                         <td style="text-align:center!important">@user.Email</td>
                                         <td style="text-align:center!important">@user.PhoneNumber</td>
@@ -63,7 +65,15 @@
                                             }
                                         </td>
                                         <td style="text-align:center!important">
-                                            <a class="btn btn-danger" asp-controller="Home" asp-action="UnSubscribeSubscription" asp-route-id="@user.Id">Un-Subscribe</a> &nbsp;
+                                            @{
+                                                if (user.SubscribeID == 0)
+                                                {
+                                                }
+                                                else
+                                                {
+                                                    <a class="btn btn-danger" asp-controller="Home" asp-action="UnSubscribeSubscription" asp-route-id="@user.Id">Un-Subscribe</a>
+                                                }
+                                            }
                                             <a class="btn btn-primary" asp-controller="Home" asp-action="DeleteCustomer" asp-route-userId="@user.Id">Delete Customer</a> &nbsp;
                                         </td>
                                     </tr>

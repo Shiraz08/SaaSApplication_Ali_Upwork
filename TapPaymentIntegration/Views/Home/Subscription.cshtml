@@ -252,6 +252,7 @@ html {
                                                 <th>Subscription Name</th>
                                                 <th>Currency</th>
                                                 <th>Country</th>
+                                                <th>Frequency</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -259,6 +260,7 @@ html {
                                                 <td style="text-align:center!important;color:black!important">@Model.Name</td>
                                                 <td style="text-align:center!important;color:black!important">@Model.Currency</td>
                                                 <td style="text-align:center!important;color:black!important">@Model.Countries</td>
+                                                <td style="text-align:center!important;color:black!important"><span id="frequencyspanvalue"></span></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -266,19 +268,34 @@ html {
                                         <tbody>
                                             <tr>
                                                 <td style="width:800px"></td>
-                                                <td style="text-align:center!important;color:black!important;width:288px">Plan Amount</td>
-                                                <td style="text-align:center!important;color:black!important;width:153px"><input type="text" id="subamount" name="subamount" class="form-control" style="text-align:center" readonly="readonly" /></td>
+                                            <td style="text-align:center!important;color:black!important;width:288px">Original Plan Amount</td>
+                                            <td style="text-align:center!important;color:black!important;width:153px"><input type="text" id="planamount" name="planamount" class="form-control" style="text-align:center" readonly="readonly" /></td>
                                             </tr>
-                                            <tr>
-                                                <td style="width:800px"></td>
-                                                <td style="text-align:center!important;color:black!important;width:288px">Setup Fee</td>
-                                                <td style="text-align:center!important;color:black!important;width:153px"><input type="text" id="setupfee" name="setupfee" class="form-control" value="@Model.SetupFee" style="text-align:center" readonly="readonly" /></td>
-                                            </tr>
-                                            <tr>
-                                                <td style="width:800px"></td>
-                                                <td style="text-align:center!important;color:black!important;width:288px">Total</td>
-                                                <td style="text-align:center!important;color:black!important;width:153px"><input type="text" id="TotalPlanfee" name="TotalPlanfee" class="form-control" style="text-align:center" readonly="readonly" /></td>
-                                            </tr>
+                                        <tr>
+                                            <td style="width:800px"></td>
+                                            <td style="text-align:center!important;color:black!important;width:288px">Frequency Plan Amount</td>
+                                            <td style="text-align:center!important;color:black!important;width:153px"><input type="text" id="subamount" name="subamount" class="form-control" style="text-align:center" readonly="readonly" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width:800px"></td>
+                                            <td style="text-align:center!important;color:black!important;width:288px">Discount</td>
+                                            <td style="text-align:center!important;color:black!important;width:153px"><input type="text" id="Discount" name="Discount" class="form-control" style="text-align:center" readonly="readonly" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width:800px"></td>
+                                            <td style="text-align:center!important;color:black!important;width:288px">Setup Fee</td>
+                                            <td style="text-align:center!important;color:black!important;width:153px"><input type="text" id="setupfee" name="setupfee" class="form-control" value="@Model.SetupFee" style="text-align:center" readonly="readonly" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width:800px"></td>
+                                            <td style="text-align:center!important;color:black!important;width:288px">VAT</td>
+                                            <td style="text-align:center!important;color:black!important;width:153px"><input type="text" id="VAT" name="VAT" class="form-control" style="text-align:center" readonly="readonly" /></td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width:800px"></td>
+                                            <td style="text-align:center!important;color:black!important;width:288px">Total</td>
+                                            <td style="text-align:center!important;color:black!important;width:153px"><input type="text" id="TotalPlanfee" name="TotalPlanfee" class="form-control" style="text-align:center" readonly="readonly" /></td>
+                                        </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -395,12 +412,14 @@ html {
         debugger
         var Frequency = $('select#Frequency option:selected').val();
         var TotalPlanfee = $('#TotalPlanfee').val();
+        var VAT = $('#VAT').val();
         var SubscriptionId = $('#SubscriptionId').val(); 
         var formd = new FormData();
         formd.append("Frequency", Frequency);
         formd.append("TotalPlanfee", TotalPlanfee);
         formd.append("SubscriptionId", SubscriptionId);
         formd.append("Token", id); 
+        formd.append("VAT", VAT); 
         $.ajax({
             type: 'POST',
             url: '/Home/CreateInvoice', 
@@ -422,6 +441,7 @@ html {
         $('.btnNext').click(function () {
             if ($('#Frequency option:selected').val() != "0") 
             {
+                $("#frequencyspanvalue").text($('#Frequency option:selected').val());
                 $('.nav-tabs .active').parent().next('li').find('a').trigger('click');
             }
             else
@@ -444,39 +464,61 @@ html {
         });
     });
     $("#Frequency").change(function ()
-    {
-        
+    {     
+        $("#planamount").val('');
         $("#subamount").val('');
         $("#TotalPlanfee").val('');
+        $("#Discount").val('');
         $("#subamount2").val('');
         $("#TotalPlanfee2").val('');
         var selValue = $(this).val();
         var subscriptionamount = "";
-        if (selValue == "YEARLY") {
+        if (selValue == "YEARLY") 
+        {
+            debugger
             var amountpercentage = (@Model.Amount / 100) * 10;
-                var final_amount_percentage = @Model.Amount - amountpercentage;
-                subscriptionamount = final_amount_percentage * 12;
+            var final_amount_percentage = @Model.Amount - amountpercentage;
+            subscriptionamount = final_amount_percentage * 12;
+            $("#Discount").val(amountpercentage * 12);
         }
         else if (selValue == "DAILY") {
+            $("#Discount").val('0');
             subscriptionamount = @Model.Amount / 30;
         } 
         else if (selValue == "WEEKLY") {
+            $("#Discount").val('0');
             subscriptionamount = @Model.Amount / 4;
         }
         else if (selValue == "QUARTERLY") {
+            $("#Discount").val('0');
             subscriptionamount = @Model.Amount * 3;
         }
         else if (selValue == "HALFYEARLY") {
+            $("#Discount").val('0');
             subscriptionamount = @Model.Amount * 6;
         }
-        else
-        {
+        else {
+            $("#Discount").val('0');
             subscriptionamount = @Model.Amount;
         }
+        var totala = parseInt(subscriptionamount) + parseInt(@Model.SetupFee);
+        var calculate_vat = "";
+        if (@Model.VAT == null) 
+        {
+            $("#VAT").val('0');
+            calculate_vat = "0";
+        }
+        else 
+        {
+            var roundoff_totalamount = Math.round(totala);
+            calculate_vat = (roundoff_totalamount / 100) * @Model.VAT;
+            $("#VAT").val(calculate_vat);
+        }
+        $("#planamount").val(@Model.Amount);
         $("#subamount").val(subscriptionamount);
         $("#subamount2").val(subscriptionamount);
         var subscriptionSetupFee = @Model.SetupFee;
-        var totalamount = subscriptionamount +  subscriptionSetupFee;
+        var totalamount = parseInt(subscriptionamount) + parseInt(subscriptionSetupFee) + parseInt(calculate_vat);
         $("#TotalPlanfee").val(totalamount);
         $("#TotalPlanfee2").val(totalamount);
     });
