@@ -428,7 +428,15 @@ html {
             data: formd,
             success: function (response)
             {
-                window.location.href = response;
+                if (response.status == true) 
+                {
+                    window.location.href = response.URL;
+                }
+                else
+                {
+                    alert(response.URL);
+                }
+                
             },
             failure: function (response) {
                 $('#result').html(response);
@@ -503,7 +511,7 @@ html {
         }
         var totala = parseInt(subscriptionamount) + parseInt(@Model.SetupFee);
         var calculate_vat = "";
-        if (@Model.VAT == null) 
+        if (@Model.VAT == "0") 
         {
             $("#VAT").val('0');
             calculate_vat = "0";

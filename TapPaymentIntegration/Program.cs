@@ -97,5 +97,4 @@ app.UseEndpoints(endpoints =>
     RecurringJob.AddOrUpdate<DailyRecurreningJob>(x => x.AutoChargeJob(), Cron.Daily);
    // RecurringJob.AddOrUpdate<DailyRecurreningJob>(x => x.AutoChargeJob(), Cron.MinuteInterval(1));
 });
-
 app.Run();

@@ -26,10 +26,16 @@ namespace TapPaymentIntegration.Controllers
         private Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
         EmailSender _emailSender = new EmailSender();
         // Change Your Keys & URL's Here
-        public readonly string BHD_Public_Key = "pk_test_7sAiZNXvdpKax26RuJMwbIen"; 
-        public readonly string BHD_Test_Key = "sk_test_Tgoy8HbxdQ40l6Ea9SIDci7B";
-        public readonly string KSA_Public_Key = "pk_test_j3yKfvbxws8khDpFQOX5JeWc"; 
-        public readonly string KSA_Test_Key = "sk_test_1SU5woL8vZe6JXrBHipQu9Dn";
+        public readonly string BHD_Public_Key = "pk_live_MWDV5szwGbxeUBdHnJZLk9S2"; 
+        public readonly string BHD_Test_Key = "sk_live_VDJ1UxM2Arq6ONbz9ptGXhoj";
+        public readonly string KSA_Public_Key = "pk_live_MWDV5szwGbxeUBdHnJZLk9S2";
+        public readonly string KSA_Test_Key = "sk_live_VDJ1UxM2Arq6ONbz9ptGXhoj";
+
+        //public readonly string BHD_Public_Key = "pk_test_7sAiZNXvdpKax26RuJMwbIen";
+        //public readonly string BHD_Test_Key = "sk_test_Tgoy8HbxdQ40l6Ea9SIDci7B";
+        //public readonly string KSA_Public_Key = "pk_test_j3yKfvbxws8khDpFQOX5JeWc";
+        //public readonly string KSA_Test_Key = "sk_test_1SU5woL8vZe6JXrBHipQu9Dn";
+
         public readonly string RedirectURL = "https://tappayment.niralahyderabadirestaurant.com/";
         public HomeController(IWebHostEnvironment Environment, ILogger<HomeController> logger, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, TapPaymentIntegrationContext context, IUserStore<ApplicationUser> userStore)
         {
@@ -56,6 +62,10 @@ namespace TapPaymentIntegration.Controllers
             }
             var subscriptions = _context.subscriptions.Where(x => x.Status == true && x.SubscriptionId == id).FirstOrDefault();
             var users = _context.Users.Where(x => x.Status == true && x.SubscribeID == id).FirstOrDefault();
+            if(subscriptions.VAT == null)
+            {
+                subscriptions.VAT = "0";
+            }
             return View(subscriptions);
         }
         public async Task<IActionResult> Logout()
@@ -84,7 +94,6 @@ namespace TapPaymentIntegration.Controllers
 					Random rnd = new Random();
 					var TransNo = "Txn_" + rnd.Next(10000000, 99999999);
 					var OrderNo = "Ord_" + rnd.Next(10000000, 99999999);
-					var currency = userinfo.Currency;
 					var amount = decimal.Round(Convert.ToDecimal(TotalPlanfee));
 					var description = subscriptions.Frequency;
 					Reference reference = new Reference();
@@ -97,48 +106,39 @@ namespace TapPaymentIntegration.Controllers
 					Post post = new Post();
 					post.url = RedirectURL + "Home/CardVerifyurl";
 
-
 					var countrycode = "";
-					var currencycode = "";
 					if (userinfo.Country == "Bahrain")
 					{
 						countrycode = "+973";
-						currencycode = "BHD";
 					}
 					else if (userinfo.Country == "KSA")
 					{
 						countrycode = "+966";
-						currencycode = "SAR";
 					}
 					else if (userinfo.Country == "Kuwait")
 					{
 						countrycode = "+965";
-						currencycode = "KWD";
 					}
 					else if (userinfo.Country == "UAE")
 					{
 						countrycode = "+971";
-						currencycode = "AED";
 					}
 					else if (userinfo.Country == "Qatar")
 					{
 						countrycode = "+974";
-						currencycode = "QAR";
 					}
 					else if (userinfo.Country == "Oman")
 					{
 						countrycode = "+968";
-						currencycode = "OMR";
 					}
-					Phone phone = new Phone();
+                    var currency = subscriptions.Currency;
+                    Phone phone = new Phone();
 					phone.number = userinfo.PhoneNumber;
 					phone.country_code = countrycode;
 
-
-
 					Customer customer = new Customer();
-					customer.first_name = GetCurrentUserAsync().Result.FullName;
-					customer.email = GetCurrentUserAsync().Result.Email;
+					customer.first_name = userinfo.FullName;
+					customer.email = userinfo.Email;
 					customer.phone = phone;
 
 					Receipt receipt = new Receipt();
@@ -171,34 +171,40 @@ namespace TapPaymentIntegration.Controllers
 					var jsonmodel = JsonConvert.SerializeObject(fillChargeModel);
 					var client_charge = new HttpClient();
 					var request_charge = new HttpRequestMessage(HttpMethod.Post, "https://api.tap.company/v2/charges");
-					request_charge.Headers.Add("Authorization", "Bearer " + GetCurrentUserAsync().Result.SecertKey);
+					request_charge.Headers.Add("Authorization", "Bearer " + userinfo.SecertKey);
 					request_charge.Headers.Add("accept", "application/json");
 					var content_charge = new StringContent(jsonmodel, null, "application/json");
 					request_charge.Content = content_charge;
 					var response_charge = await client_charge.SendAsync(request_charge);
 					var body = await response_charge.Content.ReadAsStringAsync();
 					CreateCharge deserialized_CreateCharge = JsonConvert.DeserializeObject<CreateCharge>(body);
-
-					HttpContext.Session.SetString("SubscriptionId", SubscriptionId);
-					HttpContext.Session.SetString("Frequency", Frequency);
-					HttpContext.Session.SetString("Token", Token);
-					ChargeResponse chargeResponse = new ChargeResponse
-					{
-						UserId = userinfo.Id,
-						ChargeId = deserialized_CreateCharge.id,
-						amount = deserialized_CreateCharge.amount,
-						currency = currency,
-						status = deserialized_CreateCharge.status,
-					};
-					_context.chargeResponses.Add(chargeResponse);
-					_context.SaveChanges();
-					//update user 
-					userinfo.Tap_CustomerID = deserialized_CreateCharge.customer.id;
-					userinfo.Frequency = Frequency;
-					userinfo.VAT = VAT;
-					_context.Users.Update(userinfo);
-					_context.SaveChanges();
-					return Json(deserialized_CreateCharge.transaction.url);
+                    if(deserialized_CreateCharge.status == "CAPTURED")
+                    {
+                        HttpContext.Session.SetString("SubscriptionId", SubscriptionId);
+                        HttpContext.Session.SetString("Frequency", Frequency);
+                        HttpContext.Session.SetString("Token", Token);
+                        ChargeResponse chargeResponse = new ChargeResponse
+                        {
+                            UserId = userinfo.Id,
+                            ChargeId = deserialized_CreateCharge.id,
+                            amount = deserialized_CreateCharge.amount,
+                            currency = currency,
+                            status = deserialized_CreateCharge.status,
+                        };
+                        _context.chargeResponses.Add(chargeResponse);
+                        _context.SaveChanges();
+                        //update user 
+                        userinfo.Tap_CustomerID = deserialized_CreateCharge.customer.id;
+                        userinfo.Frequency = Frequency;
+                        userinfo.VAT = VAT;
+                        _context.Users.Update(userinfo);
+                        _context.SaveChanges();
+                        return Json(new { status = true, URL = deserialized_CreateCharge.transaction.url });
+                    }
+                    else
+                    {
+                        return Json(new { status = false, URL = deserialized_CreateCharge.response.message });
+                    }
 				}
 				return Json(false);
 			}
