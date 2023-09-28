@@ -12,6 +12,7 @@ using TapPaymentIntegration.Models.UserDTO;
 using TapPaymentIntegration.Models.Card;
 using ApplicationUser = TapPaymentIntegration.Areas.Identity.Data.ApplicationUser;
 using System.Text.Encodings.Web;
+using System.Numerics;
 
 namespace TapPaymentIntegration.Controllers
 {
@@ -26,17 +27,16 @@ namespace TapPaymentIntegration.Controllers
         private Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
         EmailSender _emailSender = new EmailSender();
         // Change Your Keys & URL's Here
-        public readonly string BHD_Public_Key = "pk_live_MWDV5szwGbxeUBdHnJZLk9S2"; 
-        public readonly string BHD_Test_Key = "sk_live_VDJ1UxM2Arq6ONbz9ptGXhoj";
-        public readonly string KSA_Public_Key = "pk_live_MWDV5szwGbxeUBdHnJZLk9S2";
-        public readonly string KSA_Test_Key = "sk_live_VDJ1UxM2Arq6ONbz9ptGXhoj";
+        //public readonly string BHD_Public_Key = "pk_live_MWDV5szwGbxeUBdHnJZLk9S2"; 
+        //public readonly string BHD_Test_Key = "sk_live_VDJ1UxM2Arq6ONbz9ptGXhoj";
+        //public readonly string KSA_Public_Key = "pk_live_MWDV5szwGbxeUBdHnJZLk9S2";
+        //public readonly string KSA_Test_Key = "sk_live_VDJ1UxM2Arq6ONbz9ptGXhoj";
 
-        //public readonly string BHD_Public_Key = "pk_test_7sAiZNXvdpKax26RuJMwbIen";
-        //public readonly string BHD_Test_Key = "sk_test_Tgoy8HbxdQ40l6Ea9SIDci7B";
-        //public readonly string KSA_Public_Key = "pk_test_j3yKfvbxws8khDpFQOX5JeWc";
-        //public readonly string KSA_Test_Key = "sk_test_1SU5woL8vZe6JXrBHipQu9Dn";
-
-        public readonly string RedirectURL = "https://tappayment.niralahyderabadirestaurant.com/";
+        public readonly string BHD_Public_Key = "pk_test_7sAiZNXvdpKax26RuJMwbIen";
+        public readonly string BHD_Test_Key = "sk_test_Tgoy8HbxdQ40l6Ea9SIDci7B";
+        public readonly string KSA_Public_Key = "pk_test_j3yKfvbxws8khDpFQOX5JeWc";
+        public readonly string KSA_Test_Key = "sk_test_1SU5woL8vZe6JXrBHipQu9Dn";
+        public readonly string RedirectURL = "https://localhost:7279";
         public HomeController(IWebHostEnvironment Environment, ILogger<HomeController> logger, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, TapPaymentIntegrationContext context, IUserStore<ApplicationUser> userStore)
         {
             _logger = logger;
@@ -53,7 +53,7 @@ namespace TapPaymentIntegration.Controllers
             var subscriptions = _context.subscriptions.Where(x => x.Status == true).ToList();
             return View(subscriptions); 
         }
-        public async Task<IActionResult> Subscription(int id,string link,string userid)
+        public async Task<IActionResult> Subscription(int id,string link,string userid,string invoiceid)
         {
             if(link != null)
             {
@@ -66,6 +66,25 @@ namespace TapPaymentIntegration.Controllers
             {
                 subscriptions.VAT = "0";
             }
+            ViewBag.Invoiceid = invoiceid;
+            return View(subscriptions);
+        }
+        public async Task<IActionResult> SubscriptionAdmin(int id, string link, string userid, string invoiceid,string After_vat_totalamount)
+        {
+            if (link != null)
+            {
+                var applicationUser = _context.Users.Where(x => x.Id == userid).FirstOrDefault();
+                await _signInManager.PasswordSignInAsync(applicationUser.UserName.ToString(), applicationUser.Password, true, lockoutOnFailure: true);
+            }
+            var subscriptions = _context.subscriptions.Where(x => x.Status == true && x.SubscriptionId == id).FirstOrDefault();
+            var users = _context.Users.Where(x => x.Status == true && x.SubscribeID == id).FirstOrDefault();
+            if (subscriptions.VAT == null)
+            {
+                subscriptions.VAT = "0";
+            }
+            ViewBag.Invoiceid = invoiceid;
+            ViewBag.After_vat_totalamount = After_vat_totalamount;
+            ViewBag.userid = userid;
             return View(subscriptions);
         }
         public async Task<IActionResult> Logout()
@@ -82,8 +101,24 @@ namespace TapPaymentIntegration.Controllers
         {
             try
             {
-				var Frequency = Request.Form.Where(x => x.Key == "Frequency").FirstOrDefault().Value.ToString();
-				var VAT = Request.Form.Where(x => x.Key == "VAT").FirstOrDefault().Value.ToString();
+				var Userid = Request.Form.Where(x => x.Key == "Userid").FirstOrDefault().Value.ToString();
+                var Invoiceid = Request.Form.Where(x => x.Key == "Invoiceid").FirstOrDefault().Value.ToString();
+                ApplicationUser usersinfo = null;
+                Invoice invoice = null;
+                var Frequency = "";
+                var VAT = "";
+                if (Userid != null)
+                {
+                    usersinfo = _context.Users.Where(x => x.Id == Userid).FirstOrDefault();
+                    invoice = _context.invoices.Where(x => x.InvoiceId == Convert.ToInt32(Invoiceid)).FirstOrDefault();
+                    VAT = invoice.VAT;
+                    Frequency = usersinfo.Frequency;
+                }
+                else
+                {
+                    Frequency = Request.Form.Where(x => x.Key == "Frequency").FirstOrDefault().Value.ToString();
+                    VAT = Request.Form.Where(x => x.Key == "VAT").FirstOrDefault().Value.ToString();
+                }
 				var TotalPlanfee = Request.Form.Where(x => x.Key == "TotalPlanfee").FirstOrDefault().Value.ToString();
 				var SubscriptionId = Request.Form.Where(x => x.Key == "SubscriptionId").FirstOrDefault().Value.ToString();
 				var Token = Request.Form.Where(x => x.Key == "Token").FirstOrDefault().Value.ToString();
@@ -101,10 +136,10 @@ namespace TapPaymentIntegration.Controllers
 					reference.order = OrderNo;
 
 					Redirect redirect = new Redirect();
-					redirect.url = RedirectURL + "Home/CardVerify";
+					redirect.url = RedirectURL + "/Home/CardVerify";
 
 					Post post = new Post();
-					post.url = RedirectURL + "Home/CardVerifyurl";
+					post.url = RedirectURL + "/Home/CardVerifyurl";
 
 					var countrycode = "";
 					if (userinfo.Country == "Bahrain")
@@ -178,11 +213,12 @@ namespace TapPaymentIntegration.Controllers
 					var response_charge = await client_charge.SendAsync(request_charge);
 					var body = await response_charge.Content.ReadAsStringAsync();
 					CreateCharge deserialized_CreateCharge = JsonConvert.DeserializeObject<CreateCharge>(body);
-                    if(deserialized_CreateCharge.status == "CAPTURED")
+                    if(deserialized_CreateCharge.status == "INITIATED")
                     {
                         HttpContext.Session.SetString("SubscriptionId", SubscriptionId);
                         HttpContext.Session.SetString("Frequency", Frequency);
                         HttpContext.Session.SetString("Token", Token);
+                        HttpContext.Session.SetString("Invoiceid", Invoiceid);
                         ChargeResponse chargeResponse = new ChargeResponse
                         {
                             UserId = userinfo.Id,
@@ -223,7 +259,6 @@ namespace TapPaymentIntegration.Controllers
                 var log_user = GetCurrentUserAsync().Result;
 				if (tap_id != null && log_user.Id != null)
 				{
-
 					//Get Charge Detail
 					var client_ChargeDetail = new HttpClient();
 					var request_ChargeDetail = new HttpRequestMessage(HttpMethod.Get, "https://api.tap.company/v2/charges/" + tap_id);
@@ -238,259 +273,352 @@ namespace TapPaymentIntegration.Controllers
                 {
                     var SubscriptionId = HttpContext.Session.GetString("SubscriptionId");
                     var Frequency = HttpContext.Session.GetString("Frequency");
+                    var Invoiceid = HttpContext.Session.GetString("Invoiceid");
                     if (Deserialized_savecard.id != null)
                     {
-                        //Create Invoice
-                        var users = GetCurrentUserAsync().Result;
-                        var subscriptions = _context.subscriptions.Where(x => x.Status == true && x.SubscriptionId == Convert.ToInt32(SubscriptionId)).FirstOrDefault();
-                        var Amount = subscriptions.Amount;
-                        int days = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
-                        int finalamount = 0;
-                        if (Frequency == "DAILY")
+                        if(Invoiceid == null || Invoiceid == "")
                         {
-                            finalamount = Convert.ToInt32(subscriptions.Amount) / days;
+                            //Create Invoice
+                            var users = GetCurrentUserAsync().Result;
+                            var subscriptions = _context.subscriptions.Where(x => x.Status == true && x.SubscriptionId == Convert.ToInt32(SubscriptionId)).FirstOrDefault();
+                            int days = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
+                            int finalamount = 0;
+                            int Discount = 0;
+                            int Vat = 0;
+                            if (users.Frequency == "DAILY")
+                            {
+                                Discount = 0;
+                                finalamount = Convert.ToInt32(subscriptions.Amount) / days;
+                            }
+                            else if (users.Frequency == "WEEKLY")
+                            {
+                                Discount = 0;
+                                finalamount = Convert.ToInt32(subscriptions.Amount) / 4;
+                            }
+                            else if (users.Frequency == "MONTHLY")
+                            {
+                                Discount = 0;
+                                finalamount = Convert.ToInt32(subscriptions.Amount) / 1;
+                            }
+                            else if (users.Frequency == "QUARTERLY")
+                            {
+                                Discount = 0;
+                                finalamount = (Convert.ToInt32(subscriptions.Amount) * 3) / 1;
+                            }
+                            else if (users.Frequency == "HALFYEARLY")
+                            {
+                                Discount = 0;
+                                finalamount = (Convert.ToInt32(subscriptions.Amount) * 6) / 1;
+                            }
+                            else if (users.Frequency == "YEARLY")
+                            {
+                                var amountpercentage = (Convert.ToInt32(subscriptions.Amount) / 100) * 10;
+                                var final_amount_percentage = Convert.ToInt32(subscriptions.Amount) - amountpercentage;
+                                finalamount = final_amount_percentage * 12;
+                                Discount = amountpercentage * 12;
+                            }
+                            if (subscriptions.VAT == "0")
+                            {
+                                Vat = 0;
+                            }
+                            else
+                            {
+                                int totala = finalamount + Convert.ToInt32(subscriptions.SetupFee);
+                                double double_amount = Math.Round(Convert.ToDouble(totala));
+                                int roundoff_totalamount = Convert.ToInt32(double_amount);
+                                Vat = ((Convert.ToInt32(roundoff_totalamount) / Convert.ToInt32(subscriptions.VAT)) * 100) / 100;
+                            }
+                            int after_vat_totalamount = finalamount + Convert.ToInt32(subscriptions.SetupFee) + Vat;
                             Invoice invoices = new Invoice
                             {
                                 InvoiceStartDate = DateTime.Now,
                                 InvoiceEndDate = DateTime.Now,
                                 Currency = subscriptions.Currency,
                                 AddedDate = DateTime.Now,
-                                AddedBy = users.FullName,
-                                SubscriptionAmount = finalamount + Convert.ToInt32(subscriptions.SetupFee),
-                                SubscriptionId = Convert.ToInt32(SubscriptionId),
+                                AddedBy = GetCurrentUserAsync().Result.FullName,
+                                SubscriptionAmount = after_vat_totalamount,
+                                SubscriptionId = Convert.ToInt32(subscriptions.SubscriptionId),
                                 Status = "Un-Paid",
                                 IsDeleted = false,
-                                Description = "Invoice Create - Frequency(" + Frequency + ")",
+                                Description = "Invoice Create - Frequency(" + users.Frequency + ")",
                                 SubscriptionName = subscriptions.Name,
                                 UserId = users.Id,
                                 ChargeId = tap_id,
                             };
                             _context.invoices.Add(invoices);
                             _context.SaveChanges();
-                        }
-                        else if (Frequency == "WEEKLY")
-                        {
-                            finalamount = Convert.ToInt32(subscriptions.Amount) / 4;
-                            Invoice invoices = new Invoice
+                            // Update Recurring Job data
+                            int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
+                            DateTime nextrecurringdate = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).Select(x => x.InvoiceEndDate).FirstOrDefault();
+                            RecurringCharge recurringCharge = new RecurringCharge();
+                            recurringCharge.Amount = Convert.ToDecimal(finalamount);
+                            recurringCharge.SubscriptionId = subscriptions.SubscriptionId;
+                            recurringCharge.UserID = users.Id;
+                            recurringCharge.Tap_CustomerId = users.Tap_CustomerID;
+                            recurringCharge.ChargeId = tap_id;
+                            recurringCharge.IsRun = false;
+                            recurringCharge.JobRunDate = nextrecurringdate.AddDays(1);
+                            _context.recurringCharges.Add(recurringCharge);
+                            _context.SaveChanges();
+
+
+                            var userinfo = _context.Users.Where(x => x.Id == users.Id).FirstOrDefault();
+                            var invoice = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).FirstOrDefault();
+
+
+                            //update user 
+                            users.Tap_CustomerID = Deserialized_savecard.payment_agreement.contract.customer_id;
+                            users.Tap_Card_ID = Deserialized_savecard.payment_agreement.contract.id;
+                            users.SubscribeID = Convert.ToInt32(SubscriptionId);
+                            users.Tap_Agreement_ID = Deserialized_savecard.payment_agreement.id;
+                            users.PaymentSource = Deserialized_savecard.source.payment_method;
+                            _context.Users.Update(users);
+                            _context.SaveChanges();
+
+                            Invoice invoice_info = _context.invoices.Where(x => x.InvoiceId == Convert.ToInt32(Invoiceid)).FirstOrDefault();
+                            invoice_info.ChargeId = tap_id;
+                            invoice_info.Status = "Payment Captured";
+                            invoice_info.ChargeResponseId = getchargesresposemodel;
+                            _context.invoices.Update(invoice_info);
+                            _context.SaveChanges();
+                            // Send Email
+                            string body = string.Empty;
+                            _environment.WebRootPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                            string contentRootPath = _environment.WebRootPath + "/htmltopdf.html";
+                            string contentRootPath1 = _environment.WebRootPath + "/css/bootstrap.min.css";
+                            //Generate PDF
+                            var cr = _context.chargeResponses.Where(x => x.ChargeId == tap_id).FirstOrDefault();
+                            var sub_id = HttpContext.Session.GetString("SubscriptionId");
+                            var sub_info = _context.subscriptions.Where(x => x.SubscriptionId == Convert.ToInt32(sub_id)).FirstOrDefault();
+                            using (StreamReader reader = new StreamReader(contentRootPath))
                             {
-                                InvoiceStartDate = DateTime.Now,
-                                InvoiceEndDate = DateTime.Now.AddDays(7),
-                                Currency = subscriptions.Currency,
-                                AddedDate = DateTime.Now,
-                                AddedBy = users.FullName,
-                                SubscriptionAmount = finalamount + Convert.ToInt32(subscriptions.SetupFee),
-                                SubscriptionId = Convert.ToInt32(SubscriptionId),
-                                Status = "Un-Paid",
-                                IsDeleted = false,
-                                Description = "Invoice Create - Frequency(" + Frequency + ")",
-                                SubscriptionName = subscriptions.Name,
-                                UserId = users.Id,
-                                ChargeId = tap_id,
-                            };
-                            _context.invoices.Add(invoices);
-                            _context.SaveChanges();
-                        }
-                        else if (Frequency == "MONTHLY")
-                        {
-                            finalamount = Convert.ToInt32(subscriptions.Amount) / 1;
-                            Invoice invoices = new Invoice
+                                body = reader.ReadToEnd();
+                            }
+                            //Fill EMail By Parameter
+                            body = body.Replace("{title}", "Tamarran Payment Invoice");
+                            body = body.Replace("{currentdate}", DateTime.Now.ToString());
+
+                            body = body.Replace("{InvocieStatus}", "Payment Captured");
+                            body = body.Replace("{InvoiceID}", "Inv" + invoice_info.InvoiceId);
+
+                            body = body.Replace("{User_Name}", userinfo.FullName);
+                            body = body.Replace("{User_Email}", userinfo.Email);
+                            body = body.Replace("{User_GYM}", userinfo.GYMName);
+                            body = body.Replace("{User_Phone}", userinfo.PhoneNumber);
+
+
+                            body = body.Replace("{SubscriptionName}", sub_info.Name);
+                            body = body.Replace("{SubscriptionPeriod}", userinfo.Frequency);
+                            body = body.Replace("{SetupFee}", sub_info.SetupFee);
+                            int amount = Convert.ToInt32(finalamount) + Convert.ToInt32(sub_info.SetupFee);
+                            body = body.Replace("{SubscriptionAmount}", finalamount.ToString());
+                            //Calculate VAT
+                            if (sub_info.VAT == null)
                             {
-                                InvoiceStartDate = DateTime.Now,
-                                InvoiceEndDate = DateTime.Now.AddMonths(1),
-                                Currency = subscriptions.Currency,
-                                AddedDate = DateTime.Now,
-                                AddedBy = users.FullName,
-                                SubscriptionAmount = finalamount + Convert.ToInt32(subscriptions.SetupFee),
-                                SubscriptionId = Convert.ToInt32(SubscriptionId),
-                                Status = "Un-Paid",
-                                IsDeleted = false,
-                                Description = "Invoice Create - Frequency(" + Frequency + ")",
-                                SubscriptionName = subscriptions.Name,
-                                UserId = users.Id,
-                                ChargeId = tap_id,
-                            };
-                            _context.invoices.Add(invoices);
-                            _context.SaveChanges();
-                        }
-                        else if (Frequency == "QUARTERLY")
-                        {
-                            finalamount = (Convert.ToInt32(subscriptions.Amount) * 3) / 1;
-                            Invoice invoices = new Invoice
+                                body = body.Replace("{VAT}", "0.00");
+                                body = body.Replace("{Total}", amount.ToString() + " " + sub_info.Currency);
+                                body = body.Replace("{InvoiceAmount}", amount.ToString() + " " + sub_info.Currency);
+                            }
+                            else
                             {
-                                InvoiceStartDate = DateTime.Now,
-                                InvoiceEndDate = DateTime.Now.AddMonths(3),
-                                Currency = subscriptions.Currency,
-                                AddedDate = DateTime.Now,
-                                AddedBy = users.FullName,
-                                SubscriptionAmount = finalamount + Convert.ToInt32(subscriptions.SetupFee),
-                                SubscriptionId = Convert.ToInt32(SubscriptionId),
-                                Status = "Un-Paid",
-                                IsDeleted = false,
-                                Description = "Invoice Create - Frequency(" + Frequency + ")",
-                                SubscriptionName = subscriptions.Name,
-                                UserId = users.Id,
-                                ChargeId = tap_id,
-                            };
-                            _context.invoices.Add(invoices);
-                            _context.SaveChanges();
-                        }
-                        else if (Frequency == "HALFYEARLY")
-                        {
-                            finalamount = (Convert.ToInt32(subscriptions.Amount) * 6) / 1;
-                            Invoice invoices = new Invoice
-                            {
-                                InvoiceStartDate = DateTime.Now,
-                                InvoiceEndDate = DateTime.Now.AddMonths(6),
-                                Currency = subscriptions.Currency,
-                                AddedDate = DateTime.Now,
-                                AddedBy = users.FullName,
-                                SubscriptionAmount = finalamount + Convert.ToInt32(subscriptions.SetupFee),
-                                SubscriptionId = Convert.ToInt32(SubscriptionId),
-                                Status = "Un-Paid",
-                                IsDeleted = false,
-                                Description = "Invoice Create - Frequency(" + Frequency + ")",
-                                SubscriptionName = subscriptions.Name,
-                                UserId = users.Id,
-                                ChargeId = tap_id,
-                            };
-                            _context.invoices.Add(invoices);
-                            _context.SaveChanges();
-                        }
-                        else if (Frequency == "YEARLY")
-                        {
-                            var discount_amount = (Convert.ToInt32(subscriptions.Amount) / 100) * 10;
-                            finalamount = (Convert.ToInt32(subscriptions.Amount) - discount_amount) * 12;
-                            Invoice invoices = new Invoice
-                            {
-                                InvoiceStartDate = DateTime.Now,
-                                InvoiceEndDate = DateTime.Now.AddMonths(12),
-                                Currency = subscriptions.Currency,
-                                AddedDate = DateTime.Now,
-                                AddedBy = users.FullName,
-                                SubscriptionAmount = finalamount + Convert.ToInt32(subscriptions.SetupFee),
-                                SubscriptionId = Convert.ToInt32(SubscriptionId),
-                                Status = "Un-Paid",
-                                IsDeleted = false,
-                                Description = "Invoice Create - Frequency(" + Frequency + ")",
-                                SubscriptionName = subscriptions.Name,
-                                UserId = users.Id,
-                                ChargeId = tap_id,
-                            };
-                            _context.invoices.Add(invoices);
-                            _context.SaveChanges();
-                        }
-                        // Update Recurring Job data
-                        int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
-                        DateTime nextrecurringdate = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).Select(x => x.InvoiceEndDate).FirstOrDefault();
-                        RecurringCharge recurringCharge = new RecurringCharge();
-                        recurringCharge.Amount = Convert.ToDecimal(finalamount);
-                        recurringCharge.SubscriptionId = subscriptions.SubscriptionId;
-                        recurringCharge.UserID = users.Id;
-                        recurringCharge.Tap_CustomerId = users.Tap_CustomerID;
-                        recurringCharge.ChargeId = tap_id;
-                        recurringCharge.IsRun = false;
-                        recurringCharge.JobRunDate = nextrecurringdate.AddDays(1);
-                        _context.recurringCharges.Add(recurringCharge);
-                        _context.SaveChanges();
+                                body = body.Replace("{VAT}", Vat.ToString());
+                                body = body.Replace("{Total}", after_vat_totalamount.ToString() + " " + sub_info.Currency);
+                                body = body.Replace("{InvoiceAmount}", after_vat_totalamount.ToString() + " " + sub_info.Currency);
+                            }
 
 
-                        var userinfo = _context.Users.Where(x => x.Id == users.Id).FirstOrDefault();
-                        var invoice = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).FirstOrDefault();
+                            var renderer = new ChromePdfRenderer();
+                            // Many rendering options to use to customize!
+                            renderer.RenderingOptions.SetCustomPaperSizeInInches(6.9, 12);
+                            renderer.RenderingOptions.PaperOrientation = IronPdf.Rendering.PdfPaperOrientation.Portrait;
+                            renderer.RenderingOptions.Title = "My PDF Document Name";
+                            renderer.RenderingOptions.EnableJavaScript = true;
+                            renderer.RenderingOptions.Zoom = 100;
+
+                            // Supports margin customization!
+                            renderer.RenderingOptions.MarginTop = 0; //millimeters
+                            renderer.RenderingOptions.MarginLeft = 0; //millimeters
+                            renderer.RenderingOptions.MarginRight = 0; //millimeters
+                            renderer.RenderingOptions.MarginBottom = 0; //millimeters
+
+                            // Can set FirstPageNumber if you have a cover page
+                            renderer.RenderingOptions.FirstPageNumber = 1;
+
+                            // Settings have been set, we can render:
+                            var pdf = renderer.RenderHtmlAsPdf(body);
+                            pdf.SaveAs("TamrranInvoice.pdf");
 
 
-                        //update user 
-                        users.Tap_CustomerID = Deserialized_savecard.payment_agreement.contract.customer_id;
-                        users.Tap_Card_ID = Deserialized_savecard.payment_agreement.contract.id;
-                        users.SubscribeID = Convert.ToInt32(SubscriptionId);
-                        users.Tap_Agreement_ID = Deserialized_savecard.payment_agreement.id;
-                        users.PaymentSource = Deserialized_savecard.source.payment_method;
-                        _context.Users.Update(users);
-                        _context.SaveChanges();
+                            string pdfpath = _environment.ContentRootPath + "/TamrranInvoice.pdf";
+                            byte[] bytes = System.IO.File.ReadAllBytes(pdfpath);
 
-                        Invoice invoice_info = _context.invoices.Find(max_invoice_id);
-                        invoice_info.ChargeId = tap_id;
-                        invoice_info.Status = "Payment Captured";
-                        invoice_info.ChargeResponseId = getchargesresposemodel;
-                        _context.invoices.Update(invoice_info);
-                        _context.SaveChanges();
-                        // Send Email
-                        string body = string.Empty;
-                        _environment.WebRootPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-                        string contentRootPath = _environment.WebRootPath + "/htmltopdf.html";
-                        string contentRootPath1 = _environment.WebRootPath + "/css/bootstrap.min.css";
-                        //Generate PDF
-                        var cr = _context.chargeResponses.Where(x => x.ChargeId == tap_id).FirstOrDefault();
-                        var sub_id = HttpContext.Session.GetString("SubscriptionId");
-                        var sub_info = _context.subscriptions.Where(x => x.SubscriptionId == Convert.ToInt32(sub_id)).FirstOrDefault();
-                        using (StreamReader reader = new StreamReader(contentRootPath))
-                        {
-                            body = reader.ReadToEnd();
-                        }
-                        //Fill EMail By Parameter
-                        body = body.Replace("{title}", "Tamarran Payment Invoice");
-                        body = body.Replace("{currentdate}", DateTime.Now.ToString());
-
-                        body = body.Replace("{InvocieStatus}", "Payment Captured");
-                        body = body.Replace("{InvoiceID}", "Inv" + invoice_info.InvoiceId);
-                        body = body.Replace("{InvoiceAmount}", "23");
-
-
-                        body = body.Replace("{User_Name}", userinfo.FullName);
-                        body = body.Replace("{User_Email}", userinfo.Email);
-                        body = body.Replace("{User_GYM}", userinfo.GYMName);
-                        body = body.Replace("{User_Phone}", userinfo.PhoneNumber);
-
-
-                        body = body.Replace("{SubscriptionName}", sub_info.Name);
-                        body = body.Replace("{SubscriptionPeriod}", userinfo.Frequency);
-                        body = body.Replace("{SetupFee}", sub_info.SetupFee);
-                        int amount = Convert.ToInt32(finalamount) + Convert.ToInt32(sub_info.SetupFee);
-                        body = body.Replace("{SubscriptionAmount}", finalamount.ToString());
-                        //Calculate VAT
-                        if (sub_info.VAT == null)
-                        {
-                            body = body.Replace("{VAT}", "0.00");
-                            body = body.Replace("{Total}", amount.ToString() + " " + sub_info.Currency);
-                            body = body.Replace("{InvoiceAmount}", amount.ToString() + " " + sub_info.Currency);
+                            _ = _emailSender.SendEmailWithFIle(bytes, userinfo.Email, "Payment Captured", "Your Payment has been received successfully. Thank you.");
+                            return RedirectToAction("ShowInvoice", "Home", new { PaymentStatus = "All" });
                         }
                         else
                         {
-                            int vat_percentage = Convert.ToInt32(sub_info.VAT);
-                            var per = (amount / 100) * vat_percentage;
-                            body = body.Replace("{VAT}", decimal.Round(per).ToString());
-                            var All_tottal = amount + per;
-                            body = body.Replace("{Total}", All_tottal.ToString() + " " + sub_info.Currency);
-                            body = body.Replace("{InvoiceAmount}", All_tottal.ToString() + " " + sub_info.Currency);
+                            //Create Invoice
+                            var users = GetCurrentUserAsync().Result;
+                            var subscriptions = _context.subscriptions.Where(x => x.Status == true && x.SubscriptionId == Convert.ToInt32(SubscriptionId)).FirstOrDefault();
+                            var Amount = subscriptions.Amount;
+                            int days = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
+                            int finalamount = 0;
+                            int Discount = 0;
+                            int Vat = 0;
+                            if (users.Frequency == "DAILY")
+                            {
+                                Discount = 0;
+                                finalamount = Convert.ToInt32(subscriptions.Amount) / days;
+                            }
+                            else if (users.Frequency == "WEEKLY")
+                            {
+                                Discount = 0;
+                                finalamount = Convert.ToInt32(subscriptions.Amount) / 4;
+                            }
+                            else if (users.Frequency == "MONTHLY")
+                            {
+                                Discount = 0;
+                                finalamount = Convert.ToInt32(subscriptions.Amount) / 1;
+                            }
+                            else if (users.Frequency == "QUARTERLY")
+                            {
+                                Discount = 0;
+                                finalamount = (Convert.ToInt32(subscriptions.Amount) * 3) / 1;
+                            }
+                            else if (users.Frequency == "HALFYEARLY")
+                            {
+                                Discount = 0;
+                                finalamount = (Convert.ToInt32(subscriptions.Amount) * 6) / 1;
+                            }
+                            else if (users.Frequency == "YEARLY")
+                            {
+                                var amountpercentage = (Convert.ToInt32(subscriptions.Amount) / 100) * 10;
+                                var final_amount_percentage = Convert.ToInt32(subscriptions.Amount) - amountpercentage;
+                                finalamount = final_amount_percentage * 12;
+                                Discount = amountpercentage * 12;
+                            }
+                            if (subscriptions.VAT == "0")
+                            {
+                                Vat = 0;
+                            }
+                            else
+                            {
+                                double totala = finalamount;
+                                double roundoff_totalamount = Math.Round(totala);
+                                Vat = (Convert.ToInt32(roundoff_totalamount) / 100) * Convert.ToInt32(subscriptions.VAT);
+                            }
+                            int after_vat_totalamount = finalamount + Convert.ToInt32(subscriptions.SetupFee) + Convert.ToInt32(subscriptions.VAT);
+                            // Update Recurring Job data
+                            var max_invoice_id = _context.invoices.Where(x => x.InvoiceId == Convert.ToInt32(Invoiceid)).FirstOrDefault();
+                            RecurringCharge recurringCharge = new RecurringCharge();
+                            recurringCharge.Amount = Convert.ToDecimal(finalamount);
+                            recurringCharge.SubscriptionId = subscriptions.SubscriptionId;
+                            recurringCharge.UserID = users.Id;
+                            recurringCharge.Tap_CustomerId = users.Tap_CustomerID;
+                            recurringCharge.ChargeId = tap_id;
+                            recurringCharge.IsRun = false;
+                            recurringCharge.JobRunDate = max_invoice_id.InvoiceEndDate.AddDays(1);
+                            _context.recurringCharges.Add(recurringCharge);
+                            _context.SaveChanges();
+
+
+                            var userinfo = _context.Users.Where(x => x.Id == users.Id).FirstOrDefault();
+
+
+                            //update user 
+                            users.Tap_CustomerID = Deserialized_savecard.payment_agreement.contract.customer_id;
+                            users.Tap_Card_ID = Deserialized_savecard.payment_agreement.contract.id;
+                            users.SubscribeID = Convert.ToInt32(SubscriptionId);
+                            users.Tap_Agreement_ID = Deserialized_savecard.payment_agreement.id;
+                            users.PaymentSource = Deserialized_savecard.source.payment_method;
+                            _context.Users.Update(users);
+                            _context.SaveChanges();
+
+                            Invoice invoice_info = _context.invoices.Where(x=>x.InvoiceId == Convert.ToInt32(Invoiceid)).FirstOrDefault();
+                            invoice_info.ChargeId = tap_id;
+                            invoice_info.Status = "Payment Captured";
+                            invoice_info.ChargeResponseId = getchargesresposemodel;
+                            _context.invoices.Update(invoice_info);
+                            _context.SaveChanges();
+                            // Send Email
+                            string body = string.Empty;
+                            _environment.WebRootPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                            string contentRootPath = _environment.WebRootPath + "/htmltopdf.html";
+                            string contentRootPath1 = _environment.WebRootPath + "/css/bootstrap.min.css";
+                            //Generate PDF
+                            var cr = _context.chargeResponses.Where(x => x.ChargeId == tap_id).FirstOrDefault();
+                            var sub_id = HttpContext.Session.GetString("SubscriptionId");
+                            var sub_info = _context.subscriptions.Where(x => x.SubscriptionId == Convert.ToInt32(sub_id)).FirstOrDefault();
+                            using (StreamReader reader = new StreamReader(contentRootPath))
+                            {
+                                body = reader.ReadToEnd();
+                            }
+                            //Fill EMail By Parameter
+                            body = body.Replace("{title}", "Tamarran Payment Invoice");
+                            body = body.Replace("{currentdate}", DateTime.Now.ToString());
+
+                            body = body.Replace("{InvocieStatus}", "Payment Captured");
+                            body = body.Replace("{InvoiceID}", "Inv" + invoice_info.InvoiceId.ToString());
+
+
+                            body = body.Replace("{User_Name}", userinfo.FullName);
+                            body = body.Replace("{User_Email}", userinfo.Email);
+                            body = body.Replace("{User_GYM}", userinfo.GYMName);
+                            body = body.Replace("{User_Phone}", userinfo.PhoneNumber);
+
+
+                            body = body.Replace("{SubscriptionName}", sub_info.Name);
+                            body = body.Replace("{SubscriptionPeriod}", userinfo.Frequency);
+                            body = body.Replace("{SetupFee}", sub_info.SetupFee);
+                            int amount = Convert.ToInt32(finalamount) + Convert.ToInt32(sub_info.SetupFee);
+                            body = body.Replace("{SubscriptionAmount}", finalamount.ToString());
+                            //Calculate VAT
+                            if (sub_info.VAT == null)
+                            {
+                                body = body.Replace("{VAT}", "0.00");
+                                body = body.Replace("{Total}", amount.ToString() + " " + sub_info.Currency);
+                                body = body.Replace("{InvoiceAmount}", amount.ToString() + " " + sub_info.Currency);
+
+                            }
+                            else
+                            {
+                                int vat_percentage = Convert.ToInt32(sub_info.VAT);
+                                var per = (amount / 100) * vat_percentage;
+                                body = body.Replace("{VAT}", decimal.Round(per).ToString());
+                                var All_tottal = amount + per;
+                                body = body.Replace("{Total}", All_tottal.ToString() + " " + sub_info.Currency);
+                                body = body.Replace("{InvoiceAmount}", All_tottal.ToString() + " " + sub_info.Currency);
+                            }
+
+
+                            var renderer = new ChromePdfRenderer();
+                            // Many rendering options to use to customize!
+                            renderer.RenderingOptions.SetCustomPaperSizeInInches(6.9, 12);
+                            renderer.RenderingOptions.PaperOrientation = IronPdf.Rendering.PdfPaperOrientation.Portrait;
+                            renderer.RenderingOptions.Title = "My PDF Document Name";
+                            renderer.RenderingOptions.EnableJavaScript = true;
+                            renderer.RenderingOptions.Zoom = 100;
+
+                            // Supports margin customization!
+                            renderer.RenderingOptions.MarginTop = 0; //millimeters
+                            renderer.RenderingOptions.MarginLeft = 0; //millimeters
+                            renderer.RenderingOptions.MarginRight = 0; //millimeters
+                            renderer.RenderingOptions.MarginBottom = 0; //millimeters
+
+                            // Can set FirstPageNumber if you have a cover page
+                            renderer.RenderingOptions.FirstPageNumber = 1;
+
+                            // Settings have been set, we can render:
+                            var pdf = renderer.RenderHtmlAsPdf(body);
+                            pdf.SaveAs("TamrranInvoice.pdf");
+
+
+                            string pdfpath = _environment.ContentRootPath + "/TamrranInvoice.pdf";
+                            byte[] bytes = System.IO.File.ReadAllBytes(pdfpath);
+
+                            _ = _emailSender.SendEmailWithFIle(bytes, userinfo.Email, "Payment Captured", "Your Payment has been received successfully. Thank you.");
+                            return RedirectToAction("ShowInvoice", "Home", new { PaymentStatus = "All" });
                         }
-
-
-                        var renderer = new ChromePdfRenderer();
-                        // Many rendering options to use to customize!
-                        renderer.RenderingOptions.SetCustomPaperSizeInInches(6.9, 12);
-                        renderer.RenderingOptions.PaperOrientation = IronPdf.Rendering.PdfPaperOrientation.Portrait;
-                        renderer.RenderingOptions.Title = "My PDF Document Name";
-                        renderer.RenderingOptions.EnableJavaScript = true;
-                        renderer.RenderingOptions.Zoom = 100;
-
-                        // Supports margin customization!
-                        renderer.RenderingOptions.MarginTop = 0; //millimeters
-                        renderer.RenderingOptions.MarginLeft = 0; //millimeters
-                        renderer.RenderingOptions.MarginRight = 0; //millimeters
-                        renderer.RenderingOptions.MarginBottom = 0; //millimeters
-
-                        // Can set FirstPageNumber if you have a cover page
-                        renderer.RenderingOptions.FirstPageNumber = 1;
-
-                        // Settings have been set, we can render:
-                        var pdf = renderer.RenderHtmlAsPdf(body);
-                        pdf.SaveAs("TamrranInvoice.pdf");
-
-
-                        string pdfpath = _environment.ContentRootPath + "/TamrranInvoice.pdf";
-                        byte[] bytes = System.IO.File.ReadAllBytes(pdfpath);
-
-                        _ = _emailSender.SendEmailWithFIle(bytes, userinfo.Email, "Payment Captured", "Your Payment has been received successfully. Thank you.");
-                        return RedirectToAction("ShowInvoice", "Home", new { PaymentStatus = "All" });
                     }
                     else
                     {
@@ -635,38 +763,76 @@ namespace TapPaymentIntegration.Controllers
             var result = await _userManager.CreateAsync(applicationUser, applicationUser.Password);
             if(result.Succeeded)
             {
-                int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
                 string max_user_id = _context.Users.Where(x=>x.Email == applicationUser.Email).Select(x=>x.Id).FirstOrDefault();
                 //Create Invoice
-               // var users = GetCurrentUserAsync().Result;
-                var Amount = subscriptions.Amount;
                 int days = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
                 int finalamount = 0;
+                int Discount = 0;
+                int Vat = 0;
                 if (applicationUser.Frequency == "DAILY")
                 {
+                    Discount = 0;
                     finalamount = Convert.ToInt32(subscriptions.Amount) / days;
                 }
                 else if (applicationUser.Frequency == "WEEKLY")
                 {
+                    Discount = 0;
                     finalamount = Convert.ToInt32(subscriptions.Amount) / 4;
                 }
                 else if (applicationUser.Frequency == "MONTHLY")
                 {
+                    Discount = 0;
                     finalamount = Convert.ToInt32(subscriptions.Amount) / 1;
                 }
                 else if (applicationUser.Frequency == "QUARTERLY")
                 {
+                    Discount = 0;
                     finalamount = (Convert.ToInt32(subscriptions.Amount) * 3) / 1;
                 }
                 else if (applicationUser.Frequency == "HALFYEARLY")
                 {
+                    Discount = 0;
                     finalamount = (Convert.ToInt32(subscriptions.Amount) * 6) / 1;
                 }
                 else if (applicationUser.Frequency == "YEARLY")
                 {
-                    var discount_amount = (Convert.ToInt32(subscriptions.Amount) / 100) * 10;
-                    finalamount = (Convert.ToInt32(subscriptions.Amount) - discount_amount) * 12;
+                    var amountpercentage = (Convert.ToInt32(subscriptions.Amount) / 100) * 10;
+                    var final_amount_percentage = Convert.ToInt32(subscriptions.Amount) - amountpercentage;
+                    finalamount = final_amount_percentage * 12;
+                    Discount = amountpercentage * 12;
                 }
+                if (subscriptions.VAT == "0")
+                {
+                    Vat = 0;
+                }
+                else
+                {
+                    double totala = finalamount + Convert.ToDouble(subscriptions.SetupFee);
+                    double roundoff_totalamount = Math.Round(totala);
+                    Vat = ((Convert.ToInt32(roundoff_totalamount) / Convert.ToInt32(subscriptions.VAT)) * 100) / 100;
+                }
+                int after_vat_totalamount = finalamount + Convert.ToInt32(subscriptions.SetupFee) + Vat;
+                Invoice invoices = new Invoice
+                {
+                    InvoiceStartDate = DateTime.Now,
+                    InvoiceEndDate = DateTime.Now,
+                    Currency = subscriptions.Currency,
+                    AddedDate = DateTime.Now,
+                    VAT =Vat.ToString(),
+                    Discount = Discount.ToString(),
+                    AddedBy = GetCurrentUserAsync().Result.FullName,
+                    SubscriptionAmount = after_vat_totalamount,
+                    SubscriptionId = Convert.ToInt32(subscriptions.SubscriptionId),
+                    Status = "Un-Paid",
+                    IsDeleted = false,
+                    Description = "Invoice Create - Frequency(" + applicationUser.Frequency + ")",
+                    SubscriptionName = subscriptions.Name,
+                    UserId = max_user_id,
+                    ChargeId = "",
+                };
+                _context.invoices.Add(invoices);
+                _context.SaveChanges();
+                int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
                 // Send Email
                 string body = string.Empty;
                 _environment.WebRootPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
@@ -682,21 +848,19 @@ namespace TapPaymentIntegration.Controllers
                 body = body.Replace("{currentdate}", DateTime.Now.ToString());
 
                 body = body.Replace("{InvocieStatus}", "Un-Paid");
-                body = body.Replace("{InvoiceID}", "Inv" + "233");
-                body = body.Replace("{InvoiceAmount}", "23");
-
+                body = body.Replace("{InvoiceID}", "Inv" + max_invoice_id);
+                body = body.Replace("{InvoiceAmount}", after_vat_totalamount.ToString());
 
                 body = body.Replace("{User_Name}", applicationUser.FullName);
                 body = body.Replace("{User_Email}", applicationUser.Email);
-                body = body.Replace("{User_Country}", applicationUser.Country);
+                body = body.Replace("{User_GYM}", applicationUser.GYMName);
                 body = body.Replace("{User_Phone}", applicationUser.PhoneNumber);
-
 
                 body = body.Replace("{SubscriptionName}", subscriptions.Name);
                 body = body.Replace("{SubscriptionPeriod}", applicationUser.Frequency);
-                body = body.Replace("{VAT}", "0.00");
+                body = body.Replace("{VAT}", Vat.ToString());
                 body = body.Replace("{SetupFee}", subscriptions.SetupFee);
-                int amount = Convert.ToInt32(finalamount) + Convert.ToInt32(subscriptions.SetupFee);
+                int amount = Convert.ToInt32(finalamount) + Convert.ToInt32(subscriptions.SetupFee) + Vat;
                 body = body.Replace("{Total}", amount.ToString());
                 body = body.Replace("{SubscriptionAmount}", finalamount.ToString());
 
@@ -722,12 +886,9 @@ namespace TapPaymentIntegration.Controllers
                 pdf.SaveAs("TamrranInvoice.pdf");
                 string pdfpath = _environment.ContentRootPath + "/TamrranInvoice.pdf";
                 byte[] bytes = System.IO.File.ReadAllBytes(pdfpath);
-                var callbackUrl =  @Url.Action("Subscription", "Home" ,new { id = applicationUser.SubscribeID, link= "Yes", userid = max_user_id });
+                var callbackUrl =  @Url.Action("SubscriptionAdmin", "Home" ,new { id = applicationUser.SubscribeID, link= "Yes", userid = max_user_id, invoiceid = max_invoice_id , After_vat_totalamount = after_vat_totalamount });
                 var websiteurl  =  HtmlEncoder.Default.Encode(RedirectURL + callbackUrl);
-                _ = _emailSender.SendEmailWithFIle(bytes, applicationUser.Email, "Un-Paid Invoice", "Hi..! <br /> Your Tamarran Credentials is here. <br /> Username: "+ applicationUser.UserName+" and <br /> Password: "+applicationUser.Password+" <br /> Payment URL: "+ websiteurl + "");
-                var remove_invoice = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).FirstOrDefault();
-                _context.invoices.Remove(remove_invoice);
-                _context.SaveChanges();
+                _ = _emailSender.SendEmailWithFIle(bytes, applicationUser.Email, "Un-Paid Invoice", "Hi..! <br /> Your Tamarran Credentials is here. <br /> Username: "+ applicationUser.UserName+" and <br /> Password: "+applicationUser.Password+ " <br /> For Payment Click This: <a href='"+ websiteurl + "'>Link</a>");
                 return RedirectToAction("ViewCustomer", "Home");
             }
             foreach (var error in result.Errors)

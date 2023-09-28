@@ -6,7 +6,7 @@
 @using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor Accessor
 @{
-	ViewData["Title"] = "Subscription"; 
+    ViewData["Title"] = "Subscription";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var user = await UserManager.GetUserAsync(User);
 }
@@ -14,28 +14,29 @@
 <script src="https://secure.gosell.io/js/sdk/tap.min.js"></script>
 <style>
     @@import url('https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600');
-@@import url('https://fonts.googleapis.com/css?family=Raleway:300,400');
-html {
-  box-sizing: border-box;
-  font-weight: 300;
-}
+    @@import url('https://fonts.googleapis.com/css?family=Raleway:300,400');
 
-*,
-*:before,
-*:after {
-  box-sizing: border-box;
-  position: relative;
-  box-sizing: inherit;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+    html {
+        box-sizing: border-box;
+        font-weight: 300;
+    }
+
+    *,
+    *:before,
+    *:after {
+        box-sizing: border-box;
+        position: relative;
+        box-sizing: inherit;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
 
     .bg-light {
         background-color: black !important;
     }
 
     .bg-dark {
-        background-color: #efd41c!important;
+        background-color: #efd41c !important;
     }
 
     .owl-item {
@@ -44,22 +45,22 @@ html {
     }
 
 
-.input-group {
-  justify-content: flex-end;
-  margin-bottom: .5em !important;
-}
+    .input-group {
+        justify-content: flex-end;
+        margin-bottom: .5em !important;
+    }
 
-.btn {
-  border-radius: 0;
-  margin-right: .5em;
-  color: #fff !important;
-  width: 100px;
-}
+    .btn {
+        border-radius: 0;
+        margin-right: .5em;
+        color: #fff !important;
+        width: 100px;
+    }
 
-.nav-tabs,
-.tab-content {
-  max-width: 100%;
-}
+    .nav-tabs,
+    .tab-content {
+        max-width: 100%;
+    }
 
         .nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
             color: black;
@@ -196,7 +197,8 @@ html {
     </div>
 </div>
 
-<br /><br />
+<br />
+<br />
 
 <section class="content col-lg-12">
     <div class="container-fluid flex-row justify-content-center align-items-center col-md-8">
@@ -204,126 +206,29 @@ html {
             <div class="card-header">
                 <ul class="nav nav-tabs" id="myTab" role="tablist" style="background-color:white!important;border:1px solid #efd41c!important">
                     <li class="nav-item">
-                        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Payment Frequency</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">View Subscription</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Card Information</a>
+                        <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Card Information</a>
                     </li>
                 </ul>
             </div>
             <div class="card-body">
-               @* @using (Html.BeginForm("CreateInvoice", "Home", new { PaymentStatus = "Un-Paid", id = "form-container", role = "form" }, FormMethod.Post))
-                { *@
+                <input type="hidden" value="@Model.SubscriptionId" name="SubscriptionId" id="SubscriptionId" />
+                <input type="hidden" value="@ViewBag.Invoiceid" name="Invoiceid" id="Invoiceid" />
                 <div class="tab-content" id="myTabContent">
-                        <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <input type="hidden" value="@Model.SubscriptionId" name="SubscriptionId" id="SubscriptionId" />
-                                <input type="hidden" value="@ViewBag.Invoiceid" name="Invoiceid" id="Invoiceid" />
-                                    <div class="form-group">
-                                        <label style="color:black!important">Frequency:&nbsp;<span style="color:red!important"><b>*</b></span></label>
-                                        <select class="form-control" id="Frequency" name="Frequency" tabindex="1" required="required">
-                                            <option value="0">Please Select Frequency</option>
-                                        <option value="DAILY">Daily</option>
-                                        <option value="WEEKLY">Weekly</option>
-                                        <option value="MONTHLY">Monthly</option>
-                                        <option value="QUARTERLY">Quarterly</option>
-                                        <option value="HALFYEARLY">Semi Annual</option>
-                                        <option value="YEARLY">Annually</option>
-                                        </select>
-                                    </div>
-                                </div>
+                    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                        <form id="form-container" method="post" action="/Home/CreateInvoice">
+                            <!-- Tap element will be here -->
+                            <div id="element-container"></div>
+                            <div id="error-handler" role="alert"></div>
+                            <div id="success" style=" display: none;;position: relative;float: left;">
+                                Success! Your token is <span id="token"></span>
                             </div>
-
-                            <div class="input-group mb-3 group-end">
-                                <a class="btn btn-success btnNext">Next</a>
-                            </div>
-                            <!--/. form element wrap -->
-
-                        </div>
-                        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr style="text-align:center!important">
-                                                <th>Subscription Name</th>
-                                                <th>Currency</th>
-                                                <th>Country</th>
-                                                <th>Frequency</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td style="text-align:center!important;color:black!important">@Model.Name</td>
-                                                <td style="text-align:center!important;color:black!important">@Model.Currency</td>
-                                                <td style="text-align:center!important;color:black!important">@Model.Countries</td>
-                                                <td style="text-align:center!important;color:black!important"><span id="frequencyspanvalue"></span></td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                    <table class="table table-bordered" style="margin-top:60px!important">
-                                        <tbody>
-                                            <tr>
-                                                <td style="width:800px"></td>
-                                            <td style="text-align:center!important;color:black!important;width:288px">Original Plan Amount</td>
-                                            <td style="text-align:center!important;color:black!important;width:153px"><input type="text" id="planamount" name="planamount" class="form-control" style="text-align:center" readonly="readonly" /></td>
-                                            </tr>
-                                        <tr>
-                                            <td style="width:800px"></td>
-                                            <td style="text-align:center!important;color:black!important;width:288px">Frequency Plan Amount</td>
-                                            <td style="text-align:center!important;color:black!important;width:153px"><input type="text" id="subamount" name="subamount" class="form-control" style="text-align:center" readonly="readonly" /></td>
-                                        </tr>
-                                        <tr>
-                                            <td style="width:800px"></td>
-                                            <td style="text-align:center!important;color:black!important;width:288px">Discount</td>
-                                            <td style="text-align:center!important;color:black!important;width:153px"><input type="text" id="Discount" name="Discount" class="form-control" style="text-align:center" readonly="readonly" /></td>
-                                        </tr>
-                                        <tr>
-                                            <td style="width:800px"></td>
-                                            <td style="text-align:center!important;color:black!important;width:288px">Setup Fee</td>
-                                            <td style="text-align:center!important;color:black!important;width:153px"><input type="text" id="setupfee" name="setupfee" class="form-control" value="@Model.SetupFee" style="text-align:center" readonly="readonly" /></td>
-                                        </tr>
-                                        <tr>
-                                            <td style="width:800px"></td>
-                                            <td style="text-align:center!important;color:black!important;width:288px">VAT</td>
-                                            <td style="text-align:center!important;color:black!important;width:153px"><input type="text" id="VAT" name="VAT" class="form-control" style="text-align:center" readonly="readonly" /></td>
-                                        </tr>
-                                        <tr>
-                                            <td style="width:800px"></td>
-                                            <td style="text-align:center!important;color:black!important;width:288px">Total</td>
-                                            <td style="text-align:center!important;color:black!important;width:153px"><input type="text" id="TotalPlanfee" name="TotalPlanfee" class="form-control" style="text-align:center" readonly="readonly" /></td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <div class="input-group mb-3 group-end">
-                                <a class="btn btn-danger btnPrevious">Previous</a>
-                                <a class="btn btn-success btnNext">Next</a>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
-                            <form id="form-container" method="post" action="/Home/CreateInvoice">
-                              <!-- Tap element will be here -->
-                              <div id="element-container"></div>
-                              <div id="error-handler" role="alert"></div>
-                              <div id="success" style=" display: none;;position: relative;float: left;">
-                                    Success! Your token is <span id="token"></span>
-                              </div>
-                              <!-- Tap pay button -->
-@*                              <button id="tap-btn">Submit</button>*@
                             <div class="input-group mb-3 group-end" style="margin-top:15px!important">
                                 <a class="btn btn-danger btnPrevious">Previous</a>
                                 <button class="btn btn-success" type="submit">Proceed</button>
                             </div>
-                            </form> 
-                        </div>
+                        </form>
                     </div>
+                </div>
                 @*}*@
             </div>
         </div>
@@ -408,37 +313,34 @@ html {
         });
     });
 
-    function tapTokenHandler(id) 
-    {
+    function tapTokenHandler(id) {
         debugger
         var Frequency = $('select#Frequency option:selected').val();
         var TotalPlanfee = $('#TotalPlanfee').val();
         var VAT = $('#VAT').val();
-        var SubscriptionId = $('#SubscriptionId').val(); 
+        var SubscriptionId = $('#SubscriptionId').val();
         var Invoiceid = $('#Invoiceid').val();
         var formd = new FormData();
         formd.append("Frequency", Frequency);
         formd.append("TotalPlanfee", TotalPlanfee);
         formd.append("SubscriptionId", SubscriptionId);
-        formd.append("Token", id); 
-        formd.append("VAT", VAT); 
+        formd.append("Token", id);
+        formd.append("VAT", VAT);
         formd.append("Invoiceid", Invoiceid);
         $.ajax({
             type: 'POST',
-            url: '/Home/CreateInvoice', 
+            url: '/Home/CreateInvoice',
             processData: false,
             contentType: false,
             data: formd,
-            success: function (response)
-            {
+            success: function (response) {
                 if (response.status == true) {
                     window.location.href = response.URL;
                 }
-                else
-                {
+                else {
                     alert(response.URL);
                 }
-                
+
             },
             failure: function (response) {
                 $('#result').html(response);
@@ -449,13 +351,11 @@ html {
 <script>
     $(document).ready(function () {
         $('.btnNext').click(function () {
-            if ($('#Frequency option:selected').val() != "0") 
-            {
+            if ($('#Frequency option:selected').val() != "0") {
                 $("#frequencyspanvalue").text($('#Frequency option:selected').val());
                 $('.nav-tabs .active').parent().next('li').find('a').trigger('click');
             }
-            else
-            {
+            else {
                 alert("Please Select Payment Frequency..!");
             }
         });
@@ -465,16 +365,14 @@ html {
         });
 
         $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-            var target = $(e.target).attr("href") 
-            if ($('#Frequency option:selected').val() == "0")
-            {
+            var target = $(e.target).attr("href")
+            if ($('#Frequency option:selected').val() == "0") {
                 $('.nav-tabs .active').parent().prev('li').find('a').trigger('click');
             }
-            
+
         });
     });
-    $("#Frequency").change(function ()
-    {     
+    $("#Frequency").change(function () {
         $("#planamount").val('');
         $("#subamount").val('');
         $("#TotalPlanfee").val('');
@@ -483,17 +381,16 @@ html {
         $("#TotalPlanfee2").val('');
         var selValue = $(this).val();
         var subscriptionamount = "";
-        if (selValue == "YEARLY") 
-        {
+        if (selValue == "YEARLY") {
             var amountpercentage = (@Model.Amount / 100) * 10;
-            var final_amount_percentage = @Model.Amount - amountpercentage;
+                var final_amount_percentage = @Model.Amount - amountpercentage;
             subscriptionamount = final_amount_percentage * 12;
             $("#Discount").val(amountpercentage * 12);
         }
         else if (selValue == "DAILY") {
             $("#Discount").val('0');
             subscriptionamount = @Model.Amount / 30;
-        } 
+        }
         else if (selValue == "WEEKLY") {
             $("#Discount").val('0');
             subscriptionamount = @Model.Amount / 4;
@@ -512,13 +409,11 @@ html {
         }
         var totala = parseInt(subscriptionamount) + parseInt(@Model.SetupFee);
         var calculate_vat = "";
-        if (@Model.VAT == "0") 
-        {
+        if (@Model.VAT == "0") {
             $("#VAT").val('0');
             calculate_vat = "0";
         }
-        else 
-        {
+        else {
             var roundoff_totalamount = Math.round(totala);
             calculate_vat = (roundoff_totalamount / 100) * @Model.VAT;
             $("#VAT").val(calculate_vat);

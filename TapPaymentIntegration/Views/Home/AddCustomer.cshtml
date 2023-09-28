@@ -57,6 +57,17 @@
                         </select>
                 </div>
                 <div class="input-group mb-3">
+                    <select class="form-control" id="Frequency" name="Frequency" tabindex="1" required="required">
+                        <option value="0">Please Select Frequency</option>
+                        <option value="DAILY">Daily</option>
+                        <option value="WEEKLY">Weekly</option>
+                        <option value="MONTHLY">Monthly</option>
+                        <option value="QUARTERLY">Quarterly</option>
+                        <option value="HALFYEARLY">Semi Annual</option>
+                        <option value="YEARLY">Annually</option>
+                    </select>
+                </div>
+                <div class="input-group mb-3">
                     <input type="text" class="form-control" asp-for="City" placeholder="Enter The City" >
                     <div class="input-group-append">
                         <div class="input-group-text">

@@ -23,11 +23,6 @@ public class TapPaymentIntegrationContext : IdentityDbContext<ApplicationUser>
     {
         base.OnModelCreating(builder);
 
-        builder.Entity<ApplicationUser>(b =>
-        {
-            b.Property(p => p.Id)
-                .HasMaxLength(36);
-        });
 
     }
 }
