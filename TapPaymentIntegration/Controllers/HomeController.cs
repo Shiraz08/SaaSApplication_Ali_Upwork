@@ -503,11 +503,11 @@ namespace TapPaymentIntegration.Controllers
                             }
                             else
                             {
-                                double totala = finalamount;
+                                double totala = finalamount + Convert.ToDouble(subscriptions.SetupFee);
                                 double roundoff_totalamount = Math.Round(totala);
-                                Vat = (Convert.ToInt32(roundoff_totalamount) / 100) * Convert.ToInt32(subscriptions.VAT);
+                                Vat = ((Convert.ToInt32(roundoff_totalamount) / Convert.ToInt32(subscriptions.VAT)) * 100) / 100;
                             }
-                            int after_vat_totalamount = finalamount + Convert.ToInt32(subscriptions.SetupFee) + Convert.ToInt32(subscriptions.VAT);
+                            int after_vat_totalamount = finalamount + Convert.ToInt32(subscriptions.SetupFee) + Vat;
                             // Update Recurring Job data
                             var max_invoice_id = _context.invoices.Where(x => x.InvoiceId == Convert.ToInt32(Invoiceid)).FirstOrDefault();
                             RecurringCharge recurringCharge = new RecurringCharge();
@@ -569,25 +569,22 @@ namespace TapPaymentIntegration.Controllers
 
                             body = body.Replace("{SubscriptionName}", sub_info.Name);
                             body = body.Replace("{SubscriptionPeriod}", userinfo.Frequency);
-                            body = body.Replace("{SetupFee}", sub_info.SetupFee);
+                            body = body.Replace("{SetupFee}", sub_info.SetupFee + " " + sub_info.Currency);
                             int amount = Convert.ToInt32(finalamount) + Convert.ToInt32(sub_info.SetupFee);
-                            body = body.Replace("{SubscriptionAmount}", finalamount.ToString());
+                            body = body.Replace("{SubscriptionAmount}", finalamount.ToString() + " " + sub_info.Currency);
                             //Calculate VAT
                             if (sub_info.VAT == null)
                             {
-                                body = body.Replace("{VAT}", "0.00");
-                                body = body.Replace("{Total}", amount.ToString() + " " + sub_info.Currency);
-                                body = body.Replace("{InvoiceAmount}", amount.ToString() + " " + sub_info.Currency);
+                                body = body.Replace("{VAT}", "0.00" + " " + sub_info.Currency);
+                                body = body.Replace("{Total}", after_vat_totalamount.ToString() + " " + sub_info.Currency);
+                                body = body.Replace("{InvoiceAmount}", after_vat_totalamount.ToString() + " " + sub_info.Currency);
 
                             }
                             else
                             {
-                                int vat_percentage = Convert.ToInt32(sub_info.VAT);
-                                var per = (amount / 100) * vat_percentage;
-                                body = body.Replace("{VAT}", decimal.Round(per).ToString());
-                                var All_tottal = amount + per;
-                                body = body.Replace("{Total}", All_tottal.ToString() + " " + sub_info.Currency);
-                                body = body.Replace("{InvoiceAmount}", All_tottal.ToString() + " " + sub_info.Currency);
+                                body = body.Replace("{VAT}", Vat.ToString() + " " + sub_info.Currency);
+                                body = body.Replace("{Total}", after_vat_totalamount.ToString() + " " + sub_info.Currency);
+                                body = body.Replace("{InvoiceAmount}", after_vat_totalamount.ToString() + " " + sub_info.Currency);
                             }
 
 
@@ -847,22 +844,33 @@ namespace TapPaymentIntegration.Controllers
                 body = body.Replace("{title}", "Tamarran Payment Invoice");
                 body = body.Replace("{currentdate}", DateTime.Now.ToString());
 
-                body = body.Replace("{InvocieStatus}", "Un-Paid");
+                body = body.Replace("{InvocieStatus}", "UnPaid");
                 body = body.Replace("{InvoiceID}", "Inv" + max_invoice_id);
-                body = body.Replace("{InvoiceAmount}", after_vat_totalamount.ToString());
 
                 body = body.Replace("{User_Name}", applicationUser.FullName);
                 body = body.Replace("{User_Email}", applicationUser.Email);
                 body = body.Replace("{User_GYM}", applicationUser.GYMName);
                 body = body.Replace("{User_Phone}", applicationUser.PhoneNumber);
 
+
                 body = body.Replace("{SubscriptionName}", subscriptions.Name);
                 body = body.Replace("{SubscriptionPeriod}", applicationUser.Frequency);
-                body = body.Replace("{VAT}", Vat.ToString());
-                body = body.Replace("{SetupFee}", subscriptions.SetupFee);
-                int amount = Convert.ToInt32(finalamount) + Convert.ToInt32(subscriptions.SetupFee) + Vat;
-                body = body.Replace("{Total}", amount.ToString());
-                body = body.Replace("{SubscriptionAmount}", finalamount.ToString());
+                body = body.Replace("{SetupFee}", subscriptions.SetupFee + " " + subscriptions.Currency);
+                int amount = Convert.ToInt32(finalamount) + Convert.ToInt32(subscriptions.SetupFee);
+                body = body.Replace("{SubscriptionAmount}", finalamount.ToString() + " " + subscriptions.Currency);
+                //Calculate VAT
+                if (subscriptions.VAT == null)
+                {
+                    body = body.Replace("{VAT}", "0.00" + " " + subscriptions.Currency);
+                    body = body.Replace("{Total}", amount.ToString() + " " + subscriptions.Currency);
+                    body = body.Replace("{InvoiceAmount}", amount.ToString() + " " + subscriptions.Currency);
+                }
+                else
+                {
+                    body = body.Replace("{VAT}", Vat.ToString() + " " + subscriptions.Currency);
+                    body = body.Replace("{Total}", after_vat_totalamount.ToString() + " " + subscriptions.Currency);
+                    body = body.Replace("{InvoiceAmount}", after_vat_totalamount.ToString() + " " + subscriptions.Currency);
+                }
 
                 var renderer = new ChromePdfRenderer();
                 // Many rendering options to use to customize!
@@ -888,7 +896,11 @@ namespace TapPaymentIntegration.Controllers
                 byte[] bytes = System.IO.File.ReadAllBytes(pdfpath);
                 var callbackUrl =  @Url.Action("SubscriptionAdmin", "Home" ,new { id = applicationUser.SubscribeID, link= "Yes", userid = max_user_id, invoiceid = max_invoice_id , After_vat_totalamount = after_vat_totalamount });
                 var websiteurl  =  HtmlEncoder.Default.Encode(RedirectURL + callbackUrl);
-                _ = _emailSender.SendEmailWithFIle(bytes, applicationUser.Email, "Un-Paid Invoice", "Hi..! <br /> Your Tamarran Credentials is here. <br /> Username: "+ applicationUser.UserName+" and <br /> Password: "+applicationUser.Password+ " <br /> For Payment Click This: <a href='"+ websiteurl + "'>Link</a>");
+                _ = _emailSender.SendEmailWithFIle(bytes, applicationUser.Email, "UnPaid Invoice", "Hi..! <br /> Your Tamarran Credentials is here. <br /> Username: "+ applicationUser.UserName+" and <br /> Password: "+applicationUser.Password+ " <br /> For Payment Click This: <a href='"+ websiteurl + "'>Link</a>");
+                var invoiceinfo = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).FirstOrDefault();
+                invoiceinfo.InvoiceLink = RedirectURL + callbackUrl;
+                _context.invoices.Update(invoiceinfo);
+                _context.SaveChanges();
                 return RedirectToAction("ViewCustomer", "Home");
             }
             foreach (var error in result.Errors)

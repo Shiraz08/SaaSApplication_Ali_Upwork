@@ -121,6 +121,7 @@ namespace TapPaymentIntegration.Controllers
         public ActionResult ViewChangeCardInfo()
         {
             var users = _context.changeCardInfos.ToList();
+            ViewBag.Userinfo = _context.Users.ToList();
             return View(users);
         }
     }

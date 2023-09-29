@@ -53,6 +53,8 @@ builder.Services.AddSession(options => {
     options.IdleTimeout = TimeSpan.FromHours(60);
 });
 //email sender override class
+builder.Services.Configure<DataProtectionTokenProviderOptions>(opt =>
+   opt.TokenLifespan = TimeSpan.FromHours(2));
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 // LOgot user by admin 
 builder.Services.Configure<SecurityStampValidatorOptions>(options =>

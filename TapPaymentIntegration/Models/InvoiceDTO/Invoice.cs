@@ -16,6 +16,7 @@ namespace TapPaymentIntegration.Models.InvoiceDTO
         public string Currency { get; set;}
         public string VAT { get; set; }
         public string Discount { get; set; }
+        public string InvoiceLink { get; set; }
         public string Description { get; set;}
         public bool IsDeleted { get; set; } 
         public string AddedBy { get; set; }

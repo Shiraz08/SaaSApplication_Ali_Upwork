@@ -57,8 +57,7 @@
                                         <td style="text-align:center!important">
                                             @if (user.Status != "Payment Captured")
                                             {
-                                                <a class="btn btn-primary" href="@Url.Action("Index","TapPayment",new {id = user.InvoiceId, userid = user.UserId})">Pay Invoice</a>
-                                                <a class="btn btn-danger" href="@Url.Action("DeleteInvoice","Home",new {id = user.InvoiceId, userid = user.UserId})">Delete Invoice</a>
+                                                <a class="btn btn-primary" href="@user.InvoiceLink">Pay Invoice</a>
                                             }
                                             else
                                             {

@@ -17,7 +17,7 @@
     }
     else
     {
-        displayName = user.GYMName;
+        displayName ="Hello" + " "+ user.GYMName;
         SubscribeID = user.SubscribeID;
         UserTypes = user.UserType;
     }
@@ -35,18 +35,11 @@
     <!-- Favicon -->
     <link href="img/favicon.ico" rel="icon">
 
-    <!-- Google Web Fonts -->
-@*     <link rel="preconnect" href="https://fonts.gstatic.com"> *@
-@*     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"> *@
-
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/~/Website/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-
     <!-- Libraries Stylesheet -->
     <link href="~/Website/lib/animate/animate.min.css" rel="stylesheet">
     <link href="~/Website/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
     <link href="~/Website/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
-
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
     <!-- Customized Bootstrap Stylesheet -->
     <link href="~/Website/css/style.css" rel="stylesheet">
     <style type="text/css" id="cst_font_data">
@@ -111,7 +104,27 @@ font-family: 'ITC TAPIOCA';
 font-weight: 100;
 font-display: auto;
 src: url('http://ispeciaprojects.xyz/wp-content/uploads/2021/06/tapioca-itc.otf') format('OpenType');
-}					</style>
+}
+
+            .float {
+                position: fixed;
+                width: 60px;
+                height: 60px;
+                bottom: 40px;
+                right: 40px;
+                background-color: #25d366;
+                color: #FFF;
+                border-radius: 50px;
+                text-align: center;
+                font-size: 30px;
+                box-shadow: 2px 2px 3px #999;
+                z-index: 100;
+            }
+
+            .my-float {
+                margin-top: 16px;
+            }
+</style>
 </head>
 
 <body>
@@ -128,16 +141,7 @@ src: url('http://ispeciaprojects.xyz/wp-content/uploads/2021/06/tapioca-itc.otf'
             <div class="col-lg-6 text-right">
                 <div class="d-inline-flex align-items-center">
                     <a class="text-primary px-2" href="">
-                        <small style="color:black!important">Hello @displayName</small>
-                    </a>
-                    <a class="text-primary px-2" href="">
-                        <i class="fab fa-linkedin-in"></i>
-                    </a>
-                    <a class="text-primary px-2" href="">
-                        <i class="fab fa-instagram"></i>
-                    </a>
-                    <a class="text-primary pl-2" href="">
-                        <i class="fab fa-youtube"></i>
+                        <small style="color:black!important">@displayName</small>
                     </a>
                 </div>
             </div>
@@ -200,7 +204,9 @@ src: url('http://ispeciaprojects.xyz/wp-content/uploads/2021/06/tapioca-itc.otf'
         </div>
     </div>
     <!-- Footer End -->
-
+    <a href="https://api.whatsapp.com/send?phone=+97336021122&text=Hello" class="float" target="_blank">
+        <i class="fa fa-whatsapp my-float"></i>
+    </a>
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>

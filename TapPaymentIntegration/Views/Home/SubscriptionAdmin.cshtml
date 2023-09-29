@@ -213,8 +213,11 @@
             <div class="card-body">
                 <input type="hidden" value="@Model.SubscriptionId" name="SubscriptionId" id="SubscriptionId" />
                 <input type="hidden" value="@ViewBag.Invoiceid" name="Invoiceid" id="Invoiceid" />
+                <input type="hidden" value="@ViewBag.userid" name="userid" id="userid" />
+                <input type="hidden" value="@ViewBag.After_vat_totalamount" name="After_vat_totalamount" id="After_vat_totalamount" />
                 <div class="tab-content" id="myTabContent">
                     <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                        <center><h5>Click Here if Payment Screen did not load: <a href="@Url.Action("SubscriptionAdmin","Home")"  style="color:red!important">Load Payment Screen</a></h5></center>
                         <form id="form-container" method="post" action="/Home/CreateInvoice">
                             <!-- Tap element will be here -->
                             <div id="element-container"></div>
@@ -316,16 +319,18 @@
     function tapTokenHandler(id) {
         debugger
         var Frequency = $('select#Frequency option:selected').val();
-        var TotalPlanfee = $('#TotalPlanfee').val();
+        var TotalPlanfee = $('#After_vat_totalamount').val();
         var VAT = $('#VAT').val();
         var SubscriptionId = $('#SubscriptionId').val();
         var Invoiceid = $('#Invoiceid').val();
+        var userid = $('#userid').val();
         var formd = new FormData();
         formd.append("Frequency", Frequency);
         formd.append("TotalPlanfee", TotalPlanfee);
         formd.append("SubscriptionId", SubscriptionId);
         formd.append("Token", id);
         formd.append("VAT", VAT);
+        formd.append("Userid", userid);
         formd.append("Invoiceid", Invoiceid);
         $.ajax({
             type: 'POST',
@@ -349,6 +354,11 @@
     }
 </script>
 <script>
+    function Pageload()
+    {
+        location.reload();
+    }
+<script>
     $(document).ready(function () {
         $('.btnNext').click(function () {
             if ($('#Frequency option:selected').val() != "0") {
@@ -371,6 +381,9 @@
             }
 
         });
+
+
+
     });
     $("#Frequency").change(function () {
         $("#planamount").val('');

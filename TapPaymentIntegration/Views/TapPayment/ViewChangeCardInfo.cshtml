@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "ViewChangeCardInfo";
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
+    var UserList = ViewBag.Userinfo as IEnumerable<TapPaymentIntegration.Areas.Identity.Data.ApplicationUser>;
 }
 
 <br />
@@ -18,8 +19,10 @@
                         <table id="example1" class="table table-bordered table-striped table-responsive-xl">
                             <thead>
                                 <tr style="text-align:center!important">
+                                    <th>GYM Name</th>
                                     <th>Full Name</th>
                                     <th>Email</th>
+                                    <th>Country</th>
                                     <th>Subscription Name</th>
                                     <th>Old Payment Method</th>
                                     <th>New Payment Method</th>
@@ -30,11 +33,23 @@
                                 @foreach (var user in Model)
                                 {
                                     <tr>
+                                        <td style="text-align:center!important">
+                                            @{
+                                                var gymname = UserList.Where(x => x.Email == user.Email).Select(x => x.GYMName).FirstOrDefault();
+                                                <span>@gymname</span>
+                                            }
+                                        </td>
                                         <td style="text-align:center!important">@user.UserName</td>
                                         <td style="text-align:center!important">@user.Email</td>
+                                        <td style="text-align:center!important">
+                                            @{
+                                                var countryname = UserList.Where(x => x.Email == user.Email).Select(x => x.Country).FirstOrDefault();
+                                                <span>@countryname</span>
+                                            }
+                                        </td>
                                         <td style="text-align:center!important">@user.SubscriptionName</td>
-                                        <td style="text-align:center!important">@user.OldCardName</td>
-                                        <td style="text-align:center!important">@user.NewCardName</td>
+                                        <td style="text-align:center!important">@user.OldCardName - (Changed)</td>
+                                        <td style="text-align:center!important">@user.NewCardName - (Active)</td>
                                         <td style="text-align:center!important">
                                             @{
                                                 DateTime dateTime = Convert.ToDateTime(user.ChangeCardDate);
