@@ -30,8 +30,8 @@ namespace TapPaymentIntegration.Models.HangFire
         }
         public async System.Threading.Tasks.Task AutoChargeJob() 
         {
-            var recurringCharges_list = _context.recurringCharges.Where(x => x.JobRunDate.Date == DateTime.Now.Date && x.IsRun == false).ToList();
-            //var recurringCharges_list = _context.recurringCharges.Where(x => x.JobRunDate.Date == DateTime.Now.AddDays(1).Date && x.IsRun == false).ToList();
+           // var recurringCharges_list = _context.recurringCharges.Where(x => x.JobRunDate.Date == DateTime.Now.Date && x.IsRun == false).ToList();
+            var recurringCharges_list = _context.recurringCharges.Where(x => x.JobRunDate.Date == DateTime.Now.AddDays(1).Date && x.IsRun == false).ToList();
             foreach (var item in recurringCharges_list)
             {
                 var getsubinfo = _context.subscriptions.Where(x => x.SubscriptionId == item.SubscriptionId).FirstOrDefault();
@@ -55,16 +55,61 @@ namespace TapPaymentIntegration.Models.HangFire
                         var TransNo = "Txn_" + rnd.Next(10000000, 99999999);
                         var OrderNo = "Ord_" + rnd.Next(10000000, 99999999);
                         //Create Invoice 
+                        int finalamount = 0;
+                        int Discount = 0;
+                        int Vat = 0;
                         if (getuserinfo.Frequency == "DAILY")
                         {
-                            int calculate_amount = Convert.ToInt32(getsubinfo.Amount);
-                            var finalamount = calculate_amount / days;
+                            Discount = 0;
+                            finalamount = Convert.ToInt32(getsubinfo.Amount) / days;
+                        }
+                        else if (getuserinfo.Frequency == "WEEKLY")
+                        {
+                            Discount = 0;
+                            finalamount = Convert.ToInt32(getsubinfo.Amount) / 4;
+                        }
+                        else if (getuserinfo.Frequency == "MONTHLY")
+                        {
+                            Discount = 0;
+                            finalamount = Convert.ToInt32(getsubinfo.Amount) / 1;
+                        }
+                        else if (getuserinfo.Frequency == "QUARTERLY")
+                        {
+                            Discount = 0;
+                            finalamount = (Convert.ToInt32(getsubinfo.Amount) * 3) / 1;
+                        }
+                        else if (getuserinfo.Frequency == "HALFYEARLY")
+                        {
+                            Discount = 0;
+                            finalamount = (Convert.ToInt32(getsubinfo.Amount) * 6) / 1;
+                        }
+                        else if (getuserinfo.Frequency == "YEARLY")
+                        {
+                            var amountpercentage = (Convert.ToInt32(getsubinfo.Amount) / 100) * 10;
+                            var final_amount_percentage = Convert.ToInt32(getsubinfo.Amount) - amountpercentage;
+                            finalamount = final_amount_percentage * 12;
+                            Discount = amountpercentage * 12;
+                        }
+                        if (getsubinfo.VAT == "0")
+                        {
+                            Vat = 0;
+                        }
+                        else
+                        {
+                            int totala = finalamount;
+                            double double_amount = Math.Round(Convert.ToDouble(totala));
+                            int roundoff_totalamount = Convert.ToInt32(double_amount);
+                            Vat = ((Convert.ToInt32(roundoff_totalamount) / Convert.ToInt32(getsubinfo.VAT)) * 100) / 100;
+                        }
+                        int after_vat_totalamount = finalamount + Vat;
+                        if (getuserinfo.Frequency == "DAILY")
+                        {
                             // Create a charge
                             var client = new HttpClient();
                             var request = new HttpRequestMessage(HttpMethod.Post, "https://api.tap.company/v2/charges");
                             request.Headers.Add("Authorization", "Bearer " + getuserinfo.SecertKey);
                             request.Headers.Add("accept", "application/json");
-                            var content = new StringContent("\r\n{\r\n  \"amount\": " + Decimal.Round(finalamount) + ",\r\n  \"currency\": \"" + getsubinfo.Currency + "\",\r\n  \"customer_initiated\": false,\r\n  \"threeDSecure\": true,\r\n  \"save_card\": false,\r\n  \"payment_agreement\": {\r\n    \"contract\": {\r\n      \"id\": \"" + getuserinfo.Tap_Card_ID + "\"\r\n    },\r\n    \"id\": \"" + getuserinfo.Tap_Agreement_ID + "\"\r\n  },\r\n  \"receipt\": {\r\n    \"email\": true,\r\n    \"sms\": true\r\n  },\"reference\": {\r\n    \"transaction\": \"" + TransNo + "\",\r\n    \"order\": \"" + OrderNo + "\"\r\n  },\r\n  \"customer\": {\r\n    \"id\": \"" + getuserinfo.Tap_CustomerID + "\"\r\n  },\r\n  \"merchant\": {\r\n    \"id\": \"22116401\"\r\n  },\r\n  \"source\": {\r\n    \"id\": \"" + Deserialized_savecard.id + "\"\r\n  },\r\n  \"redirect\": {\r\n    \"url\": \"https://test.com/\"\r\n  }\r\n}\r\n", null, "application/json");
+                            var content = new StringContent("\r\n{\r\n  \"amount\": " + Decimal.Round(after_vat_totalamount) + ",\r\n  \"currency\": \"" + getsubinfo.Currency + "\",\r\n  \"customer_initiated\": false,\r\n  \"threeDSecure\": true,\r\n  \"save_card\": false,\r\n  \"payment_agreement\": {\r\n    \"contract\": {\r\n      \"id\": \"" + getuserinfo.Tap_Card_ID + "\"\r\n    },\r\n    \"id\": \"" + getuserinfo.Tap_Agreement_ID + "\"\r\n  },\r\n  \"receipt\": {\r\n    \"email\": true,\r\n    \"sms\": true\r\n  },\"reference\": {\r\n    \"transaction\": \"" + TransNo + "\",\r\n    \"order\": \"" + OrderNo + "\"\r\n  },\r\n  \"customer\": {\r\n    \"id\": \"" + getuserinfo.Tap_CustomerID + "\"\r\n  },\r\n  \"merchant\": {\r\n    \"id\": \"22116401\"\r\n  },\r\n  \"source\": {\r\n    \"id\": \"" + Deserialized_savecard.id + "\"\r\n  },\r\n  \"redirect\": {\r\n    \"url\": \"https://test.com/\"\r\n  }\r\n}\r\n", null, "application/json");
                             request.Content = content;
                             var response = await client.SendAsync(request);
                             var bodys = await response.Content.ReadAsStringAsync();
@@ -82,6 +127,8 @@ namespace TapPaymentIntegration.Models.HangFire
                                     SubscriptionId = getsubinfo.SubscriptionId,
                                     Status = "Payment Captured",
                                     IsDeleted = false,
+                                    VAT = Vat.ToString(),
+                                    Discount = Discount.ToString(),
                                     Description = "Invoice Create - Frequency(" + getuserinfo.Frequency + ")",
                                     SubscriptionName = getsubinfo.Name,
                                     UserId = getuserinfo.Id,
@@ -103,14 +150,12 @@ namespace TapPaymentIntegration.Models.HangFire
                         }
                         else if (getuserinfo.Frequency == "WEEKLY")
                         {
-                            var calculate_amount = getsubinfo.Amount;
-                            int finalamount = Convert.ToInt32(calculate_amount) / 4;
                             // Create a charge
                             var client = new HttpClient();
                             var request = new HttpRequestMessage(HttpMethod.Post, "https://api.tap.company/v2/charges");
                             request.Headers.Add("Authorization", "Bearer " + getuserinfo.SecertKey);
                             request.Headers.Add("accept", "application/json");
-                            var content = new StringContent("\r\n{\r\n  \"amount\": " + Decimal.Round(finalamount) + ",\r\n  \"currency\": \"" + getsubinfo.Currency + "\",\r\n  \"customer_initiated\": false,\r\n  \"threeDSecure\": true,\r\n  \"save_card\": false,\r\n  \"payment_agreement\": {\r\n    \"contract\": {\r\n      \"id\": \"" + getuserinfo.Tap_Card_ID + "\"\r\n    },\r\n    \"id\": \"" + getuserinfo.Tap_Agreement_ID + "\"\r\n  },\r\n  \"receipt\": {\r\n    \"email\": true,\r\n    \"sms\": true\r\n  },\"reference\": {\r\n    \"transaction\": \"" + TransNo + "\",\r\n    \"order\": \"" + OrderNo + "\"\r\n  },\r\n  \"customer\": {\r\n    \"id\": \"" + getuserinfo.Tap_CustomerID + "\"\r\n  },\r\n  \"merchant\": {\r\n    \"id\": \"22116401\"\r\n  },\r\n  \"source\": {\r\n    \"id\": \"" + Deserialized_savecard.id + "\"\r\n  },\r\n  \"redirect\": {\r\n    \"url\": \"https://1f3b186efe31e8696c144578816c5443.m.pipedream.net/\"\r\n  }\r\n}\r\n", null, "application/json");
+                            var content = new StringContent("\r\n{\r\n  \"amount\": " + Decimal.Round(after_vat_totalamount) + ",\r\n  \"currency\": \"" + getsubinfo.Currency + "\",\r\n  \"customer_initiated\": false,\r\n  \"threeDSecure\": true,\r\n  \"save_card\": false,\r\n  \"payment_agreement\": {\r\n    \"contract\": {\r\n      \"id\": \"" + getuserinfo.Tap_Card_ID + "\"\r\n    },\r\n    \"id\": \"" + getuserinfo.Tap_Agreement_ID + "\"\r\n  },\r\n  \"receipt\": {\r\n    \"email\": true,\r\n    \"sms\": true\r\n  },\"reference\": {\r\n    \"transaction\": \"" + TransNo + "\",\r\n    \"order\": \"" + OrderNo + "\"\r\n  },\r\n  \"customer\": {\r\n    \"id\": \"" + getuserinfo.Tap_CustomerID + "\"\r\n  },\r\n  \"merchant\": {\r\n    \"id\": \"22116401\"\r\n  },\r\n  \"source\": {\r\n    \"id\": \"" + Deserialized_savecard.id + "\"\r\n  },\r\n  \"redirect\": {\r\n    \"url\": \"https://1f3b186efe31e8696c144578816c5443.m.pipedream.net/\"\r\n  }\r\n}\r\n", null, "application/json");
                             request.Content = content;
                             var response = await client.SendAsync(request);
                             var bodys = await response.Content.ReadAsStringAsync();
@@ -125,6 +170,8 @@ namespace TapPaymentIntegration.Models.HangFire
                                     AddedDate = DateTime.Now,
                                     AddedBy = getuserinfo.FullName,
                                     SubscriptionAmount = finalamount,
+                                    VAT = Vat.ToString(),
+                                    Discount = Discount.ToString(),
                                     SubscriptionId = getsubinfo.SubscriptionId,
                                     Status = "Payment Captured",
                                     IsDeleted = false,
@@ -149,14 +196,12 @@ namespace TapPaymentIntegration.Models.HangFire
                         }
                         else if (getuserinfo.Frequency == "MONTHLY")
                         {
-                            var calculate_amount = getsubinfo.Amount;
-                            int finalamount = Convert.ToInt32(calculate_amount) / 1;
                             // Create a charge
                             var client = new HttpClient();
                             var request = new HttpRequestMessage(HttpMethod.Post, "https://api.tap.company/v2/charges");
                             request.Headers.Add("Authorization", "Bearer " + getuserinfo.SecertKey);
                             request.Headers.Add("accept", "application/json");
-                            var content = new StringContent("\r\n{\r\n  \"amount\": " + Decimal.Round(finalamount) + ",\r\n  \"currency\": \"" + getsubinfo.Currency + "\",\r\n  \"customer_initiated\": false,\r\n  \"threeDSecure\": true,\r\n  \"save_card\": false,\r\n  \"payment_agreement\": {\r\n    \"contract\": {\r\n      \"id\": \"" + getuserinfo.Tap_Card_ID + "\"\r\n    },\r\n    \"id\": \"" + getuserinfo.Tap_Agreement_ID + "\"\r\n  },\r\n  \"receipt\": {\r\n    \"email\": true,\r\n    \"sms\": true\r\n  },\"reference\": {\r\n    \"transaction\": \"" + TransNo + "\",\r\n    \"order\": \"" + OrderNo + "\"\r\n  },\r\n  \"customer\": {\r\n    \"id\": \"" + getuserinfo.Tap_CustomerID + "\"\r\n  },\r\n  \"merchant\": {\r\n    \"id\": \"22116401\"\r\n  },\r\n  \"source\": {\r\n    \"id\": \"" + Deserialized_savecard.id + "\"\r\n  },\r\n  \"redirect\": {\r\n    \"url\": \"https://1f3b186efe31e8696c144578816c5443.m.pipedream.net/\"\r\n  }\r\n}\r\n", null, "application/json");
+                            var content = new StringContent("\r\n{\r\n  \"amount\": " + Decimal.Round(after_vat_totalamount) + ",\r\n  \"currency\": \"" + getsubinfo.Currency + "\",\r\n  \"customer_initiated\": false,\r\n  \"threeDSecure\": true,\r\n  \"save_card\": false,\r\n  \"payment_agreement\": {\r\n    \"contract\": {\r\n      \"id\": \"" + getuserinfo.Tap_Card_ID + "\"\r\n    },\r\n    \"id\": \"" + getuserinfo.Tap_Agreement_ID + "\"\r\n  },\r\n  \"receipt\": {\r\n    \"email\": true,\r\n    \"sms\": true\r\n  },\"reference\": {\r\n    \"transaction\": \"" + TransNo + "\",\r\n    \"order\": \"" + OrderNo + "\"\r\n  },\r\n  \"customer\": {\r\n    \"id\": \"" + getuserinfo.Tap_CustomerID + "\"\r\n  },\r\n  \"merchant\": {\r\n    \"id\": \"22116401\"\r\n  },\r\n  \"source\": {\r\n    \"id\": \"" + Deserialized_savecard.id + "\"\r\n  },\r\n  \"redirect\": {\r\n    \"url\": \"https://1f3b186efe31e8696c144578816c5443.m.pipedream.net/\"\r\n  }\r\n}\r\n", null, "application/json");
                             request.Content = content;
                             var response = await client.SendAsync(request);
                             var bodys = await response.Content.ReadAsStringAsync();
@@ -174,6 +219,8 @@ namespace TapPaymentIntegration.Models.HangFire
                                     Currency = getsubinfo.Currency,
                                     Status = "Payment Captured",
                                     IsDeleted = false,
+                                    VAT = Vat.ToString(),
+                                    Discount = Discount.ToString(),
                                     Description = "Invoice Create - Frequency(" + getuserinfo.Frequency + ")",
                                     SubscriptionName = getsubinfo.Name,
                                     UserId = getuserinfo.Id,
@@ -195,14 +242,12 @@ namespace TapPaymentIntegration.Models.HangFire
                         }
                         else if (getuserinfo.Frequency == "QUARTERLY")
                         {
-                            var calculate_amount = getsubinfo.Amount;
-                            int finalamount = (Convert.ToInt32(calculate_amount) * 3) / 1;
                             // Create a charge
                             var client = new HttpClient();
                             var request = new HttpRequestMessage(HttpMethod.Post, "https://api.tap.company/v2/charges");
                             request.Headers.Add("Authorization", "Bearer " + getuserinfo.SecertKey);
                             request.Headers.Add("accept", "application/json");
-                            var content = new StringContent("\r\n{\r\n  \"amount\": " + Decimal.Round(finalamount) + ",\r\n  \"currency\": \"" + getsubinfo.Currency + "\",\r\n  \"customer_initiated\": false,\r\n  \"threeDSecure\": true,\r\n  \"save_card\": false,\r\n  \"payment_agreement\": {\r\n    \"contract\": {\r\n      \"id\": \"" + getuserinfo.Tap_Card_ID + "\"\r\n    },\r\n    \"id\": \"" + getuserinfo.Tap_Agreement_ID + "\"\r\n  },\r\n  \"receipt\": {\r\n    \"email\": true,\r\n    \"sms\": true\r\n  },\"reference\": {\r\n    \"transaction\": \"" + TransNo + "\",\r\n    \"order\": \"" + OrderNo + "\"\r\n  },\r\n  \"customer\": {\r\n    \"id\": \"" + getuserinfo.Tap_CustomerID + "\"\r\n  },\r\n  \"merchant\": {\r\n    \"id\": \"22116401\"\r\n  },\r\n  \"source\": {\r\n    \"id\": \"" + Deserialized_savecard.id + "\"\r\n  },\r\n  \"redirect\": {\r\n    \"url\": \"https://1f3b186efe31e8696c144578816c5443.m.pipedream.net/\"\r\n  }\r\n}\r\n", null, "application/json");
+                            var content = new StringContent("\r\n{\r\n  \"amount\": " + Decimal.Round(after_vat_totalamount) + ",\r\n  \"currency\": \"" + getsubinfo.Currency + "\",\r\n  \"customer_initiated\": false,\r\n  \"threeDSecure\": true,\r\n  \"save_card\": false,\r\n  \"payment_agreement\": {\r\n    \"contract\": {\r\n      \"id\": \"" + getuserinfo.Tap_Card_ID + "\"\r\n    },\r\n    \"id\": \"" + getuserinfo.Tap_Agreement_ID + "\"\r\n  },\r\n  \"receipt\": {\r\n    \"email\": true,\r\n    \"sms\": true\r\n  },\"reference\": {\r\n    \"transaction\": \"" + TransNo + "\",\r\n    \"order\": \"" + OrderNo + "\"\r\n  },\r\n  \"customer\": {\r\n    \"id\": \"" + getuserinfo.Tap_CustomerID + "\"\r\n  },\r\n  \"merchant\": {\r\n    \"id\": \"22116401\"\r\n  },\r\n  \"source\": {\r\n    \"id\": \"" + Deserialized_savecard.id + "\"\r\n  },\r\n  \"redirect\": {\r\n    \"url\": \"https://1f3b186efe31e8696c144578816c5443.m.pipedream.net/\"\r\n  }\r\n}\r\n", null, "application/json");
                             request.Content = content;
                             var response = await client.SendAsync(request);
                             var bodys = await response.Content.ReadAsStringAsync();
@@ -219,6 +264,8 @@ namespace TapPaymentIntegration.Models.HangFire
                                     SubscriptionAmount = finalamount,
                                     SubscriptionId = getsubinfo.SubscriptionId,
                                     Status = "Payment Captured",
+                                    VAT = Vat.ToString(),
+                                    Discount = Discount.ToString(),
                                     IsDeleted = false,
                                     Description = "Invoice Create - Frequency(" + getuserinfo.Frequency + ")",
                                     SubscriptionName = getsubinfo.Name,
@@ -241,14 +288,12 @@ namespace TapPaymentIntegration.Models.HangFire
                         }
                         else if (getuserinfo.Frequency == "HALFYEARLY")
                         {
-                            var calculate_amount = getsubinfo.Amount;
-                            int finalamount = (Convert.ToInt32(calculate_amount) * 6) / 1;
                             // Create a charge
                             var client = new HttpClient();
                             var request = new HttpRequestMessage(HttpMethod.Post, "https://api.tap.company/v2/charges");
                             request.Headers.Add("Authorization", "Bearer " + getuserinfo.SecertKey);
                             request.Headers.Add("accept", "application/json");
-                            var content = new StringContent("\r\n{\r\n  \"amount\": " + Decimal.Round(finalamount) + ",\r\n  \"currency\": \"" + getsubinfo.Currency + "\",\r\n  \"customer_initiated\": false,\r\n  \"threeDSecure\": true,\r\n  \"save_card\": false,\r\n  \"payment_agreement\": {\r\n    \"contract\": {\r\n      \"id\": \"" + getuserinfo.Tap_Card_ID + "\"\r\n    },\r\n    \"id\": \"" + getuserinfo.Tap_Agreement_ID + "\"\r\n  },\r\n  \"receipt\": {\r\n    \"email\": true,\r\n    \"sms\": true\r\n  },\"reference\": {\r\n    \"transaction\": \"" + TransNo + "\",\r\n    \"order\": \"" + OrderNo + "\"\r\n  },\r\n  \"customer\": {\r\n    \"id\": \"" + getuserinfo.Tap_CustomerID + "\"\r\n  },\r\n  \"merchant\": {\r\n    \"id\": \"22116401\"\r\n  },\r\n  \"source\": {\r\n    \"id\": \"" + Deserialized_savecard.id + "\"\r\n  },\r\n  \"redirect\": {\r\n    \"url\": \"https://1f3b186efe31e8696c144578816c5443.m.pipedream.net/\"\r\n  }\r\n}\r\n", null, "application/json");
+                            var content = new StringContent("\r\n{\r\n  \"amount\": " + Decimal.Round(after_vat_totalamount) + ",\r\n  \"currency\": \"" + getsubinfo.Currency + "\",\r\n  \"customer_initiated\": false,\r\n  \"threeDSecure\": true,\r\n  \"save_card\": false,\r\n  \"payment_agreement\": {\r\n    \"contract\": {\r\n      \"id\": \"" + getuserinfo.Tap_Card_ID + "\"\r\n    },\r\n    \"id\": \"" + getuserinfo.Tap_Agreement_ID + "\"\r\n  },\r\n  \"receipt\": {\r\n    \"email\": true,\r\n    \"sms\": true\r\n  },\"reference\": {\r\n    \"transaction\": \"" + TransNo + "\",\r\n    \"order\": \"" + OrderNo + "\"\r\n  },\r\n  \"customer\": {\r\n    \"id\": \"" + getuserinfo.Tap_CustomerID + "\"\r\n  },\r\n  \"merchant\": {\r\n    \"id\": \"22116401\"\r\n  },\r\n  \"source\": {\r\n    \"id\": \"" + Deserialized_savecard.id + "\"\r\n  },\r\n  \"redirect\": {\r\n    \"url\": \"https://1f3b186efe31e8696c144578816c5443.m.pipedream.net/\"\r\n  }\r\n}\r\n", null, "application/json");
                             request.Content = content;
                             var response = await client.SendAsync(request);
                             var bodys = await response.Content.ReadAsStringAsync();
@@ -260,6 +305,8 @@ namespace TapPaymentIntegration.Models.HangFire
                                     InvoiceStartDate = DateTime.Now,
                                     InvoiceEndDate = DateTime.Now.AddMonths(6),
                                     AddedDate = DateTime.Now,
+                                    VAT = Vat.ToString(),
+                                    Discount = Discount.ToString(),
                                     AddedBy = getuserinfo.FullName,
                                     SubscriptionAmount = finalamount,
                                     Currency = getsubinfo.Currency,
@@ -287,15 +334,12 @@ namespace TapPaymentIntegration.Models.HangFire
                         }
                         else if (getuserinfo.Frequency == "YEARLY")
                         {
-                            var calculate_amount = getsubinfo.Amount;
-                            var discount_amount = (Convert.ToInt32(calculate_amount) / 100) * 10;
-                            int finalamount = (Convert.ToInt32(calculate_amount) - discount_amount) * 12;
                             // Create a charge
                             var client = new HttpClient();
                             var request = new HttpRequestMessage(HttpMethod.Post, "https://api.tap.company/v2/charges");
                             request.Headers.Add("Authorization", "Bearer " + getuserinfo.SecertKey);
                             request.Headers.Add("accept", "application/json");
-                            var content = new StringContent("\r\n{\r\n  \"amount\": " + Decimal.Round(finalamount) + ",\r\n  \"currency\": \"" + getsubinfo.Currency + "\",\r\n  \"customer_initiated\": false,\r\n  \"threeDSecure\": true,\r\n  \"save_card\": false,\r\n  \"payment_agreement\": {\r\n    \"contract\": {\r\n      \"id\": \"" + getuserinfo.Tap_Card_ID + "\"\r\n    },\r\n    \"id\": \"" + getuserinfo.Tap_Agreement_ID + "\"\r\n  },\r\n  \"receipt\": {\r\n    \"email\": true,\r\n    \"sms\": true\r\n  },\"reference\": {\r\n    \"transaction\": \"" + TransNo + "\",\r\n    \"order\": \"" + OrderNo + "\"\r\n  },\r\n  \"customer\": {\r\n    \"id\": \"" + getuserinfo.Tap_CustomerID + "\"\r\n  },\r\n  \"merchant\": {\r\n    \"id\": \"22116401\"\r\n  },\r\n  \"source\": {\r\n    \"id\": \"" + Deserialized_savecard.id + "\"\r\n  },\r\n  \"redirect\": {\r\n    \"url\": \"https://1f3b186efe31e8696c144578816c5443.m.pipedream.net/\"\r\n  }\r\n}\r\n", null, "application/json");
+                            var content = new StringContent("\r\n{\r\n  \"amount\": " + Decimal.Round(after_vat_totalamount) + ",\r\n  \"currency\": \"" + getsubinfo.Currency + "\",\r\n  \"customer_initiated\": false,\r\n  \"threeDSecure\": true,\r\n  \"save_card\": false,\r\n  \"payment_agreement\": {\r\n    \"contract\": {\r\n      \"id\": \"" + getuserinfo.Tap_Card_ID + "\"\r\n    },\r\n    \"id\": \"" + getuserinfo.Tap_Agreement_ID + "\"\r\n  },\r\n  \"receipt\": {\r\n    \"email\": true,\r\n    \"sms\": true\r\n  },\"reference\": {\r\n    \"transaction\": \"" + TransNo + "\",\r\n    \"order\": \"" + OrderNo + "\"\r\n  },\r\n  \"customer\": {\r\n    \"id\": \"" + getuserinfo.Tap_CustomerID + "\"\r\n  },\r\n  \"merchant\": {\r\n    \"id\": \"22116401\"\r\n  },\r\n  \"source\": {\r\n    \"id\": \"" + Deserialized_savecard.id + "\"\r\n  },\r\n  \"redirect\": {\r\n    \"url\": \"https://1f3b186efe31e8696c144578816c5443.m.pipedream.net/\"\r\n  }\r\n}\r\n", null, "application/json");
                             request.Content = content;
                             var response = await client.SendAsync(request);
                             var bodys = await response.Content.ReadAsStringAsync();
@@ -309,6 +353,8 @@ namespace TapPaymentIntegration.Models.HangFire
                                     AddedDate = DateTime.Now,
                                     AddedBy = getuserinfo.FullName,
                                     SubscriptionAmount = finalamount,
+                                    VAT = Vat.ToString(),
+                                    Discount = Discount.ToString(),
                                     SubscriptionId = getsubinfo.SubscriptionId,
                                     Status = "Payment Captured",
                                     IsDeleted = false,
@@ -354,7 +400,7 @@ namespace TapPaymentIntegration.Models.HangFire
                         body = body.Replace("{title}", "Tamarran Payment Invoice");
                         body = body.Replace("{currentdate}", DateTime.Now.ToString());
 
-                        body = body.Replace("{InvocieStatus}", "Subscription Renewal Payment Captured");
+                        body = body.Replace("{InvocieStatus}", "Payment Captured");
                         body = body.Replace("{InvoiceID}", "Inv" + max_invoice_id);
 
 
@@ -365,7 +411,7 @@ namespace TapPaymentIntegration.Models.HangFire
 
                         body = body.Replace("{SubscriptionName}", getsubinfo.Name);
                         body = body.Replace("{SubscriptionPeriod}", getuserinfo.Frequency);
-                        body = body.Replace("{SetupFee}", getsubinfo.SetupFee);
+                        body = body.Replace("{SetupFee}", getsubinfo.SetupFee + " " + getsubinfo.Currency);
                         int amount = Convert.ToInt32(incoice_info.SubscriptionAmount);
                         body = body.Replace("{SubscriptionAmount}", incoice_info.SubscriptionAmount.ToString() + " " + getsubinfo.Currency);
                         //Calculate VAT
@@ -377,11 +423,9 @@ namespace TapPaymentIntegration.Models.HangFire
                         }
                         else
                         {
-                            int vat_percentage = Convert.ToInt32(getsubinfo.VAT);
-                            var per = (amount / 100) * vat_percentage;
-                            body = body.Replace("{VAT}", decimal.Round(per).ToString() + " " + getsubinfo.Currency);
-                            var All_tottal = amount + per;
-                            body = body.Replace("{Total}", All_tottal.ToString());
+                            body = body.Replace("{VAT}", Vat + " " + getsubinfo.Currency);
+                            var All_tottal =Convert.ToInt32(amount) + Convert.ToInt32(Vat);
+                            body = body.Replace("{Total}", All_tottal.ToString() + " " + getsubinfo.Currency);
                             body = body.Replace("{InvoiceAmount}", All_tottal.ToString() + " " + getsubinfo.Currency);
                         }
 
@@ -411,7 +455,7 @@ namespace TapPaymentIntegration.Models.HangFire
                         string pdfpath = _environment.ContentRootPath + "/TamrranInvoice.pdf";
                         byte[] bytes = System.IO.File.ReadAllBytes(pdfpath);
 
-                        _ = _emailSender.SendEmailWithFIle(bytes, getuserinfo.Email, "Subscription Renewal Payment Captured", "Your Recurring Payment has been received successfully. Thank you.");
+                        _ = _emailSender.SendEmailWithFIle(bytes, getuserinfo.Email, "Tamarran - Automatic Payment Confirmation", "Hello " + getuserinfo.GYMName+ ",<br />Kindly note that your subscription payment to Tamarran was made successfully.<br />Attached is the receipt for subscription auto-payment transaction.<br />Thank you for your business.<br />Tamarran's team!");
                     }
                 }
             }

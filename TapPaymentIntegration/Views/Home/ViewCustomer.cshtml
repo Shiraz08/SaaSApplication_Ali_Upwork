@@ -66,15 +66,19 @@
                                         </td>
                                         <td style="text-align:center!important">
                                             @{
-                                                if (user.SubscribeID == 0)
-                                                {
-                                                }
-                                                else
+                                                if (user.SubscribeID > 0)
                                                 {
                                                     <a class="btn btn-danger" asp-controller="Home" asp-action="UnSubscribeSubscription" asp-route-id="@user.Id">Un-Subscribe</a>
                                                 }
+                                                else
+                                                {
+                                                }
                                             }
-                                            <a class="btn btn-primary" asp-controller="Home" asp-action="DeleteCustomer" asp-route-userId="@user.Id">Delete Customer</a> &nbsp;
+                                            @if (user.UserType != "SuperAdmin")
+                                            {
+                                                <a class="btn btn-primary" asp-controller="Home" asp-action="DeleteCustomer" asp-route-userId="@user.Id">Delete Customer</a>
+                                                <a class="btn btn-success" asp-controller="Home" asp-action="ViewAllInvoices" asp-route-userId="@user.Id">View Invoice</a>
+                                            }
                                         </td>
                                     </tr>
                                 }

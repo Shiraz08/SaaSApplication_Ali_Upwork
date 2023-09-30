@@ -1,9 +1,9 @@
-﻿@model IEnumerable<TapPaymentIntegration.Models.InvoiceDTO.Invoice>
+﻿
 @{
-    ViewData["Title"] = "ShowInvoice";
+    ViewData["Title"] = "ViewAllInvoices";
     Layout = "~/Views/Shared/_DashboardLayout.cshtml";
 }
-
+@model IEnumerable<TapPaymentIntegration.Models.InvoiceDTO.Invoice>
 
 <br />
 <section class="content">
@@ -26,7 +26,6 @@
                                     <th>VAT</th>
                                     <th>Discont</th>
                                     <th>Status</th>
-                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -58,16 +57,6 @@
                                         {
                                             <td style="text-align:center!important">@user.Status</td>
                                         }
-                                        <td style="text-align:center!important">
-                                            @if (user.Status != "Payment Captured")
-                                            {
-                                                <a class="btn btn-primary" href="@user.InvoiceLink">Pay Invoice</a>
-                                            }
-                                            else
-                                            {
-                                                <a class="btn btn-success" href="@Url.Action("ViewInvoice","Home",new {id = user.ChargeId, sub_id = user.SubscriptionId, userid = user.UserId,invoiceid = user.InvoiceId})">Invoice Detail</a>
-                                            }
-                                        </td>
                                     </tr>
                                 }
                             </tbody>

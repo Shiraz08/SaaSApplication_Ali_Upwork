@@ -281,6 +281,7 @@
                                         </a>
                                     </li>
                                 </ul>
+                            </li>
                             <li class="nav-item">
                                 <a href="#" class="nav-link">
                                     <i class="nav-icon fas fa-address-card"></i>
@@ -298,7 +299,7 @@
                                     </li>
                                 </ul>
                             </li>
-                            </li>
+                            
                             <li class="nav-item">
                                 <a href="#" class="nav-link">
                                     <i class="nav-icon fas fa-credit-card"></i>
@@ -312,6 +313,29 @@
                                         <a href="@Url.Action("ChangeCard","TapPayment", new { id=user.Id })" class="nav-link">
                                             <i class="far fa-circle nav-icon"></i>
                                             <p>Change Card</p>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#" class="nav-link">
+                                    <i class="nav-icon fas fa-user"></i>
+                                    <p>
+                                        Manage Account
+                                        <i class="fas fa-angle-left right"></i>
+                                    </p>
+                                </a>
+                                <ul class="nav nav-treeview">
+                                    <li class="nav-item">
+                                        <a href="@Url.Action("ChangePassword","Accounts")" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Change Password</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="@Url.Action("ChangeProfile","Accounts")" class="nav-link">
+                                            <i class="far fa-circle nav-icon"></i>
+                                            <p>Update Profile</p>
                                         </a>
                                     </li>
                                 </ul>

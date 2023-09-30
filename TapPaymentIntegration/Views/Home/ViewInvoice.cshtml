@@ -116,14 +116,14 @@
                                     <tr>
                                         <th style="width:50%">Subtotal:</th>
                                         @{
-                                            var finalamount = Convert.ToInt32(@Model.amount) - Convert.ToInt32(@Model.Subscriptions.SetupFee);
+                                            var finalamount =Convert.ToInt32(@ViewBag.finalamount);
                                             <td style="text-align:center!important">@Model.Subscriptions.Currency @finalamount</td>
                                         }
 
                                     </tr>
                                     <tr>
                                         <th>VAT </th>
-                                        <td style="text-align:center!important">@Model.Subscriptions.Currency @ViewBag.VAT <br /><span style="color:red!important">VAT amount already add in Subtotal amount</span></td>
+                                        <td style="text-align:center!important">@Model.Subscriptions.Currency @ViewBag.VAT</td>
                                     </tr>
                                     <tr>
                                         <th>Setup Fee:</th>

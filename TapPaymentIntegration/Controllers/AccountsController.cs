@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using TapPaymentIntegration.Areas.Identity.Data;
@@ -12,7 +13,7 @@ namespace TapPaymentIntegration.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         EmailSender _emailSender = new EmailSender();
-        public AccountsController( UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public AccountsController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -37,7 +38,7 @@ namespace TapPaymentIntegration.Controllers
                 return RedirectToAction(nameof(ForgotPasswordConfirmation));
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             var callback = Url.Action(nameof(ResetPassword), "Accounts", new { token, email = user.Email }, Request.Scheme);
-            await _emailSender.SendEmailAsync(user.Email, "Reset password Email", "For Reset Passowrd Click This: <a href='"+ callback + "'>Link</a>");
+            await _emailSender.SendEmailAsync(user.Email, "Reset password Email", "For Reset Passowrd Click This: <a href='" + callback + "'>Link</a>");
             return RedirectToAction(nameof(ForgotPasswordConfirmation));
         }
         public IActionResult ForgotPasswordConfirmation()
@@ -73,6 +74,66 @@ namespace TapPaymentIntegration.Controllers
         [HttpGet]
         public IActionResult ResetPasswordConfirmation()
         {
+            return View();
+        }
+        [Authorize]
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePassword change)
+        {
+            var user = await _userManager.GetUserAsync(User); 
+            if (user == null)
+            {
+                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            var changePasswordResult = await _userManager.ChangePasswordAsync(user, change.OldPassword, change.NewPassword);
+            if (!changePasswordResult.Succeeded)
+            {
+                foreach (var error in changePasswordResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                return View();
+            }
+
+            await _signInManager.RefreshSignInAsync(user);
+            ModelState.AddModelError(string.Empty, "Your password has been changed.");
+            return View();
+        }
+        [Authorize]
+        public IActionResult ChangeProfile()
+        {
+            return View();
+        }
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> ChangeProfile(UpdateProfile change)
+        { 
+            var user = await _userManager.GetUserAsync(User);
+            user.Email = change.Email;
+            user.PhoneNumber = change.PhoneNumber;
+            if (user == null)
+            {
+                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            var changePasswordResult = await _userManager.UpdateAsync(user);
+            if (!changePasswordResult.Succeeded)
+            {
+                foreach (var error in changePasswordResult.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+                return View();
+            }
+
+            await _signInManager.RefreshSignInAsync(user);
+            ModelState.AddModelError(string.Empty, "Your Profile has been changed.");
             return View();
         }
     }

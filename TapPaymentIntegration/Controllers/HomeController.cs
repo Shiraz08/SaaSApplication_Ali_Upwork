@@ -13,6 +13,7 @@ using TapPaymentIntegration.Models.Card;
 using ApplicationUser = TapPaymentIntegration.Areas.Identity.Data.ApplicationUser;
 using System.Text.Encodings.Web;
 using System.Numerics;
+using System;
 
 namespace TapPaymentIntegration.Controllers
 {
@@ -107,7 +108,7 @@ namespace TapPaymentIntegration.Controllers
                 Invoice invoice = null;
                 var Frequency = "";
                 var VAT = "";
-                if (Userid != null)
+                if (Userid != "")
                 {
                     usersinfo = _context.Users.Where(x => x.Id == Userid).FirstOrDefault();
                     invoice = _context.invoices.Where(x => x.InvoiceId == Convert.ToInt32(Invoiceid)).FirstOrDefault();
@@ -340,6 +341,8 @@ namespace TapPaymentIntegration.Controllers
                                 SubscriptionId = Convert.ToInt32(subscriptions.SubscriptionId),
                                 Status = "Un-Paid",
                                 IsDeleted = false,
+                                VAT =Vat.ToString(),
+                                Discount =Discount.ToString(),
                                 Description = "Invoice Create - Frequency(" + users.Frequency + ")",
                                 SubscriptionName = subscriptions.Name,
                                 UserId = users.Id,
@@ -363,9 +366,6 @@ namespace TapPaymentIntegration.Controllers
 
 
                             var userinfo = _context.Users.Where(x => x.Id == users.Id).FirstOrDefault();
-                            var invoice = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).FirstOrDefault();
-
-
                             //update user 
                             users.Tap_CustomerID = Deserialized_savecard.payment_agreement.contract.customer_id;
                             users.Tap_Card_ID = Deserialized_savecard.payment_agreement.contract.id;
@@ -375,7 +375,7 @@ namespace TapPaymentIntegration.Controllers
                             _context.Users.Update(users);
                             _context.SaveChanges();
 
-                            Invoice invoice_info = _context.invoices.Where(x => x.InvoiceId == Convert.ToInt32(Invoiceid)).FirstOrDefault();
+                            Invoice invoice_info = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).FirstOrDefault();
                             invoice_info.ChargeId = tap_id;
                             invoice_info.Status = "Payment Captured";
                             invoice_info.ChargeResponseId = getchargesresposemodel;
@@ -409,9 +409,9 @@ namespace TapPaymentIntegration.Controllers
 
                             body = body.Replace("{SubscriptionName}", sub_info.Name);
                             body = body.Replace("{SubscriptionPeriod}", userinfo.Frequency);
-                            body = body.Replace("{SetupFee}", sub_info.SetupFee);
+                            body = body.Replace("{SetupFee}", sub_info.SetupFee + " " + sub_info.Currency);
                             int amount = Convert.ToInt32(finalamount) + Convert.ToInt32(sub_info.SetupFee);
-                            body = body.Replace("{SubscriptionAmount}", finalamount.ToString());
+                            body = body.Replace("{SubscriptionAmount}", finalamount.ToString() + " " + sub_info.Currency);
                             //Calculate VAT
                             if (sub_info.VAT == null)
                             {
@@ -680,12 +680,18 @@ namespace TapPaymentIntegration.Controllers
                          Country = um.Country,
                          City = um.City,
                          Currency = um.Currency,
-                         SubscribeName = sub.Name + " " + "-" + " " +"(" + sub.Amount + ")",
-                         SubscribeID= um.SubscribeID,
+                         SubscribeName = sub.Name + " " + "-" + " " + "(" + sub.Amount + ")",
+                         SubscribeID = um.SubscribeID,
                          Status = um.Status,
-                         GYMName=um.GYMName
+                         PaymentSource = um.PaymentSource,
+                         GYMName = um.GYMName,UserType = um.UserType
                      });
             return View(users);
+        }
+        public IActionResult ViewAllInvoices(string userId)
+        {
+            var incoices = _context.invoices.Where(x => x.UserId == userId).ToList(); 
+            return View(incoices);
         }
         public IActionResult AddCustomer()
         {
@@ -695,6 +701,13 @@ namespace TapPaymentIntegration.Controllers
         [HttpPost]
         public async Task<IActionResult> AddCustomer(ApplicationUser applicationUser)
         {
+            var resultuser = await _userManager.FindByEmailAsync(applicationUser.UserName);
+            if (resultuser != null)
+            {
+                ViewBag.SubscriptionList = applicationUser.SubscribeID;
+                ModelState.AddModelError(string.Empty, "Email Already Exist..!");
+                return View(applicationUser);
+            }
             //Save data to tap side
             var countrycode = "";
             var currencycode = "";
@@ -736,6 +749,7 @@ namespace TapPaymentIntegration.Controllers
             applicationUser.UserType = "Customer"; 
             applicationUser.EmailConfirmed = true; 
             applicationUser.PhoneNumberConfirmed = true; 
+            applicationUser.PhoneNumber = applicationUser.PhoneNumber; 
             applicationUser.Password = applicationUser.Password;
             applicationUser.Tap_CustomerID =null;
             if(applicationUser.Password != null)
@@ -1089,11 +1103,127 @@ namespace TapPaymentIntegration.Controllers
             var response_ChargeDetail = await client_ChargeDetail.SendAsync(request_ChargeDetail);
             var result_ChargeDetail = await response_ChargeDetail.Content.ReadAsStringAsync();
             ChargeDetail Deserialized_savecard = JsonConvert.DeserializeObject<ChargeDetail>(result_ChargeDetail);
-            var subscription_info = _context.subscriptions.Where(x => x.SubscriptionId == sub_id).FirstOrDefault();
-            Deserialized_savecard.Subscriptions = subscription_info;
-            ViewBag.Frequency = _userManager.Users.Where(x=>x.Id == userid).Select(x => x.Frequency).FirstOrDefault();
-            ViewBag.VAT = _userManager.Users.Where(x=>x.Id == userid).Select(x => x.VAT).FirstOrDefault();
-            ViewBag.InvoiceID = _context.invoices.Where(x=>x.InvoiceId == Convert.ToInt32(invoiceid)).Select(x=>x.InvoiceId).FirstOrDefault();
+            var getsubinfo = _context.subscriptions.Where(x => x.SubscriptionId == sub_id).FirstOrDefault();
+            var getuserinfo = _context.Users.Where(x => x.Id == userid).FirstOrDefault();
+            var getinvoiceinfo = _context.invoices.Where(x => x.InvoiceId == Convert.ToInt32(invoiceid)).FirstOrDefault();
+            Deserialized_savecard.Subscriptions = getsubinfo;
+
+            if(getinvoiceinfo.ChargeResponseId > 0)
+            {
+                int days = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
+                int finalamount = 0;
+                int Discount = 0;
+                int Vat = 0;
+                if (getuserinfo.Frequency == "DAILY")
+                {
+                    Discount = 0;
+                    finalamount = Convert.ToInt32(getsubinfo.Amount) / days;
+                }
+                else if (getuserinfo.Frequency == "WEEKLY")
+                {
+                    Discount = 0;
+                    finalamount = Convert.ToInt32(getsubinfo.Amount) / 4;
+                }
+                else if (getuserinfo.Frequency == "MONTHLY")
+                {
+                    Discount = 0;
+                    finalamount = Convert.ToInt32(getsubinfo.Amount) / 1;
+                }
+                else if (getuserinfo.Frequency == "QUARTERLY")
+                {
+                    Discount = 0;
+                    finalamount = (Convert.ToInt32(getsubinfo.Amount) * 3) / 1;
+                }
+                else if (getuserinfo.Frequency == "HALFYEARLY")
+                {
+                    Discount = 0;
+                    finalamount = (Convert.ToInt32(getsubinfo.Amount) * 6) / 1;
+                }
+                else if (getuserinfo.Frequency == "YEARLY")
+                {
+                    var amountpercentage = (Convert.ToInt32(getsubinfo.Amount) / 100) * 10;
+                    var final_amount_percentage = Convert.ToInt32(getsubinfo.Amount) - amountpercentage;
+                    finalamount = final_amount_percentage * 12;
+                    Discount = amountpercentage * 12;
+                }
+                if (getsubinfo.VAT == "0")
+                {
+                    Vat = 0;
+                }
+                else
+                {
+                    int totala = finalamount + Convert.ToInt32(getsubinfo.SetupFee);
+                    double double_amount = Math.Round(Convert.ToDouble(totala));
+                    int roundoff_totalamount = Convert.ToInt32(double_amount);
+                    Vat = ((Convert.ToInt32(roundoff_totalamount) / Convert.ToInt32(getsubinfo.VAT)) * 100) / 100;
+                }
+                int after_vat_totalamount = finalamount + Vat;
+
+
+
+                ViewBag.Frequency = getuserinfo.Frequency;
+                ViewBag.finalamount = finalamount;
+                ViewBag.VAT = Vat;
+                ViewBag.InvoiceID = getinvoiceinfo.InvoiceId;
+            }
+            else
+            {
+                int days = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
+                int finalamount = 0;
+                int Discount = 0;
+                int Vat = 0;
+                if (getuserinfo.Frequency == "DAILY")
+                {
+                    Discount = 0;
+                    finalamount = Convert.ToInt32(getsubinfo.Amount) / days;
+                }
+                else if (getuserinfo.Frequency == "WEEKLY")
+                {
+                    Discount = 0;
+                    finalamount = Convert.ToInt32(getsubinfo.Amount) / 4;
+                }
+                else if (getuserinfo.Frequency == "MONTHLY")
+                {
+                    Discount = 0;
+                    finalamount = Convert.ToInt32(getsubinfo.Amount) / 1;
+                }
+                else if (getuserinfo.Frequency == "QUARTERLY")
+                {
+                    Discount = 0;
+                    finalamount = (Convert.ToInt32(getsubinfo.Amount) * 3) / 1;
+                }
+                else if (getuserinfo.Frequency == "HALFYEARLY")
+                {
+                    Discount = 0;
+                    finalamount = (Convert.ToInt32(getsubinfo.Amount) * 6) / 1;
+                }
+                else if (getuserinfo.Frequency == "YEARLY")
+                {
+                    var amountpercentage = (Convert.ToInt32(getsubinfo.Amount) / 100) * 10;
+                    var final_amount_percentage = Convert.ToInt32(getsubinfo.Amount) - amountpercentage;
+                    finalamount = final_amount_percentage * 12;
+                    Discount = amountpercentage * 12;
+                }
+                if (getsubinfo.VAT == "0")
+                {
+                    Vat = 0;
+                }
+                else
+                {
+                    int totala = finalamount;
+                    double double_amount = Math.Round(Convert.ToDouble(totala));
+                    int roundoff_totalamount = Convert.ToInt32(double_amount);
+                    Vat = ((Convert.ToInt32(roundoff_totalamount) / Convert.ToInt32(getsubinfo.VAT)) * 100) / 100;
+                }
+                int after_vat_totalamount = finalamount + Vat;
+
+
+
+                ViewBag.Frequency = getuserinfo.Frequency;
+                ViewBag.finalamount = finalamount;
+                ViewBag.VAT = Vat;
+                ViewBag.InvoiceID = getinvoiceinfo.InvoiceId;
+            }
             return View(Deserialized_savecard);
         }
         public IActionResult ShowInvoice(string PaymentStatus)
@@ -1136,6 +1266,14 @@ namespace TapPaymentIntegration.Controllers
         [HttpPost]
         public async Task<IActionResult> AddGymCustomer(ApplicationUser applicationUser)
         {
+            var subid = applicationUser.SubscribeID;
+            var resultuser = await _userManager.FindByEmailAsync(applicationUser.UserName);
+            if (resultuser != null)
+            {
+                ViewBag.SubscriptionList = subid;
+                ModelState.AddModelError(string.Empty, "Email Already Exist..!");
+                return View(applicationUser);
+            }
             var countrycode = "";
             var currencycode = "";
             if (applicationUser.Country == "Bahrain")
@@ -1171,17 +1309,18 @@ namespace TapPaymentIntegration.Controllers
             applicationUser.Currency = currencycode;
             var selectsub_country = _context.subscriptions.Where(x => x.SubscriptionId == applicationUser.SubscribeID).Select(x => x.Countries).FirstOrDefault();
             // save data to database
-            var subid = applicationUser.SubscribeID;
             applicationUser.Email = applicationUser.UserName;
             applicationUser.Status = true;
             applicationUser.UserType = "Customer";
             applicationUser.EmailConfirmed = true;
             applicationUser.PhoneNumberConfirmed = true;
+            applicationUser.PhoneNumber = applicationUser.PhoneNumber;
             applicationUser.Password = applicationUser.Password;
             applicationUser.Tap_CustomerID = null;
             applicationUser.SubscribeID = 0;
             if (applicationUser.Password == null)
             {
+                ViewBag.SubscriptionList = subid;
                 ViewBag.SubscriptionList = _context.subscriptions.Select(x => new SelectListItem { Value = x.SubscriptionId.ToString(), Text = x.Name + " " + "-" + " " + x.Amount });
                 ModelState.AddModelError(string.Empty, "Please Enter The Password...!");
             }
@@ -1207,6 +1346,7 @@ namespace TapPaymentIntegration.Controllers
             }
             foreach (var error in result.Errors)
             {
+                ViewBag.SubscriptionList = subid;
                 ViewBag.SubscriptionList = _context.subscriptions.Select(x => new SelectListItem { Value = x.SubscriptionId.ToString(), Text = x.Name + " " + "-" + " " + x.Amount });
                 ModelState.AddModelError(string.Empty, error.Description);
             }
