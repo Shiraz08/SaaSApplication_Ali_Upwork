@@ -37,7 +37,7 @@ namespace TapPaymentIntegration.Controllers
         public readonly string BHD_Test_Key = "sk_test_Tgoy8HbxdQ40l6Ea9SIDci7B";
         public readonly string KSA_Public_Key = "pk_test_j3yKfvbxws8khDpFQOX5JeWc";
         public readonly string KSA_Test_Key = "sk_test_1SU5woL8vZe6JXrBHipQu9Dn";
-        public readonly string RedirectURL = "https://localhost:7279";
+        public readonly string RedirectURL = "https://tappayment.niralahyderabadirestaurant.com";
         public HomeController(IWebHostEnvironment Environment, ILogger<HomeController> logger, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, TapPaymentIntegrationContext context, IUserStore<ApplicationUser> userStore)
         {
             _logger = logger;
@@ -910,7 +910,7 @@ namespace TapPaymentIntegration.Controllers
                 byte[] bytes = System.IO.File.ReadAllBytes(pdfpath);
                 var callbackUrl =  @Url.Action("SubscriptionAdmin", "Home" ,new { id = applicationUser.SubscribeID, link= "Yes", userid = max_user_id, invoiceid = max_invoice_id , After_vat_totalamount = after_vat_totalamount });
                 var websiteurl  =  HtmlEncoder.Default.Encode(RedirectURL + callbackUrl);
-                _ = _emailSender.SendEmailWithFIle(bytes, applicationUser.Email, "UnPaid Invoice", "Hi..! <br /> Your Tamarran Credentials is here. <br /> Username: "+ applicationUser.UserName+" and <br /> Password: "+applicationUser.Password+ " <br /> For Payment Click This: <a href='"+ websiteurl + "'>Link</a>");
+                _ = _emailSender.SendEmailWithFIle(bytes, applicationUser.Email, "Payment Request", "Hi..! <br /> Your Tamarran Credentials is here. <br /> Username: "+ applicationUser.UserName+" and <br /> Password: "+applicationUser.Password+ " <br /> For Payment Click This: <a href='"+ websiteurl + "'>Link</a>");
                 var invoiceinfo = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).FirstOrDefault();
                 invoiceinfo.InvoiceLink = RedirectURL + callbackUrl;
                 _context.invoices.Update(invoiceinfo);
