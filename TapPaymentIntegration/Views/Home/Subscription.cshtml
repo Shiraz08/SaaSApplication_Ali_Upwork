@@ -520,7 +520,7 @@ html {
             $("#Discount").val('0');
             subscriptionamount = @Model.Amount;
         }
-        var totala = parseInt(subscriptionamount) + parseInt(@Model.SetupFee);
+        var totala = parseFloat(subscriptionamount) + parseFloat(@Model.SetupFee);
         var calculate_vat = "";
         if (@Model.VAT == "0") 
         {
@@ -530,14 +530,14 @@ html {
         else 
         {
             var roundoff_totalamount = Math.round(totala);
-            calculate_vat = (roundoff_totalamount / 100) * @Model.VAT;
+            calculate_vat = (totala / 100) * @Model.VAT;
             $("#VAT").val(calculate_vat);
         }
         $("#planamount").val(@Model.Amount);
         $("#subamount").val(subscriptionamount);
         $("#subamount2").val(subscriptionamount);
         var subscriptionSetupFee = @Model.SetupFee;
-        var totalamount = parseInt(subscriptionamount) + parseInt(subscriptionSetupFee) + parseInt(calculate_vat);
+        var totalamount = parseFloat(subscriptionamount) + parseFloat(subscriptionSetupFee) + parseFloat(calculate_vat);
         $("#TotalPlanfee").val(totalamount);
         $("#TotalPlanfee2").val(totalamount);
     });

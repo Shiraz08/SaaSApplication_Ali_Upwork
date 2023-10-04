@@ -37,7 +37,7 @@ namespace TapPaymentIntegration.Controllers
         public readonly string BHD_Test_Key = "sk_test_Tgoy8HbxdQ40l6Ea9SIDci7B";
         public readonly string KSA_Public_Key = "pk_test_j3yKfvbxws8khDpFQOX5JeWc";
         public readonly string KSA_Test_Key = "sk_test_1SU5woL8vZe6JXrBHipQu9Dn";
-        public readonly string RedirectURL = "https://tappayment.niralahyderabadirestaurant.com";
+        public readonly string RedirectURL = "https://localhost:7279";
         public HomeController(IWebHostEnvironment Environment, ILogger<HomeController> logger, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, TapPaymentIntegrationContext context, IUserStore<ApplicationUser> userStore)
         {
             _logger = logger;
@@ -86,6 +86,7 @@ namespace TapPaymentIntegration.Controllers
             ViewBag.Invoiceid = invoiceid;
             ViewBag.After_vat_totalamount = After_vat_totalamount;
             ViewBag.userid = userid;
+            ViewBag.RedirectURL = RedirectURL;
             return View(subscriptions);
         }
         public async Task<IActionResult> Logout()
@@ -283,37 +284,37 @@ namespace TapPaymentIntegration.Controllers
                             var users = GetCurrentUserAsync().Result;
                             var subscriptions = _context.subscriptions.Where(x => x.Status == true && x.SubscriptionId == Convert.ToInt32(SubscriptionId)).FirstOrDefault();
                             int days = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
-                            int finalamount = 0;
-                            int Discount = 0;
-                            int Vat = 0;
+                            decimal finalamount = 0;
+                            decimal Discount = 0;
+                            decimal Vat = 0;
                             if (users.Frequency == "DAILY")
                             {
                                 Discount = 0;
-                                finalamount = Convert.ToInt32(subscriptions.Amount) / days;
+                                finalamount = (decimal)Convert.ToInt32(subscriptions.Amount) / (int)days;
                             }
                             else if (users.Frequency == "WEEKLY")
                             {
                                 Discount = 0;
-                                finalamount = Convert.ToInt32(subscriptions.Amount) / 4;
+                                finalamount = (decimal)Convert.ToInt32(subscriptions.Amount) / 4;
                             }
                             else if (users.Frequency == "MONTHLY")
                             {
                                 Discount = 0;
-                                finalamount = Convert.ToInt32(subscriptions.Amount) / 1;
+                                finalamount = (decimal)Convert.ToInt32(subscriptions.Amount) / 1;
                             }
                             else if (users.Frequency == "QUARTERLY")
                             {
                                 Discount = 0;
-                                finalamount = (Convert.ToInt32(subscriptions.Amount) * 3) / 1;
+                                finalamount = (decimal)(Convert.ToInt32(subscriptions.Amount) * 3) / 1;
                             }
                             else if (users.Frequency == "HALFYEARLY")
                             {
                                 Discount = 0;
-                                finalamount = (Convert.ToInt32(subscriptions.Amount) * 6) / 1;
+                                finalamount = (decimal)(Convert.ToInt32(subscriptions.Amount) * 6) / 1;
                             }
                             else if (users.Frequency == "YEARLY")
                             {
-                                var amountpercentage = (Convert.ToInt32(subscriptions.Amount) / 100) * 10;
+                                var amountpercentage = (decimal)(Convert.ToInt32(subscriptions.Amount) / 100) * 10;
                                 var final_amount_percentage = Convert.ToInt32(subscriptions.Amount) - amountpercentage;
                                 finalamount = final_amount_percentage * 12;
                                 Discount = amountpercentage * 12;
@@ -324,12 +325,10 @@ namespace TapPaymentIntegration.Controllers
                             }
                             else
                             {
-                                int totala = finalamount + Convert.ToInt32(subscriptions.SetupFee);
-                                double double_amount = Math.Round(Convert.ToDouble(totala));
-                                int roundoff_totalamount = Convert.ToInt32(double_amount);
-                                Vat = ((Convert.ToInt32(roundoff_totalamount) / Convert.ToInt32(subscriptions.VAT)) * 100) / 100;
+                                decimal totala = finalamount + Convert.ToInt32(subscriptions.SetupFee);
+                                Vat = (decimal)((totala / Convert.ToInt32(subscriptions.VAT)) * 100) / 100;
                             }
-                            int after_vat_totalamount = finalamount + Convert.ToInt32(subscriptions.SetupFee) + Vat;
+                            decimal after_vat_totalamount = finalamount + Convert.ToInt32(subscriptions.SetupFee) + Vat;
                             Invoice invoices = new Invoice
                             {
                                 InvoiceStartDate = DateTime.Now,
@@ -337,7 +336,7 @@ namespace TapPaymentIntegration.Controllers
                                 Currency = subscriptions.Currency,
                                 AddedDate = DateTime.Now,
                                 AddedBy = GetCurrentUserAsync().Result.FullName,
-                                SubscriptionAmount = after_vat_totalamount,
+                                SubscriptionAmount =Convert.ToInt32(decimal.Round(after_vat_totalamount)),
                                 SubscriptionId = Convert.ToInt32(subscriptions.SubscriptionId),
                                 Status = "Un-Paid",
                                 IsDeleted = false,
@@ -410,7 +409,7 @@ namespace TapPaymentIntegration.Controllers
                             body = body.Replace("{SubscriptionName}", sub_info.Name);
                             body = body.Replace("{SubscriptionPeriod}", userinfo.Frequency);
                             body = body.Replace("{SetupFee}", sub_info.SetupFee + " " + sub_info.Currency);
-                            int amount = Convert.ToInt32(finalamount) + Convert.ToInt32(sub_info.SetupFee);
+                            decimal amount = finalamount+ Convert.ToInt32(sub_info.SetupFee);
                             body = body.Replace("{SubscriptionAmount}", finalamount.ToString() + " " + sub_info.Currency);
                             //Calculate VAT
                             if (sub_info.VAT == null)
@@ -462,37 +461,37 @@ namespace TapPaymentIntegration.Controllers
                             var subscriptions = _context.subscriptions.Where(x => x.Status == true && x.SubscriptionId == Convert.ToInt32(SubscriptionId)).FirstOrDefault();
                             var Amount = subscriptions.Amount;
                             int days = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
-                            int finalamount = 0;
-                            int Discount = 0;
-                            int Vat = 0;
+                            decimal finalamount = 0;
+                            decimal Discount = 0;
+                            decimal Vat = 0;
                             if (users.Frequency == "DAILY")
                             {
                                 Discount = 0;
-                                finalamount = Convert.ToInt32(subscriptions.Amount) / days;
+                                finalamount = (decimal)Convert.ToInt32(subscriptions.Amount) / (int)days;
                             }
                             else if (users.Frequency == "WEEKLY")
                             {
                                 Discount = 0;
-                                finalamount = Convert.ToInt32(subscriptions.Amount) / 4;
+                                finalamount = (decimal)Convert.ToInt32(subscriptions.Amount) / 4;
                             }
                             else if (users.Frequency == "MONTHLY")
                             {
                                 Discount = 0;
-                                finalamount = Convert.ToInt32(subscriptions.Amount) / 1;
+                                finalamount = (decimal)Convert.ToInt32(subscriptions.Amount) / 1;
                             }
                             else if (users.Frequency == "QUARTERLY")
                             {
                                 Discount = 0;
-                                finalamount = (Convert.ToInt32(subscriptions.Amount) * 3) / 1;
+                                finalamount = (decimal)(Convert.ToInt32(subscriptions.Amount) * 3) / 1;
                             }
                             else if (users.Frequency == "HALFYEARLY")
                             {
                                 Discount = 0;
-                                finalamount = (Convert.ToInt32(subscriptions.Amount) * 6) / 1;
+                                finalamount = (decimal)(Convert.ToInt32(subscriptions.Amount) * 6) / 1;
                             }
                             else if (users.Frequency == "YEARLY")
                             {
-                                var amountpercentage = (Convert.ToInt32(subscriptions.Amount) / 100) * 10;
+                                var amountpercentage = (decimal)(Convert.ToInt32(subscriptions.Amount) / 100) * 10;
                                 var final_amount_percentage = Convert.ToInt32(subscriptions.Amount) - amountpercentage;
                                 finalamount = final_amount_percentage * 12;
                                 Discount = amountpercentage * 12;
@@ -503,15 +502,13 @@ namespace TapPaymentIntegration.Controllers
                             }
                             else
                             {
-                                double totala = finalamount + Convert.ToDouble(subscriptions.SetupFee);
-                                double roundoff_totalamount = Math.Round(totala);
-                                Vat = ((Convert.ToInt32(roundoff_totalamount) / Convert.ToInt32(subscriptions.VAT)) * 100) / 100;
+                                decimal totala = finalamount + Convert.ToInt32(subscriptions.SetupFee);
+                                Vat = (decimal)((totala / Convert.ToInt32(subscriptions.VAT)) * 100) / 100;
                             }
-                            int after_vat_totalamount = finalamount + Convert.ToInt32(subscriptions.SetupFee) + Vat;
-                            // Update Recurring Job data
+                            decimal after_vat_totalamount = finalamount + Convert.ToInt32(subscriptions.SetupFee) + Vat;
                             var max_invoice_id = _context.invoices.Where(x => x.InvoiceId == Convert.ToInt32(Invoiceid)).FirstOrDefault();
                             RecurringCharge recurringCharge = new RecurringCharge();
-                            recurringCharge.Amount = Convert.ToDecimal(finalamount);
+                            recurringCharge.Amount = decimal.Round(finalamount);
                             recurringCharge.SubscriptionId = subscriptions.SubscriptionId;
                             recurringCharge.UserID = users.Id;
                             recurringCharge.Tap_CustomerId = users.Tap_CustomerID;
@@ -570,7 +567,7 @@ namespace TapPaymentIntegration.Controllers
                             body = body.Replace("{SubscriptionName}", sub_info.Name);
                             body = body.Replace("{SubscriptionPeriod}", userinfo.Frequency);
                             body = body.Replace("{SetupFee}", sub_info.SetupFee + " " + sub_info.Currency);
-                            int amount = Convert.ToInt32(finalamount) + Convert.ToInt32(sub_info.SetupFee);
+                            decimal amount = finalamount + Convert.ToInt32(sub_info.SetupFee);
                             body = body.Replace("{SubscriptionAmount}", finalamount.ToString() + " " + sub_info.Currency);
                             //Calculate VAT
                             if (sub_info.VAT == null)
@@ -777,37 +774,37 @@ namespace TapPaymentIntegration.Controllers
                 string max_user_id = _context.Users.Where(x=>x.Email == applicationUser.Email).Select(x=>x.Id).FirstOrDefault();
                 //Create Invoice
                 int days = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
-                int finalamount = 0;
-                int Discount = 0;
-                int Vat = 0;
+                decimal finalamount = 0;
+                decimal Discount = 0;
+                decimal Vat = 0;
                 if (applicationUser.Frequency == "DAILY")
                 {
                     Discount = 0;
-                    finalamount = Convert.ToInt32(subscriptions.Amount) / days;
+                    finalamount = (decimal)Convert.ToInt32(subscriptions.Amount) / (int)days;
                 }
                 else if (applicationUser.Frequency == "WEEKLY")
                 {
                     Discount = 0;
-                    finalamount = Convert.ToInt32(subscriptions.Amount) / 4;
+                    finalamount = (decimal)Convert.ToInt32(subscriptions.Amount) / 4;
                 }
                 else if (applicationUser.Frequency == "MONTHLY")
                 {
                     Discount = 0;
-                    finalamount = Convert.ToInt32(subscriptions.Amount) / 1;
+                    finalamount = (decimal)Convert.ToInt32(subscriptions.Amount) / 1;
                 }
                 else if (applicationUser.Frequency == "QUARTERLY")
                 {
                     Discount = 0;
-                    finalamount = (Convert.ToInt32(subscriptions.Amount) * 3) / 1;
+                    finalamount = (decimal)(Convert.ToInt32(subscriptions.Amount) * 3) / 1;
                 }
                 else if (applicationUser.Frequency == "HALFYEARLY")
                 {
                     Discount = 0;
-                    finalamount = (Convert.ToInt32(subscriptions.Amount) * 6) / 1;
+                    finalamount = (decimal)(Convert.ToInt32(subscriptions.Amount) * 6) / 1;
                 }
                 else if (applicationUser.Frequency == "YEARLY")
                 {
-                    var amountpercentage = (Convert.ToInt32(subscriptions.Amount) / 100) * 10;
+                    var amountpercentage = (decimal)(Convert.ToInt32(subscriptions.Amount) / 100) * 10;
                     var final_amount_percentage = Convert.ToInt32(subscriptions.Amount) - amountpercentage;
                     finalamount = final_amount_percentage * 12;
                     Discount = amountpercentage * 12;
@@ -818,11 +815,10 @@ namespace TapPaymentIntegration.Controllers
                 }
                 else
                 {
-                    double totala = finalamount + Convert.ToDouble(subscriptions.SetupFee);
-                    double roundoff_totalamount = Math.Round(totala);
-                    Vat = ((Convert.ToInt32(roundoff_totalamount) / Convert.ToInt32(subscriptions.VAT)) * 100) / 100;
+                    decimal totala = finalamount + Convert.ToInt32(subscriptions.SetupFee);
+                    Vat = (decimal)((totala / Convert.ToInt32(subscriptions.VAT)) * 100) / 100;
                 }
-                int after_vat_totalamount = finalamount + Convert.ToInt32(subscriptions.SetupFee) + Vat;
+                decimal after_vat_totalamount = finalamount + Convert.ToInt32(subscriptions.SetupFee) + Vat;
                 Invoice invoices = new Invoice
                 {
                     InvoiceStartDate = DateTime.Now,
@@ -832,7 +828,7 @@ namespace TapPaymentIntegration.Controllers
                     VAT =Vat.ToString(),
                     Discount = Discount.ToString(),
                     AddedBy = GetCurrentUserAsync().Result.FullName,
-                    SubscriptionAmount = after_vat_totalamount,
+                    SubscriptionAmount = Convert.ToInt32(decimal.Round(after_vat_totalamount)),
                     SubscriptionId = Convert.ToInt32(subscriptions.SubscriptionId),
                     Status = "Un-Paid",
                     IsDeleted = false,

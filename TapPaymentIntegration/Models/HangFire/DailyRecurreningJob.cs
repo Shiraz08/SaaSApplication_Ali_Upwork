@@ -30,8 +30,8 @@ namespace TapPaymentIntegration.Models.HangFire
         }
         public async System.Threading.Tasks.Task AutoChargeJob() 
         {
-           // var recurringCharges_list = _context.recurringCharges.Where(x => x.JobRunDate.Date == DateTime.Now.Date && x.IsRun == false).ToList();
-            var recurringCharges_list = _context.recurringCharges.Where(x => x.JobRunDate.Date == DateTime.Now.AddDays(1).Date && x.IsRun == false).ToList();
+         //  var recurringCharges_list = _context.recurringCharges.Where(x => x.JobRunDate.Date == DateTime.Now.Date && x.IsRun == false).ToList();
+           var recurringCharges_list = _context.recurringCharges.Where(x => x.JobRunDate.Date == DateTime.Now.AddDays(1).Date && x.IsRun == false).ToList();
             foreach (var item in recurringCharges_list)
             {
                 var getsubinfo = _context.subscriptions.Where(x => x.SubscriptionId == item.SubscriptionId).FirstOrDefault();
@@ -55,37 +55,37 @@ namespace TapPaymentIntegration.Models.HangFire
                         var TransNo = "Txn_" + rnd.Next(10000000, 99999999);
                         var OrderNo = "Ord_" + rnd.Next(10000000, 99999999);
                         //Create Invoice 
-                        int finalamount = 0;
-                        int Discount = 0;
-                        int Vat = 0;
+                        decimal finalamount = 0;
+                        decimal Discount = 0;
+                        decimal Vat = 0;
                         if (getuserinfo.Frequency == "DAILY")
                         {
                             Discount = 0;
-                            finalamount = Convert.ToInt32(getsubinfo.Amount) / days;
+                            finalamount = (decimal)Convert.ToInt32(getsubinfo.Amount) / (int)days;
                         }
                         else if (getuserinfo.Frequency == "WEEKLY")
                         {
                             Discount = 0;
-                            finalamount = Convert.ToInt32(getsubinfo.Amount) / 4;
+                            finalamount = (decimal)Convert.ToInt32(getsubinfo.Amount) / 4;
                         }
                         else if (getuserinfo.Frequency == "MONTHLY")
                         {
                             Discount = 0;
-                            finalamount = Convert.ToInt32(getsubinfo.Amount) / 1;
+                            finalamount = (decimal)Convert.ToInt32(getsubinfo.Amount) / 1;
                         }
                         else if (getuserinfo.Frequency == "QUARTERLY")
                         {
                             Discount = 0;
-                            finalamount = (Convert.ToInt32(getsubinfo.Amount) * 3) / 1;
+                            finalamount = (decimal)(Convert.ToInt32(getsubinfo.Amount) * 3) / 1;
                         }
                         else if (getuserinfo.Frequency == "HALFYEARLY")
                         {
                             Discount = 0;
-                            finalamount = (Convert.ToInt32(getsubinfo.Amount) * 6) / 1;
+                            finalamount = (decimal)(Convert.ToInt32(getsubinfo.Amount) * 6) / 1;
                         }
                         else if (getuserinfo.Frequency == "YEARLY")
                         {
-                            var amountpercentage = (Convert.ToInt32(getsubinfo.Amount) / 100) * 10;
+                            var amountpercentage = (decimal)(Convert.ToInt32(getsubinfo.Amount) / 100) * 10;
                             var final_amount_percentage = Convert.ToInt32(getsubinfo.Amount) - amountpercentage;
                             finalamount = final_amount_percentage * 12;
                             Discount = amountpercentage * 12;
@@ -96,12 +96,10 @@ namespace TapPaymentIntegration.Models.HangFire
                         }
                         else
                         {
-                            int totala = finalamount;
-                            double double_amount = Math.Round(Convert.ToDouble(totala));
-                            int roundoff_totalamount = Convert.ToInt32(double_amount);
-                            Vat = ((Convert.ToInt32(roundoff_totalamount) / Convert.ToInt32(getsubinfo.VAT)) * 100) / 100;
+                            decimal totala = finalamount + Convert.ToInt32(getsubinfo.SetupFee);
+                            Vat = (decimal)((totala / Convert.ToInt32(getsubinfo.VAT)) * 100) / 100;
                         }
-                        int after_vat_totalamount = finalamount + Vat;
+                        decimal after_vat_totalamount = finalamount + Vat;
                         if (getuserinfo.Frequency == "DAILY")
                         {
                             // Create a charge
@@ -122,7 +120,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     InvoiceEndDate = DateTime.Now,
                                     AddedDate = DateTime.Now,
                                     AddedBy = getuserinfo.FullName,
-                                    SubscriptionAmount = finalamount,
+                                    SubscriptionAmount = Convert.ToInt32(decimal.Round(after_vat_totalamount)),
                                     Currency = getsubinfo.Currency,
                                     SubscriptionId = getsubinfo.SubscriptionId,
                                     Status = "Payment Captured",
@@ -169,7 +167,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     Currency = getsubinfo.Currency,
                                     AddedDate = DateTime.Now,
                                     AddedBy = getuserinfo.FullName,
-                                    SubscriptionAmount = finalamount,
+                                    SubscriptionAmount = Convert.ToInt32(decimal.Round(after_vat_totalamount)),
                                     VAT = Vat.ToString(),
                                     Discount = Discount.ToString(),
                                     SubscriptionId = getsubinfo.SubscriptionId,
@@ -214,7 +212,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     InvoiceEndDate = DateTime.Now.AddMonths(1),
                                     AddedDate = DateTime.Now,
                                     AddedBy = getuserinfo.FullName,
-                                    SubscriptionAmount = finalamount,
+                                    SubscriptionAmount = Convert.ToInt32(decimal.Round(after_vat_totalamount)),
                                     SubscriptionId = getsubinfo.SubscriptionId,
                                     Currency = getsubinfo.Currency,
                                     Status = "Payment Captured",
@@ -261,7 +259,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     AddedDate = DateTime.Now,
                                     AddedBy = getuserinfo.FullName,
                                     Currency = getsubinfo.Currency,
-                                    SubscriptionAmount = finalamount,
+                                    SubscriptionAmount = Convert.ToInt32(decimal.Round(after_vat_totalamount)),
                                     SubscriptionId = getsubinfo.SubscriptionId,
                                     Status = "Payment Captured",
                                     VAT = Vat.ToString(),
@@ -308,7 +306,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     VAT = Vat.ToString(),
                                     Discount = Discount.ToString(),
                                     AddedBy = getuserinfo.FullName,
-                                    SubscriptionAmount = finalamount,
+                                    SubscriptionAmount = Convert.ToInt32(decimal.Round(after_vat_totalamount)),
                                     Currency = getsubinfo.Currency,
                                     SubscriptionId = getsubinfo.SubscriptionId,
                                     Status = "Payment Captured",
@@ -352,7 +350,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     InvoiceEndDate = DateTime.Now.AddMonths(12),
                                     AddedDate = DateTime.Now,
                                     AddedBy = getuserinfo.FullName,
-                                    SubscriptionAmount = finalamount,
+                                    SubscriptionAmount = Convert.ToInt32(decimal.Round(after_vat_totalamount)),
                                     VAT = Vat.ToString(),
                                     Discount = Discount.ToString(),
                                     SubscriptionId = getsubinfo.SubscriptionId,
