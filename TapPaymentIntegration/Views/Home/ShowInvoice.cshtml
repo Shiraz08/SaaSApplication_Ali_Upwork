@@ -48,7 +48,7 @@
                                         </td>
                                         <td style="text-align:center!important">@user.Currency</td>
                                         <td style="text-align:center!important">@user.SubscriptionAmount</td>
-                                        <td style="text-align:center!important">@user.VAT</td>
+                                        <td style="text-align:center!important">@decimal.Round(Convert.ToDecimal(user.VAT),2)</td>
                                         <td style="text-align:center!important">@user.Discount</td>
                                         @if (user.Status == "Payment Captured")
                                         {

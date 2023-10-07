@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using TapPaymentIntegration.Areas.Identity.Data;
 using TapPaymentIntegration.Controllers;
 using TapPaymentIntegration.Data;
+using TapPaymentIntegration.Migrations;
 using TapPaymentIntegration.Models.Email;
 using TapPaymentIntegration.Models.InvoiceDTO;
 using TapPaymentIntegration.Models.PaymentDTO;
@@ -30,8 +31,8 @@ namespace TapPaymentIntegration.Models.HangFire
         }
         public async System.Threading.Tasks.Task AutoChargeJob() 
         {
-         //  var recurringCharges_list = _context.recurringCharges.Where(x => x.JobRunDate.Date == DateTime.Now.Date && x.IsRun == false).ToList();
-           var recurringCharges_list = _context.recurringCharges.Where(x => x.JobRunDate.Date == DateTime.Now.AddDays(1).Date && x.IsRun == false).ToList();
+            var recurringCharges_list = _context.recurringCharges.Where(x => x.JobRunDate.Date == DateTime.Now.Date && x.IsRun == false).ToList();
+           //var recurringCharges_list = _context.recurringCharges.Where(x => x.JobRunDate.Date == DateTime.Now.AddDays(1).Date && x.IsRun == false).ToList();
             foreach (var item in recurringCharges_list)
             {
                 var getsubinfo = _context.subscriptions.Where(x => x.SubscriptionId == item.SubscriptionId).FirstOrDefault();
@@ -58,6 +59,7 @@ namespace TapPaymentIntegration.Models.HangFire
                         decimal finalamount = 0;
                         decimal Discount = 0;
                         decimal Vat = 0;
+                        decimal sun_amount = 0;
                         if (getuserinfo.Frequency == "DAILY")
                         {
                             Discount = 0;
@@ -90,13 +92,14 @@ namespace TapPaymentIntegration.Models.HangFire
                             finalamount = final_amount_percentage * 12;
                             Discount = amountpercentage * 12;
                         }
-                        if (getsubinfo.VAT == "0")
+                        if (getsubinfo.VAT == null)
                         {
                             Vat = 0;
                         }
                         else
                         {
-                            decimal totala = finalamount + Convert.ToInt32(getsubinfo.SetupFee);
+                            decimal totala = finalamount;
+                            sun_amount = totala;
                             Vat = (decimal)((totala / Convert.ToInt32(getsubinfo.VAT)) * 100) / 100;
                         }
                         decimal after_vat_totalamount = finalamount + Vat;
@@ -408,23 +411,25 @@ namespace TapPaymentIntegration.Models.HangFire
                         body = body.Replace("{User_Phone}", getuserinfo.PhoneNumber);
 
                         body = body.Replace("{SubscriptionName}", getsubinfo.Name);
+                        body = body.Replace("{Discount}", Discount.ToString());
                         body = body.Replace("{SubscriptionPeriod}", getuserinfo.Frequency);
                         body = body.Replace("{SetupFee}", getsubinfo.SetupFee + " " + getsubinfo.Currency);
                         int amount = Convert.ToInt32(incoice_info.SubscriptionAmount);
-                        body = body.Replace("{SubscriptionAmount}", incoice_info.SubscriptionAmount.ToString() + " " + getsubinfo.Currency);
+                        body = body.Replace("{SubscriptionAmount}", decimal.Round(sun_amount, 2).ToString() + " " + getsubinfo.Currency);
                         //Calculate VAT
                         if (getsubinfo.VAT == null)
                         {
                             body = body.Replace("{VAT}", "0.00");
                             body = body.Replace("{Total}", amount.ToString() + " " + getsubinfo.Currency);
                             body = body.Replace("{InvoiceAmount}", amount.ToString() + " " + getsubinfo.Currency);
+                            body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(amount), 2).ToString() + " " + getsubinfo.Currency);
                         }
                         else
                         {
-                            body = body.Replace("{VAT}", Vat + " " + getsubinfo.Currency);
-                            var All_tottal =Convert.ToInt32(amount) + Convert.ToInt32(Vat);
-                            body = body.Replace("{Total}", All_tottal.ToString() + " " + getsubinfo.Currency);
-                            body = body.Replace("{InvoiceAmount}", All_tottal.ToString() + " " + getsubinfo.Currency);
+                            body = body.Replace("{VAT}", decimal.Round(Convert.ToDecimal(Vat), 2).ToString() + " " + getsubinfo.Currency);
+                            body = body.Replace("{Total}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + getsubinfo.Currency);
+                            body = body.Replace("{InvoiceAmount}", decimal.Round(Convert.ToDecimal(after_vat_totalamount),2).ToString() + " " + getsubinfo.Currency);
+                            body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(amount), 2).ToString() + " " + getsubinfo.Currency);
                         }
 
 

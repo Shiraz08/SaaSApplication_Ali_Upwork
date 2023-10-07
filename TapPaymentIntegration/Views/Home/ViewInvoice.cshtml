@@ -116,14 +116,17 @@
                                     <tr>
                                         <th style="width:50%">Subtotal:</th>
                                         @{
-                                            var finalamount =Convert.ToInt32(@ViewBag.finalamount);
+                                            var finalamount =decimal.Round(Convert.ToDecimal(@ViewBag.finalamount),2);
                                             <td style="text-align:center!important">@Model.Subscriptions.Currency @finalamount</td>
                                         }
 
                                     </tr>
                                     <tr>
                                         <th>VAT </th>
-                                        <td style="text-align:center!important">@Model.Subscriptions.Currency @ViewBag.VAT</td>
+                                        @{
+                                            var vats = decimal.Round(Convert.ToDecimal(@ViewBag.VAT), 2);
+                                            <td style="text-align:center!important">@Model.Subscriptions.Currency @vats</td>
+                                        }
                                     </tr>
                                     <tr>
                                         <th>Setup Fee:</th>

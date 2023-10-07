@@ -40,7 +40,18 @@
                                         <td style="text-align:center!important">@user.Countries</td>
                                         <td style="text-align:center!important">@user.Frequency</td>
                                         <td style="text-align:center!important">@user.Amount</td>
-                                        <td style="text-align:center!important">@user.VAT %</td>
+                                        <td style="text-align:center!important">
+                                            @{
+                                                if (user.VAT == null)
+                                                {
+                                                    <span>0%</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>@user.VAT%</span>
+                                                }
+                                            }
+                                        </td>
                                         <td style="text-align:center!important">
                                             @{
                                                 if (user.Status == true)
