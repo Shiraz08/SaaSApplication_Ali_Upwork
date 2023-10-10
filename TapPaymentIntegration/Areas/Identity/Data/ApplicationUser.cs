@@ -20,6 +20,7 @@ public class ApplicationUser : IdentityUser
     public string PublicKey { get; set; } 
     public string VAT { get; set; } 
     public string SecertKey { get; set; } 
+    public string MarchantID { get; set; } 
     public bool Status  { get; set; }
     public int SubscribeID { get; set; }
     [Required]

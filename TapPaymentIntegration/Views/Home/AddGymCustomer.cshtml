@@ -49,9 +49,7 @@
                         <option value="Oman" label="Oman">Oman</option>
                     </select>
                 </div>
-                <div class="input-group mb-3">
-                    <input type="hidden" value="@ViewBag.SubscriptionList" name="SubscribeID" id="SubscribeID" />
-                </div>
+                <input type="hidden" value="@ViewBag.SubscriptionList" name="SubscribeID" id="SubscribeID" />
                 <div class="input-group mb-3">
                     <input type="text" class="form-control" asp-for="City" placeholder="Enter The City">
                     <div class="input-group-append">
@@ -60,8 +58,10 @@
                         </div>
                     </div>
                 </div>
+                <span style="color:red!important">Enter Phone Number Without Country Code</span>
+                <br />
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control" asp-for="PhoneNumber" placeholder="Enter The Phone Number" required="required">
+                    <input type="number" class="form-control" asp-for="PhoneNumber" placeholder="Enter The Phone Number" required="required">
                     <div class="input-group-append">
                         <div class="input-group-text">
                             <span class="fas fa-phone"></span>

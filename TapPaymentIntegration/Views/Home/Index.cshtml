@@ -283,7 +283,14 @@
 										}
 										else
 										{
-											<a href="@Url.Action("AddGymCustomer","Home", new {id= item.SubscriptionId})" class="price_btn">Purchase Plan</a>
+											@if (SignInManager.IsSignedIn(User))
+											{
+												<a href="@Url.Action("Subscription","Home", new {id= item.SubscriptionId, userid = user.Id})" class="price_btn">Purchase Plan</a>
+											}
+											else
+											{
+												<a href="@Url.Action("AddGymCustomer","Home", new {id= item.SubscriptionId})" class="price_btn">Purchase Plan</a>
+											}
 										}
 									}
 								</div>

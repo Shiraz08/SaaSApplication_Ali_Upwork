@@ -27,8 +27,8 @@ namespace TapPaymentIntegration.Models.Email
                 }
                 mail.Subject = subject;
                 mail.IsBodyHtml = true;
-                mail.CC.Add(new MailAddress("accounts@tamarran.com")); //Adding CC email Id  
-                mail.Bcc.Add(new MailAddress("ali.zayer@tamarran.com"));  //Adding BCC email Id 
+                //mail.CC.Add(new MailAddress("accounts@tamarran.com")); //Adding CC email Id  
+                //mail.Bcc.Add(new MailAddress("ali.zayer@tamarran.com"));  //Adding BCC email Id 
                 mail.Body = message;
                 mail.Attachments.Add(new Attachment(new MemoryStream(bytesArray), "Invoice.pdf"));
                 client.Send(mail);
@@ -59,8 +59,8 @@ namespace TapPaymentIntegration.Models.Email
                 }
                 mail.Subject = subject;
                 mail.IsBodyHtml = true;
-                mail.CC.Add(new MailAddress("accounts@tamarran.com")); //Adding CC email Id  
-                mail.Bcc.Add(new MailAddress("ali.zayer@tamarran.com"));  //Adding BCC email Id 
+                //mail.CC.Add(new MailAddress("accounts@tamarran.com")); //Adding CC email Id  
+                //mail.Bcc.Add(new MailAddress("ali.zayer@tamarran.com"));  //Adding BCC email Id 
                 mail.Body = message;
                 client.Send(mail);
             }

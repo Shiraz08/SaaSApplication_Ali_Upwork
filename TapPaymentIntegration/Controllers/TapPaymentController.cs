@@ -16,8 +16,8 @@ namespace TapPaymentIntegration.Controllers
         private TapPaymentIntegrationContext _context;
         private readonly IUserStore<ApplicationUser> _userStore;
         // Change Your URL's Here
-        public readonly string RedirectURL = "https://softsolutionlogix.com";
-        //public readonly string RedirectURL = "https://localhost:7279";
+        public readonly string RedirectURL = "https://tappayment.niralahyderabadirestaurant.com";
+       // public readonly string RedirectURL = "https://localhost:7279";
         private Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
         public TapPaymentController(ILogger<HomeController> logger, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, TapPaymentIntegrationContext context, IUserStore<ApplicationUser> userStore)
         {

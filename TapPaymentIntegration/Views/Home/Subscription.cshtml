@@ -9,6 +9,7 @@
 	ViewData["Title"] = "Subscription"; 
     Layout = "~/Views/Shared/_Layout.cshtml";
     var user = await UserManager.GetUserAsync(User);
+    var msg = TempData["Message"];
 }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.4/bluebird.min.js"></script>
 <script src="https://secure.gosell.io/js/sdk/tap.min.js"></script>
@@ -180,7 +181,10 @@ html {
         -webkit-border-image: none;
     }
 </style>
-
+@if (msg != null)
+{
+    <center><h4><span class="error" style="color:red!important">@msg</span></h4></center>
+}
 <div id="header-carousel" class="carousel slide carousel-fade" data-ride="carousel">
     <div class="carousel-inner">
         <div class="carousel-item position-relative active" style="min-height:83vh;">
@@ -317,9 +321,11 @@ html {
                               <!-- Tap element will be here -->
                               <div id="element-container"></div>
                               <div id="error-handler" role="alert"></div>
-                              <div id="success" style=" display: none;;position: relative;float: left;">
-                                Success! token <span id="token"></span>
-                              </div>
+                            <div style=" display: none">
+                                <div id="success" style=" display: none;;position: relative;float: left;">
+                                    Success! token <span id="token"></span>
+                                </div>
+                            </div>
                               <!-- Tap pay button -->
 @*                              <button id="tap-btn">Submit</button>*@
                             <div class="input-group mb-3 group-end" style="margin-top:15px!important">
@@ -367,7 +373,7 @@ html {
     };
     //payment options
     var paymentOptions = {
-        currencyCode: ["KWD", "USD", "SAR"],
+        currencyCode: ["KWD", "USD", "SAR","BHD"],
         labels: labels,
         TextDirection: 'ltr'
     }
@@ -407,7 +413,7 @@ html {
                 var errorElement = document.getElementById('success');
                 errorElement.style.display = "block";
                 var tokenElement = document.getElementById('token');
-                tokenElement.textContent = result.id;
+                 tokenElement.textContent = result.id;
                 tapTokenHandler(result.id);
             }
         });
@@ -416,11 +422,13 @@ html {
     function tapTokenHandler(id) 
     {
         debugger
+        var currentUrl = window.location.href;
         var Frequency = $('select#Frequency option:selected').val();
         var TotalPlanfee = $('#TotalPlanfee').val();
         var VAT = $('#VAT').val();
         var SubscriptionId = $('#SubscriptionId').val(); 
         var Invoiceid = $('#Invoiceid').val();
+        var Currenturl = currentUrl;
         var formd = new FormData();
         formd.append("Frequency", Frequency);
         formd.append("TotalPlanfee", TotalPlanfee);
@@ -428,6 +436,7 @@ html {
         formd.append("Token", id); 
         formd.append("VAT", VAT); 
         formd.append("Invoiceid", Invoiceid);
+        formd.append("Currenturl", Currenturl);
         $.ajax({
             type: 'POST',
             url: '/Home/CreateInvoice', 

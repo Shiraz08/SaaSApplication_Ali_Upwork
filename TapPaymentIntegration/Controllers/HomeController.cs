@@ -12,8 +12,7 @@ using TapPaymentIntegration.Models.UserDTO;
 using TapPaymentIntegration.Models.Card;
 using ApplicationUser = TapPaymentIntegration.Areas.Identity.Data.ApplicationUser;
 using System.Text.Encodings.Web;
-using System.Numerics;
-using System;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace TapPaymentIntegration.Controllers
 {
@@ -27,21 +26,23 @@ namespace TapPaymentIntegration.Controllers
         private IWebHostEnvironment _environment; 
         private Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
         EmailSender _emailSender = new EmailSender();
-        // Change Your Keys & URL's Here
+
         //Baharin
         public readonly string BHD_Public_Key = "pk_live_7MqbnXVzGkRBaO3KWEmwN8i1";
         public readonly string BHD_Test_Key = "sk_live_85POWSybstdevAiMxYaGHNp3";
+        public readonly string BHD_Merchant_Key = "";
         //KSA
         public readonly string KSA_Public_Key = "pk_live_MWDV5szwGbxeUBdHnJZLk9S2";
         public readonly string KSA_Test_Key = "sk_live_VDJ1UxM2Arq6ONbz9ptGXhoj";
+        public readonly string KSA_Merchant_Key = "22116401";
 
         //public readonly string BHD_Public_Key = "pk_test_7sAiZNXvdpKax26RuJMwbIen";
         //public readonly string BHD_Test_Key = "sk_test_Tgoy8HbxdQ40l6Ea9SIDci7B";
         //public readonly string KSA_Public_Key = "pk_test_j3yKfvbxws8khDpFQOX5JeWc";
         //public readonly string KSA_Test_Key = "sk_test_1SU5woL8vZe6JXrBHipQu9Dn";
 
-        public readonly string RedirectURL = "https://softsolutionlogix.com";
-        //public readonly string RedirectURL = "https://localhost:7279";
+      //  public readonly string RedirectURL = "https://tappayment.niralahyderabadirestaurant.com";
+        public readonly string RedirectURL = "https://localhost:7279";
         public HomeController(IWebHostEnvironment Environment, ILogger<HomeController> logger, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, TapPaymentIntegrationContext context, IUserStore<ApplicationUser> userStore)
         {
             _logger = logger;
@@ -60,13 +61,12 @@ namespace TapPaymentIntegration.Controllers
         }
         public async Task<IActionResult> Subscription(int id,string link,string userid,string invoiceid)
         {
-            if(link != null)
+            if (userid != null)
             {
                 var applicationUser = _context.Users.Where(x => x.Id == userid).FirstOrDefault();
                 await _signInManager.PasswordSignInAsync(applicationUser.UserName.ToString(), applicationUser.Password, true, lockoutOnFailure: true);
             }
             var subscriptions = _context.subscriptions.Where(x => x.Status == true && x.SubscriptionId == id).FirstOrDefault();
-            var users = _context.Users.Where(x => x.Status == true && x.SubscribeID == id).FirstOrDefault();
             if(subscriptions.VAT == null)
             {
                 subscriptions.VAT = "0";
@@ -90,6 +90,7 @@ namespace TapPaymentIntegration.Controllers
             ViewBag.Invoiceid = invoiceid;
             ViewBag.After_vat_totalamount = After_vat_totalamount;
             ViewBag.userid = userid;
+            ViewBag.PublicKey = users.PublicKey;
             ViewBag.RedirectURL = RedirectURL;
             return View(subscriptions);
         }
@@ -107,7 +108,9 @@ namespace TapPaymentIntegration.Controllers
         {
             try
             {
-				var Userid = Request.Form.Where(x => x.Key == "Userid").FirstOrDefault().Value.ToString();
+                var Currenturl = Request.Form.Where(x => x.Key == "Currenturl").FirstOrDefault().Value.ToString();
+                HttpContext.Session.SetString("Currenturl", Currenturl);
+                var Userid = Request.Form.Where(x => x.Key == "Userid").FirstOrDefault().Value.ToString();
                 var Invoiceid = Request.Form.Where(x => x.Key == "Invoiceid").FirstOrDefault().Value.ToString();
                 ApplicationUser usersinfo = null;
                 Invoice invoice = null;
@@ -193,7 +196,7 @@ namespace TapPaymentIntegration.Controllers
 					source.id = Token;
 
 					Merchant merchant = new Merchant();
-					merchant.id = "22116401";
+					merchant.id = userinfo.MarchantID;
 
 					FillChargeModel fillChargeModel = new FillChargeModel();
 					fillChargeModel.threeDSecure = true;
@@ -274,10 +277,10 @@ namespace TapPaymentIntegration.Controllers
 					var result_ChargeDetail = await response_ChargeDetail.Content.ReadAsStringAsync();
 					Deserialized_savecard = JsonConvert.DeserializeObject<ChargeDetail>(result_ChargeDetail);
 				}
+                var SubscriptionId = HttpContext.Session.GetString("SubscriptionId");
                 int getchargesresposemodel = _context.chargeResponses.Max(x => x.ChargeResponseId);
                 if (Deserialized_savecard.status == "CAPTURED")
                 {
-                    var SubscriptionId = HttpContext.Session.GetString("SubscriptionId");
                     var Frequency = HttpContext.Session.GetString("Frequency");
                     var Invoiceid = HttpContext.Session.GetString("Invoiceid");
                     if (Deserialized_savecard.id != null)
@@ -431,31 +434,7 @@ namespace TapPaymentIntegration.Controllers
                                 body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(amount), 2).ToString() + " " + subscriptions.Currency);
                             }
 
-
-                            var renderer = new ChromePdfRenderer();
-                            // Many rendering options to use to customize!
-                            renderer.RenderingOptions.SetCustomPaperSizeInInches(6.9, 12);
-                            renderer.RenderingOptions.PaperOrientation = IronPdf.Rendering.PdfPaperOrientation.Portrait;
-                            renderer.RenderingOptions.Title = "My PDF Document Name";
-                            renderer.RenderingOptions.EnableJavaScript = true;
-                            renderer.RenderingOptions.Zoom = 100;
-
-                            // Supports margin customization!
-                            renderer.RenderingOptions.MarginTop = 0; //millimeters
-                            renderer.RenderingOptions.MarginLeft = 0; //millimeters
-                            renderer.RenderingOptions.MarginRight = 0; //millimeters
-                            renderer.RenderingOptions.MarginBottom = 0; //millimeters
-
-                            // Can set FirstPageNumber if you have a cover page
-                            renderer.RenderingOptions.FirstPageNumber = 1;
-
-                            // Settings have been set, we can render:
-                            var pdf = renderer.RenderHtmlAsPdf(body);
-                            pdf.SaveAs("TamrranInvoice.pdf");
-
-
-                            string pdfpath = _environment.ContentRootPath + "/TamrranInvoice.pdf";
-                            byte[] bytes = System.IO.File.ReadAllBytes(pdfpath);
+                            var bytes = (new NReco.PdfGenerator.HtmlToPdfConverter()).GeneratePdf(body);
 
                             _ = _emailSender.SendEmailWithFIle(bytes, userinfo.Email, "Payment Captured", "Your Payment has been received successfully. Thank you.");
                             return RedirectToAction("ShowInvoice", "Home", new { PaymentStatus = "All" });
@@ -590,33 +569,7 @@ namespace TapPaymentIntegration.Controllers
                                 body = body.Replace("{InvoiceAmount}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + subscriptions.Currency);
                                 body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(amount), 2).ToString() + " " + subscriptions.Currency);
                             }
-
-
-                            var renderer = new ChromePdfRenderer();
-                            // Many rendering options to use to customize!
-                            renderer.RenderingOptions.SetCustomPaperSizeInInches(6.9, 12);
-                            renderer.RenderingOptions.PaperOrientation = IronPdf.Rendering.PdfPaperOrientation.Portrait;
-                            renderer.RenderingOptions.Title = "My PDF Document Name";
-                            renderer.RenderingOptions.EnableJavaScript = true;
-                            renderer.RenderingOptions.Zoom = 100;
-
-                            // Supports margin customization!
-                            renderer.RenderingOptions.MarginTop = 0; //millimeters
-                            renderer.RenderingOptions.MarginLeft = 0; //millimeters
-                            renderer.RenderingOptions.MarginRight = 0; //millimeters
-                            renderer.RenderingOptions.MarginBottom = 0; //millimeters
-
-                            // Can set FirstPageNumber if you have a cover page
-                            renderer.RenderingOptions.FirstPageNumber = 1;
-
-                            // Settings have been set, we can render:
-                            var pdf = renderer.RenderHtmlAsPdf(body);
-                            pdf.SaveAs("TamrranInvoice.pdf");
-
-
-                            string pdfpath = _environment.ContentRootPath + "/TamrranInvoice.pdf";
-                            byte[] bytes = System.IO.File.ReadAllBytes(pdfpath);
-
+                            var bytes = (new NReco.PdfGenerator.HtmlToPdfConverter()).GeneratePdf(body);
                             _ = _emailSender.SendEmailWithFIle(bytes, userinfo.Email, "Payment Captured", "Your Payment has been received successfully. Thank you.");
                             return RedirectToAction("ShowInvoice", "Home", new { PaymentStatus = "All" });
                         }
@@ -637,17 +590,28 @@ namespace TapPaymentIntegration.Controllers
                     _context.chargeResponses.Remove(chargeresponse);
                     _context.SaveChanges();
 
-                    //Remove User
-                    if(log_user.Id != null)
+                    //               //Remove User
+                    //               if(log_user.Id != null)
+                    //               {
+                    //	var current_user = GetCurrentUserAsync().Result;
+                    //	_context.Users.Remove(current_user);
+                    //	_context.SaveChanges();
+                    //}
+                    //               //Sign out
+                    //               await _signInManager.SignOutAsync();
+                    var _uri = HttpContext.Session.GetString("Currenturl");
+                    string[] arrs = _uri.Split('/');
+                    if (arrs[4] == "Subscription")
                     {
-						var current_user = GetCurrentUserAsync().Result;
-						_context.Users.Remove(current_user);
-						_context.SaveChanges();
-					}
-                    //Sign out
-                    await _signInManager.SignOutAsync();
-                    TempData["Message"] = Deserialized_savecard.gateway.response.message;
-                    return RedirectToAction("Index", "Home");
+                        TempData["Message"] = Deserialized_savecard.gateway.response.message + " - (" + Deserialized_savecard.source.type + ")";
+                        return Redirect(_uri);
+                    }
+                    else
+                    {
+                        TempData["Message"] = Deserialized_savecard.gateway.response.message + " - (" + Deserialized_savecard.source.type + ")";
+                        return Redirect(_uri);
+                    }
+
                 }
 			}
             catch (Exception e)
@@ -674,7 +638,8 @@ namespace TapPaymentIntegration.Controllers
         {
             var users = (from um in _context.Users 
                          join sub in _context.subscriptions on um.SubscribeID equals sub.SubscriptionId into ps
-                         from sub in ps.DefaultIfEmpty()  
+                         from sub in ps.DefaultIfEmpty()
+                         where um.Status == true
                      select new UserInfoDTO
                      {
                          Id = um.Id,
@@ -756,21 +721,24 @@ namespace TapPaymentIntegration.Controllers
             applicationUser.PhoneNumber = applicationUser.PhoneNumber; 
             applicationUser.Password = applicationUser.Password;
             applicationUser.Tap_CustomerID =null;
-            if(applicationUser.Password != null)
+            if(applicationUser.Password == null)
             {
                 ViewBag.SubscriptionList = _context.subscriptions.Select(x => new SelectListItem { Value = x.SubscriptionId.ToString(), Text = x.Name + " " + "-" + " " + x.Amount });
                 ModelState.AddModelError(string.Empty, "Please Enter The Password...!");
+                return View();
             }
             var subscriptions = _context.subscriptions.Where(x => x.SubscriptionId == applicationUser.SubscribeID).FirstOrDefault();
             if (subscriptions.Countries == "Bahrain")
             {
                 applicationUser.PublicKey = BHD_Public_Key;
                 applicationUser.SecertKey = BHD_Test_Key;
+                applicationUser.MarchantID = BHD_Merchant_Key;
             }
             else if (subscriptions.Countries == "KSA")
             {
                 applicationUser.PublicKey = KSA_Public_Key;
                 applicationUser.SecertKey = KSA_Test_Key;
+                applicationUser.MarchantID = KSA_Merchant_Key;
             }
             Guid guid = Guid.NewGuid();
             string str = guid.ToString();
@@ -891,32 +859,10 @@ namespace TapPaymentIntegration.Controllers
                     body = body.Replace("{InvoiceAmount}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + subscriptions.Currency);
                     body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(amount), 2).ToString() + " " + subscriptions.Currency);
                 }
-
-                var renderer = new ChromePdfRenderer();
-                // Many rendering options to use to customize!
-                renderer.RenderingOptions.SetCustomPaperSizeInInches(6.9, 12);
-                renderer.RenderingOptions.PaperOrientation = IronPdf.Rendering.PdfPaperOrientation.Portrait;
-                renderer.RenderingOptions.Title = "My PDF Document Name";
-                renderer.RenderingOptions.EnableJavaScript = true;
-                renderer.RenderingOptions.Zoom = 100;
-
-                // Supports margin customization!
-                renderer.RenderingOptions.MarginTop = 0; //millimeters
-                renderer.RenderingOptions.MarginLeft = 0; //millimeters
-                renderer.RenderingOptions.MarginRight = 0; //millimeters
-                renderer.RenderingOptions.MarginBottom = 0; //millimeters
-
-                // Can set FirstPageNumber if you have a cover page
-                renderer.RenderingOptions.FirstPageNumber = 1;
-
-                // Settings have been set, we can render:
-                var pdf = renderer.RenderHtmlAsPdf(body);
-                pdf.SaveAs("TamrranInvoice.pdf");
-                string pdfpath = _environment.ContentRootPath + "/TamrranInvoice.pdf";
-                byte[] bytes = System.IO.File.ReadAllBytes(pdfpath);
+                var bytes = (new NReco.PdfGenerator.HtmlToPdfConverter()).GeneratePdf(body);
                 var callbackUrl =  @Url.Action("SubscriptionAdmin", "Home" ,new { id = applicationUser.SubscribeID, link= "Yes", userid = max_user_id, invoiceid = max_invoice_id , After_vat_totalamount = after_vat_totalamount });
                 var websiteurl  =  HtmlEncoder.Default.Encode(RedirectURL + callbackUrl);
-                _ = _emailSender.SendEmailWithFIle(bytes, applicationUser.Email, "Payment Request", "Hi..! <br /> Your Tamarran Credentials is here. <br /> Username: "+ applicationUser.UserName+" and <br /> Password: "+applicationUser.Password+ " <br /> For Payment Click This: <a href='"+ websiteurl + "'>Link</a>");
+                _ = _emailSender.SendEmailWithFIle(bytes, applicationUser.Email, "Payment Request", "Hi  "+ applicationUser.GYMName + "..! <br /> Your Tamarran Credentials is here. <br /> Username: "+ applicationUser.UserName+" and <br /> Password: "+applicationUser.Password+ " <br /> For Payment Click This: <a href='"+ websiteurl + "'>Link</a>");
                 var invoiceinfo = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).FirstOrDefault();
                 invoiceinfo.InvoiceLink = RedirectURL + callbackUrl;
                 _context.invoices.Update(invoiceinfo);
@@ -930,10 +876,9 @@ namespace TapPaymentIntegration.Controllers
             }
             return View();
         }
-        [HttpPost]
-        public ActionResult DeleteCustomer(string id)
+        public ActionResult DeleteCustomer(string userId)
         {
-            var result = _context.Users.Where(x => x.Id == id).FirstOrDefault();
+            var result = _context.Users.Where(x => x.Id == userId).FirstOrDefault();
             result.Status = false;
             if (result != null)
             {
@@ -979,7 +924,7 @@ namespace TapPaymentIntegration.Controllers
             result.Status = false;
             if (result != null)
             {
-                _context.Update(result);
+                _context.Remove(result);
                 _context.SaveChanges();
             }
             return RedirectToAction("Viewsubscription", "Home");
@@ -991,8 +936,10 @@ namespace TapPaymentIntegration.Controllers
         [HttpPost]
         public IActionResult Addsubscription(Subscriptions subscription)
         {
+            if (ModelState.IsValid)
+            {
                 bool vat = string.IsNullOrWhiteSpace(subscription.VAT.ToString());
-                if(vat == true)
+                if (vat == true)
                 {
                     subscription.VAT = null;
                 }
@@ -1006,6 +953,10 @@ namespace TapPaymentIntegration.Controllers
                 _context.subscriptions.Add(subscription);
                 _context.SaveChanges();
                 return RedirectToAction("Viewsubscription", "Home");
+            }
+
+            ModelState.AddModelError(string.Empty,"");
+            return View();
         }
         public IActionResult Editsubscription(string userId)
         {
@@ -1329,11 +1280,13 @@ namespace TapPaymentIntegration.Controllers
             {
                 applicationUser.PublicKey = BHD_Public_Key;
                 applicationUser.SecertKey = BHD_Test_Key;
+                applicationUser.MarchantID = BHD_Merchant_Key;
             }
             else if (selectsub_country == "KSA")
             {
                 applicationUser.PublicKey = KSA_Public_Key;
                 applicationUser.SecertKey = KSA_Test_Key;
+                applicationUser.MarchantID = KSA_Merchant_Key;
             }
             Guid guid = Guid.NewGuid();
             string str = guid.ToString();

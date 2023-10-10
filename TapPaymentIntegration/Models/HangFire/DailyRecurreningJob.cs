@@ -31,8 +31,9 @@ namespace TapPaymentIntegration.Models.HangFire
         }
         public async System.Threading.Tasks.Task AutoChargeJob() 
         {
-            var recurringCharges_list = _context.recurringCharges.Where(x => x.JobRunDate.Date == DateTime.Now.Date && x.IsRun == false).ToList();
-           //var recurringCharges_list = _context.recurringCharges.Where(x => x.JobRunDate.Date == DateTime.Now.AddDays(1).Date && x.IsRun == false).ToList();
+            var st = "";
+            //var recurringCharges_list = _context.recurringCharges.Where(x => x.JobRunDate.Date == DateTime.Now.Date && x.IsRun == false).ToList();
+           var recurringCharges_list = _context.recurringCharges.Where(x => x.JobRunDate.Date == DateTime.Now.AddDays(1).Date && x.IsRun == false).ToList();
             foreach (var item in recurringCharges_list)
             {
                 var getsubinfo = _context.subscriptions.Where(x => x.SubscriptionId == item.SubscriptionId).FirstOrDefault();
@@ -110,11 +111,12 @@ namespace TapPaymentIntegration.Models.HangFire
                             var request = new HttpRequestMessage(HttpMethod.Post, "https://api.tap.company/v2/charges");
                             request.Headers.Add("Authorization", "Bearer " + getuserinfo.SecertKey);
                             request.Headers.Add("accept", "application/json");
-                            var content = new StringContent("\r\n{\r\n  \"amount\": " + Decimal.Round(after_vat_totalamount) + ",\r\n  \"currency\": \"" + getsubinfo.Currency + "\",\r\n  \"customer_initiated\": false,\r\n  \"threeDSecure\": true,\r\n  \"save_card\": false,\r\n  \"payment_agreement\": {\r\n    \"contract\": {\r\n      \"id\": \"" + getuserinfo.Tap_Card_ID + "\"\r\n    },\r\n    \"id\": \"" + getuserinfo.Tap_Agreement_ID + "\"\r\n  },\r\n  \"receipt\": {\r\n    \"email\": true,\r\n    \"sms\": true\r\n  },\"reference\": {\r\n    \"transaction\": \"" + TransNo + "\",\r\n    \"order\": \"" + OrderNo + "\"\r\n  },\r\n  \"customer\": {\r\n    \"id\": \"" + getuserinfo.Tap_CustomerID + "\"\r\n  },\r\n  \"merchant\": {\r\n    \"id\": \"22116401\"\r\n  },\r\n  \"source\": {\r\n    \"id\": \"" + Deserialized_savecard.id + "\"\r\n  },\r\n  \"redirect\": {\r\n    \"url\": \"https://test.com/\"\r\n  }\r\n}\r\n", null, "application/json");
+                            var content = new StringContent("\r\n{\r\n  \"amount\": " + Decimal.Round(1) + ",\r\n  \"currency\": \"" + getsubinfo.Currency + "\",\r\n  \"customer_initiated\": false,\r\n  \"threeDSecure\": true,\r\n  \"save_card\": false,\r\n  \"payment_agreement\": {\r\n    \"contract\": {\r\n      \"id\": \"" + getuserinfo.Tap_Card_ID + "\"\r\n    },\r\n    \"id\": \"" + getuserinfo.Tap_Agreement_ID + "\"\r\n  },\r\n  \"receipt\": {\r\n    \"email\": true,\r\n    \"sms\": true\r\n  },\"reference\": {\r\n    \"transaction\": \"" + TransNo + "\",\r\n    \"order\": \"" + OrderNo + "\"\r\n  },\r\n  \"customer\": {\r\n    \"id\": \"" + getuserinfo.Tap_CustomerID + "\"\r\n  },\r\n  \"source\": {\r\n    \"id\": \"" + Deserialized_savecard.id + "\"\r\n  },\r\n  \"redirect\": {\r\n    \"url\": \"https://test.com/\"\r\n  }\r\n}\r\n", null, "application/json");
                             request.Content = content;
                             var response = await client.SendAsync(request);
                             var bodys = await response.Content.ReadAsStringAsync();
                             CreateCharge deserialized_CreateCharge = JsonConvert.DeserializeObject<CreateCharge>(bodys);
+                            st = deserialized_CreateCharge.source.type;
                             if (deserialized_CreateCharge.status == "CAPTURED")
                             {
                                 Invoice invoice = new Invoice
@@ -294,7 +296,7 @@ namespace TapPaymentIntegration.Models.HangFire
                             var request = new HttpRequestMessage(HttpMethod.Post, "https://api.tap.company/v2/charges");
                             request.Headers.Add("Authorization", "Bearer " + getuserinfo.SecertKey);
                             request.Headers.Add("accept", "application/json");
-                            var content = new StringContent("\r\n{\r\n  \"amount\": " + Decimal.Round(after_vat_totalamount) + ",\r\n  \"currency\": \"" + getsubinfo.Currency + "\",\r\n  \"customer_initiated\": false,\r\n  \"threeDSecure\": true,\r\n  \"save_card\": false,\r\n  \"payment_agreement\": {\r\n    \"contract\": {\r\n      \"id\": \"" + getuserinfo.Tap_Card_ID + "\"\r\n    },\r\n    \"id\": \"" + getuserinfo.Tap_Agreement_ID + "\"\r\n  },\r\n  \"receipt\": {\r\n    \"email\": true,\r\n    \"sms\": true\r\n  },\"reference\": {\r\n    \"transaction\": \"" + TransNo + "\",\r\n    \"order\": \"" + OrderNo + "\"\r\n  },\r\n  \"customer\": {\r\n    \"id\": \"" + getuserinfo.Tap_CustomerID + "\"\r\n  },\r\n  \"merchant\": {\r\n    \"id\": \"22116401\"\r\n  },\r\n  \"source\": {\r\n    \"id\": \"" + Deserialized_savecard.id + "\"\r\n  },\r\n  \"redirect\": {\r\n    \"url\": \"https://1f3b186efe31e8696c144578816c5443.m.pipedream.net/\"\r\n  }\r\n}\r\n", null, "application/json");
+                            var content = new StringContent("\r\n{\r\n  \"amount\": " + Decimal.Round(1) + ",\r\n  \"currency\": \"" + getsubinfo.Currency + "\",\r\n  \"customer_initiated\": false,\r\n  \"threeDSecure\": true,\r\n  \"save_card\": false,\r\n  \"payment_agreement\": {\r\n    \"contract\": {\r\n      \"id\": \"" + getuserinfo.Tap_Card_ID + "\"\r\n    },\r\n    \"id\": \"" + getuserinfo.Tap_Agreement_ID + "\"\r\n  },\r\n  \"receipt\": {\r\n    \"email\": true,\r\n    \"sms\": true\r\n  },\"reference\": {\r\n    \"transaction\": \"" + TransNo + "\",\r\n    \"order\": \"" + OrderNo + "\"\r\n  },\r\n  \"customer\": {\r\n    \"id\": \"" + getuserinfo.Tap_CustomerID + "\"\r\n  },\r\n  \"merchant\": {\r\n    \"id\": \"22116401\"\r\n  },\r\n  \"source\": {\r\n    \"id\": \"" + Deserialized_savecard.id + "\"\r\n  },\r\n  \"redirect\": {\r\n    \"url\": \"https://1f3b186efe31e8696c144578816c5443.m.pipedream.net/\"\r\n  }\r\n}\r\n", null, "application/json");
                             request.Content = content;
                             var response = await client.SendAsync(request);
                             var bodys = await response.Content.ReadAsStringAsync();
@@ -398,7 +400,7 @@ namespace TapPaymentIntegration.Models.HangFire
                             body = reader.ReadToEnd();
                         }
                         //Fill EMail By Parameter
-                        body = body.Replace("{title}", "Tamarran Payment Invoice");
+                        body = body.Replace("{title}", st + "Decline Payment");
                         body = body.Replace("{currentdate}", DateTime.Now.ToString());
 
                         body = body.Replace("{InvocieStatus}", "Payment Captured");

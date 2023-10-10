@@ -44,7 +44,7 @@
                             <div class="form-group">
                                 <label>Country:&nbsp;<span style="color:red!important"><b>*</b></span></label>
                                 <div class="input-group mb-3">
-                                    <select name="Countries" class="form-control" id="Countries" tabindex="4" required="required" asp-for="Countries">
+                                    <select name="Countries" class="form-control" id="Countries" tabindex="4" required asp-for="Countries">
                                         <option value=" " label="Select a Country" selected="selected">Select a Country</option>
                                         <option value="Bahrain" label="Bahrain">Bahrain</option>
                                         <option value="KSA" label="KSA">KSA</option>
@@ -79,6 +79,9 @@
                                 <button class="btn btn-success mt-2" type="submit" tabindex="6">Add Subscription</button>
                             </div>
                         </div>
+                        <p class="mb-1">
+                            <div asp-validation-summary="All" class="text-danger"></div>
+                        </p>
                     </div>
                 }
             </div>
