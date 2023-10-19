@@ -277,7 +277,7 @@
 									<div class="pricing-price">
 									</div>
 									@{
-										if (item.SubscriptionId == Convert.ToInt32(subid))
+										if (item.SubscriptionId == Convert.ToInt32(subid) && user.Tap_CustomerID != null)
 										{
 											<span class="price_btn">AlReady Purchase</span>
 										}

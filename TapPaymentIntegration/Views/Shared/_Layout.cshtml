@@ -159,7 +159,7 @@ src: url('https://ispeciaprojects.xyz/wp-content/uploads/2023/08/Silka-Bold.otf'
                     <a href="@Url.Action("Index","Home")" class="nav-item nav-link active">Home</a>
                     @if (SignInManager.IsSignedIn(User)) 
                     {
-                        @if (SubscribeID > 0)
+                        @if (SubscribeID > 0 && user.Tap_CustomerID != null)
                         {
                             <a href="@Url.Action("Dashboard","Home")" class="nav-item nav-link">Dashboard</a>
                         }
@@ -174,7 +174,7 @@ src: url('https://ispeciaprojects.xyz/wp-content/uploads/2023/08/Silka-Bold.otf'
                         <a href="/Identity/Account/Login" class="nav-item nav-link">Sign In</a>
                     }
                 </div>
-                @if (SubscribeID == 0)
+                @if (SubscribeID > 0 && user.Tap_CustomerID != null)
                 {
                     <a href="#pricing" class="btn btn-primary d-none d-lg-block">Subscribe Plan</a>
                 }

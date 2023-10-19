@@ -231,7 +231,6 @@ html {
                             <div class="row">
                                 <div class="col-md-6">
                                     <input type="hidden" value="@Model.SubscriptionId" name="SubscriptionId" id="SubscriptionId" />
-                                <input type="hidden" value="@ViewBag.Invoiceid" name="Invoiceid" id="Invoiceid" />
                                     <div class="form-group">
                                         <label style="color:black!important">Frequency:&nbsp;<span style="color:red!important"><b>*</b></span></label>
                                         <select class="form-control" id="Frequency" name="Frequency" tabindex="1" required="required">
@@ -317,22 +316,58 @@ html {
                             </div>
                         </div>
                         <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
-                            <form id="form-container" method="post" action="/Home/CreateInvoice">
-                              <!-- Tap element will be here -->
-                              <div id="element-container"></div>
-                              <div id="error-handler" role="alert"></div>
-                            <div style=" display: none">
-                                <div id="success" style=" display: none;;position: relative;float: left;">
-                                    Success! token <span id="token"></span>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label style="color:black!important">Payment Card:&nbsp;<span style="color:red!important"><b>*</b></span></label>
+                                    <select class="form-control" id="PaymentCard" name="PaymentCard" tabindex="1" required="required" onchange="CardSelect();">
+                                        <option value="0">Please Select Card</option>
+                                        <option value="Credit Card">Credit Card</option>
+                                        <option value="Debit Card">Debit Card</option>
+                                    </select>
                                 </div>
                             </div>
-                              <!-- Tap pay button -->
-@*                              <button id="tap-btn">Submit</button>*@
-                            <div class="input-group mb-3 group-end" style="margin-top:15px!important">
-                                <a class="btn btn-danger btnPrevious">Previous</a>
-                                <button class="btn btn-success" type="submit">Proceed</button>
-                            </div>
-                            </form> 
+                        </div>
+
+                        <div class="d-none" id="creditcard">
+                            <form id="form-container" method="post" action="/Home/CreateInvoice">
+                                <!-- Tap element will be here -->
+                                <div id="element-container"></div>
+                                <div id="error-handler" role="alert"></div>
+                                <div style=" display: none">
+                                    <div id="success" style=" display: none;;position: relative;float: left;">
+                                        Success! token <span id="token"></span>
+                                    </div>
+                                </div>
+                                <!-- Tap pay button -->
+                                <div class="input-group mb-3 group-end" style="margin-top:15px!important">
+                                    <a class="btn btn-danger btnPrevious">Previous</a>
+                                    <button class="btn btn-success" type="submit">Proceed</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="d-none" id="debitcard">
+                            @{
+                                if (Model.Currency == "BHD")
+                                {
+                                        <br />
+                                        <h3><center>Pay with Benefit</center></h3>
+                                        <div class="input-group mb-3 group-end">
+                                        <a class="btn btn-danger btnPrevious">Previous</a>
+                                            <button class="btn btn-success" type="button" onclick="tapBanafit();">Proceed</button>
+                                        </div>
+                                }
+                                else if (Model.Currency == "SAR")
+                                {
+                                        <br />
+                                        <h3><center>Pay with Mada</center></h3>
+                                        <div class="input-group mb-3 group-end">
+                                        <a class="btn btn-danger btnPrevious">Previous</a>
+                                            <button class="btn btn-success" type="button" onclick="tapmada();">Proceed</button>
+                                        </div>
+                                }
+                            }
+                        </div>
                         </div>
                     </div>
                 @*}*@
@@ -421,13 +456,11 @@ html {
 
     function tapTokenHandler(id) 
     {
-        debugger
         var currentUrl = window.location.href;
         var Frequency = $('select#Frequency option:selected').val();
         var TotalPlanfee = $('#TotalPlanfee').val();
         var VAT = $('#VAT').val();
         var SubscriptionId = $('#SubscriptionId').val(); 
-        var Invoiceid = $('#Invoiceid').val();
         var Currenturl = currentUrl;
         var formd = new FormData();
         formd.append("Frequency", Frequency);
@@ -435,7 +468,6 @@ html {
         formd.append("SubscriptionId", SubscriptionId);
         formd.append("Token", id); 
         formd.append("VAT", VAT); 
-        formd.append("Invoiceid", Invoiceid);
         formd.append("Currenturl", Currenturl);
         $.ajax({
             type: 'POST',
@@ -458,6 +490,88 @@ html {
                 $('#result').html(response);
             }
         });
+    }
+    function tapBanafit() {
+        var currentUrl = window.location.href;
+        var Frequency = $('select#Frequency option:selected').val();
+        var TotalPlanfee = $('#TotalPlanfee').val();
+        var VAT = $('#VAT').val();
+        var SubscriptionId = $('#SubscriptionId').val();
+        var Currenturl = currentUrl;
+        var formd = new FormData();
+        formd.append("Frequency", Frequency);
+        formd.append("TotalPlanfee", TotalPlanfee);
+        formd.append("SubscriptionId", SubscriptionId);
+        formd.append("Token", "BENEFIT");
+        formd.append("VAT", VAT);
+        formd.append("Currenturl", Currenturl);
+        $.ajax({
+            type: 'POST',
+            url: '/Home/CreateInvoiceBenefit',
+            processData: false,
+            contentType: false,
+            data: formd,
+            success: function (response) {
+                if (response.status == true) {
+                    window.location.href = response.URL;
+                }
+                else {
+                    alert(response.URL);
+                }
+
+            },
+            failure: function (response) {
+                $('#result').html(response);
+            }
+        });
+    }
+    function tapmada() {
+        var currentUrl = window.location.href;
+        var Frequency = $('select#Frequency option:selected').val();
+        var TotalPlanfee = $('#TotalPlanfee').val();
+        var VAT = $('#VAT').val();
+        var SubscriptionId = $('#SubscriptionId').val();
+        var Currenturl = currentUrl;
+        var formd = new FormData();
+        formd.append("Frequency", Frequency);
+        formd.append("TotalPlanfee", TotalPlanfee);
+        formd.append("SubscriptionId", SubscriptionId);
+        formd.append("Token", "src_sa.mada");
+        formd.append("VAT", VAT);
+        formd.append("Currenturl", Currenturl);
+        $.ajax({
+            type: 'POST',
+            url: '/Home/CreateInvoiceMada',
+            processData: false,
+            contentType: false,
+            data: formd,
+            success: function (response) {
+                if (response.status == true) {
+                    window.location.href = response.URL;
+                }
+                else {
+                    alert(response.URL);
+                }
+
+            },
+            failure: function (response) {
+                $('#result').html(response);
+            }
+        });
+    }
+    function CardSelect()
+    {
+        debugger
+        var card = $('select#PaymentCard option:selected').val();
+        if (card === "Credit Card")
+        {
+            $("#debitcard").addClass("d-none");
+            $("#creditcard").removeClass("d-none");
+        }
+        else if (card === "Debit Card") {
+            $("#creditcard").addClass("d-none");
+            $("#debitcard").removeClass("d-none");
+        }
     }
 </script>
 <script>

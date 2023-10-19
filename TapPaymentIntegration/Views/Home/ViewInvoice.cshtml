@@ -99,13 +99,21 @@
                         <div class="col-6">
                             <p class="lead">Payment Methods:</p>
                             @{
-                                if (Model.card.brand == "VISA")
+                                if (Model.card.scheme == "VISA")
                                 {
                                     <img src="~/adminpanel/dist/img/credit/visa.png" alt="Visa">
                                 }
-                                else if (Model.card.brand == "MASTERCARD")
+                                else if (Model.card.scheme == "MASTERCARD")
                                 {
                                     <img src="~/adminpanel/dist/img/credit/mastercard.png" alt="Mastercard">
+                                }
+                                else if (Model.card.scheme == "MADA")
+                                {
+                                    <img src="~/adminpanel/dist/img/credit/mada.png" alt="Mastercard" style="height: 44px;">
+                                }
+                                else if (Model.card.scheme == "BENEFIT")
+                                {
+                                    <img src="~/adminpanel/dist/img/credit/benefit.png" alt="Mastercard" style="height: 44px;">
                                 }
                             }
                         </div>
