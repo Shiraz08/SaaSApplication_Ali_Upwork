@@ -323,7 +323,12 @@ html {
                                     <select class="form-control" id="PaymentCard" name="PaymentCard" tabindex="1" required="required" onchange="CardSelect();">
                                         <option value="0">Please Select Card</option>
                                         <option value="Credit Card">Credit Card</option>
-                                        <option value="Debit Card">Debit Card</option>
+                                        @{
+                                            if (Model.Currency == "BHD")
+                                            {
+                                                <option value="Debit Card">Debit Card</option>
+                                            }
+                                        }
                                     </select>
                                 </div>
                             </div>
@@ -355,15 +360,6 @@ html {
                                         <div class="input-group mb-3 group-end">
                                         <a class="btn btn-danger btnPrevious">Previous</a>
                                             <button class="btn btn-success" type="button" onclick="tapBanafit();">Proceed</button>
-                                        </div>
-                                }
-                                else if (Model.Currency == "SAR")
-                                {
-                                        <br />
-                                        <h3><center>Pay with Mada</center></h3>
-                                        <div class="input-group mb-3 group-end">
-                                        <a class="btn btn-danger btnPrevious">Previous</a>
-                                            <button class="btn btn-success" type="button" onclick="tapmada();">Proceed</button>
                                         </div>
                                 }
                             }

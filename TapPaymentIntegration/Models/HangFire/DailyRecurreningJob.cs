@@ -20,7 +20,7 @@ namespace TapPaymentIntegration.Models.HangFire
         private readonly IUserStore<ApplicationUser> _userStore;
         private IWebHostEnvironment _environment;
         EmailSender _emailSender = new EmailSender();
-         public readonly string RedirectURL = "https://tappayment.niralahyderabadirestaurant.com";
+        public readonly string RedirectURL = "https://tappayment.niralahyderabadirestaurant.com";
         //public readonly string RedirectURL = "https://localhost:7279";
         public DailyRecurreningJob(IWebHostEnvironment Environment, ILogger<HomeController> logger, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, TapPaymentIntegrationContext context, IUserStore<ApplicationUser> userStore)
         { 
@@ -140,6 +140,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                 };
                                 _context.invoices.Add(invoice);
                                 _context.SaveChanges();
+                                int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
                                 //Next Recurrening Job Date
                                 RecurringCharge recurringCharge = new RecurringCharge();
                                 recurringCharge.Amount = Convert.ToDecimal(item.Amount);
@@ -147,7 +148,8 @@ namespace TapPaymentIntegration.Models.HangFire
                                 recurringCharge.UserID = getuserinfo.Id;
                                 recurringCharge.Tap_CustomerId = getuserinfo.Tap_CustomerID;
                                 recurringCharge.ChargeId = deserialized_CreateCharge.id;
-                                recurringCharge.JobRunDate = invoice.InvoiceEndDate.AddDays(1);
+                                recurringCharge.JobRunDate = invoice.InvoiceEndDate;
+                                recurringCharge.Invoice = "Inv" + max_invoice_id;
                                 _context.recurringCharges.Add(recurringCharge);
                                 _context.SaveChanges();
 
@@ -159,7 +161,6 @@ namespace TapPaymentIntegration.Models.HangFire
                                 _context.recurringCharges.Update(recurreningjob);
                                 _context.SaveChanges();
                                 //Send Email
-                                int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
                                 var incoice_info = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).FirstOrDefault();
                                 string body = string.Empty;
                                 _environment.WebRootPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
@@ -268,6 +269,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                 };
                                 _context.invoices.Add(invoice);
                                 _context.SaveChanges();
+                                int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
                                 //Next Recurrening Job Date
                                 RecurringCharge recurringCharge = new RecurringCharge();
                                 recurringCharge.Amount = Convert.ToDecimal(item.Amount);
@@ -276,6 +278,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                 recurringCharge.Tap_CustomerId = getuserinfo.Tap_CustomerID;
                                 recurringCharge.ChargeId = deserialized_CreateCharge.id;
                                 recurringCharge.JobRunDate = invoice.InvoiceEndDate.AddDays(1);
+                                recurringCharge.Invoice = "Inv" + max_invoice_id;
                                 _context.recurringCharges.Add(recurringCharge);
                                 _context.SaveChanges();
 
@@ -286,7 +289,6 @@ namespace TapPaymentIntegration.Models.HangFire
                                 _context.recurringCharges.Update(recurreningjob);
                                 _context.SaveChanges();
                                 //Send Email
-                                int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
                                 var incoice_info = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).FirstOrDefault();
                                 string body = string.Empty;
                                 _environment.WebRootPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
@@ -395,6 +397,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                 };
                                 _context.invoices.Add(invoice);
                                 _context.SaveChanges();
+                                int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
                                 //Next Recurrening Job Date
                                 RecurringCharge recurringCharge = new RecurringCharge();
                                 recurringCharge.Amount = Convert.ToDecimal(item.Amount);
@@ -404,6 +407,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                 recurringCharge.ChargeId = deserialized_CreateCharge.id;
                                 recurringCharge.JobRunDate = invoice.InvoiceEndDate.AddDays(1);
                                 _context.recurringCharges.Add(recurringCharge);
+                                recurringCharge.Invoice = "Inv" + max_invoice_id;
                                 _context.SaveChanges();
 
                                 // Update Job Table
@@ -413,7 +417,6 @@ namespace TapPaymentIntegration.Models.HangFire
                                 _context.recurringCharges.Update(recurreningjob);
                                 _context.SaveChanges();
                                 //Send Email
-                                int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
                                 var incoice_info = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).FirstOrDefault();
                                 string body = string.Empty;
                                 _environment.WebRootPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
@@ -522,6 +525,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                 };
                                 _context.invoices.Add(invoice);
                                 _context.SaveChanges();
+                                int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
                                 //Next Recurrening Job Date
                                 RecurringCharge recurringCharge = new RecurringCharge();
                                 recurringCharge.Amount = Convert.ToDecimal(item.Amount);
@@ -530,6 +534,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                 recurringCharge.Tap_CustomerId = getuserinfo.Tap_CustomerID;
                                 recurringCharge.ChargeId = deserialized_CreateCharge.id;
                                 recurringCharge.JobRunDate = invoice.InvoiceEndDate.AddDays(1);
+                                recurringCharge.Invoice = "Inv" + max_invoice_id;
                                 _context.recurringCharges.Add(recurringCharge);
                                 _context.SaveChanges();
 
@@ -540,7 +545,6 @@ namespace TapPaymentIntegration.Models.HangFire
                                 _context.recurringCharges.Update(recurreningjob);
                                 _context.SaveChanges();
                                 //Send Email
-                                int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
                                 var incoice_info = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).FirstOrDefault();
                                 string body = string.Empty;
                                 _environment.WebRootPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
@@ -649,6 +653,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                 };
                                 _context.invoices.Add(invoice);
                                 _context.SaveChanges();
+                                int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
                                 //Next Recurrening Job Date
                                 RecurringCharge recurringCharge = new RecurringCharge();
                                 recurringCharge.Amount = Convert.ToDecimal(item.Amount);
@@ -657,6 +662,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                 recurringCharge.Tap_CustomerId = getuserinfo.Tap_CustomerID;
                                 recurringCharge.ChargeId = deserialized_CreateCharge.id;
                                 recurringCharge.JobRunDate = invoice.InvoiceEndDate.AddDays(1);
+                                recurringCharge.Invoice = "Inv" + max_invoice_id;
                                 _context.recurringCharges.Add(recurringCharge);
                                 _context.SaveChanges();
 
@@ -667,7 +673,6 @@ namespace TapPaymentIntegration.Models.HangFire
                                 _context.recurringCharges.Update(recurreningjob);
                                 _context.SaveChanges();
                                 //Send Email
-                                int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
                                 var incoice_info = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).FirstOrDefault();
                                 string body = string.Empty;
                                 _environment.WebRootPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
@@ -776,6 +781,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                 };
                                 _context.invoices.Add(invoice);
                                 _context.SaveChanges();
+                                int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
                                 //Next Recurrening Job Date
                                 RecurringCharge recurringCharge = new RecurringCharge();
                                 recurringCharge.Amount = Convert.ToDecimal(item.Amount);
@@ -784,6 +790,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                 recurringCharge.Tap_CustomerId = getuserinfo.Tap_CustomerID;
                                 recurringCharge.ChargeId = deserialized_CreateCharge.id;
                                 recurringCharge.JobRunDate = invoice.InvoiceEndDate.AddDays(1);
+                                recurringCharge.Invoice = "Inv" + max_invoice_id;
                                 _context.recurringCharges.Add(recurringCharge);
                                 _context.SaveChanges();
 
@@ -794,7 +801,6 @@ namespace TapPaymentIntegration.Models.HangFire
                                 _context.recurringCharges.Update(recurreningjob);
                                 _context.SaveChanges();
                                 //Send Email
-                                int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
                                 var incoice_info = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).FirstOrDefault();
                                 string body = string.Empty;
                                 _environment.WebRootPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");

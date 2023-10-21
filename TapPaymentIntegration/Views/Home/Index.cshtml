@@ -279,9 +279,9 @@
 									@{
 										if (item.SubscriptionId == Convert.ToInt32(subid) && user.Tap_CustomerID != null)
 										{
-											<span class="price_btn">AlReady Purchase</span>
+											
 										}
-										else
+									    if (item.SubscriptionId != Convert.ToInt32(subid) && user.Tap_CustomerID == null)
 										{
 											@if (SignInManager.IsSignedIn(User))
 											{
@@ -291,6 +291,10 @@
 											{
 												<a href="@Url.Action("AddGymCustomer","Home", new {id= item.SubscriptionId})" class="price_btn">Purchase Plan</a>
 											}
+										}
+										else
+										{
+											<span class="price_btn">AlReady Purchase</span>
 										}
 									}
 								</div>
