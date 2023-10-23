@@ -185,29 +185,12 @@ html {
 {
     <center><h4><span class="error" style="color:red!important">@msg</span></h4></center>
 }
-<div id="header-carousel" class="carousel slide carousel-fade" data-ride="carousel">
-    <div class="carousel-inner">
-        <div class="carousel-item position-relative active" style="min-height:83vh;">
-            <img class="position-absolute w-100 h-100" src="~/website/img/whatsapp image 2023-09-22 at 6.33.41 pm (2).jpeg" style="object-fit: cover;" />
-            <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
-                <div class="p-3" style="max-width: 900px;">
-                    <h6 class="text-white text-uppercase mb-3 animate__animated animate__fadeInDown" style="letter-spacing: 3px;font-size:17px">
-                        Your All-in-One Gym Management Software
-                    </h6>
-                    <h3 class="display-3 text-capitalize text-white mb-3">Tamarran</h3>
-                    <p class="mx-md-5 px-5">
-                        Say hello to streamlined operations, data-driven insights, and an elevated member experience
-                    </p>
-                    <a class="btn btn-outline-light py-3 px-4 mt-3 animate__animated animate__fadeInUp" href="#pricing">Get Started</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<br /><br />
+<br />
+<br />
+<br />
 
-<section class="content col-lg-12">
+<section class="content col-lg-12" style="padding-bottom:215px!important">
     <div class="container-fluid flex-row justify-content-center align-items-center col-md-8">
         <div class="card card-secondary" style="border:1px solid #efd41c!important">
             <div class="card-header">
@@ -234,7 +217,7 @@ html {
                                     <div class="form-group">
                                         <label style="color:black!important">Frequency:&nbsp;<span style="color:red!important"><b>*</b></span></label>
                                         <select class="form-control" id="Frequency" name="Frequency" tabindex="1" required="required">
-                                            <option value="0">Please Select Frequency</option>
+                                        <option value="0">Please Select Frequency</option>
                                         <option value="DAILY">Daily</option>
                                         <option value="WEEKLY">Weekly</option>
                                         <option value="MONTHLY">Monthly</option>
@@ -273,36 +256,36 @@ html {
                                             </tr>
                                         </tbody>
                                     </table>
-                                    <table class="table table-bordered" style="margin-top:60px!important">
+                                <table class="table table-bordered" style="margin-top:10px!important;border-collapse: collapse; border: none;">
                                         <tbody>
-                                            <tr>
-                                                <td style="width:800px"></td>
-                                            <td style="text-align:center!important;color:black!important;width:288px">Original Plan Amount</td>
+                                        <tr style="border: none;">
+                                            <td style="width:800px;border: none;"></td>
+                                            <td style="text-align:center!important;color:black!important;width:365px">Original Plan Amount</td>
                                             <td style="text-align:center!important;color:black!important;width:153px"><input type="text" id="planamount" name="planamount" class="form-control" style="text-align:center" readonly="readonly" /></td>
                                             </tr>
                                         <tr>
-                                            <td style="width:800px"></td>
-                                            <td style="text-align:center!important;color:black!important;width:288px">Frequency Plan Amount</td>
+                                            <td style="width:800px;border: none;"></td>
+                                            <td style="text-align:center!important;color:black!important;width:365px">Frequency Plan Amount</td>
                                             <td style="text-align:center!important;color:black!important;width:153px"><input type="text" id="subamount" name="subamount" class="form-control" style="text-align:center" readonly="readonly" /></td>
                                         </tr>
                                         <tr>
-                                            <td style="width:800px"></td>
-                                            <td style="text-align:center!important;color:black!important;width:288px">Discount</td>
+                                            <td style="width:800px;border: none;"></td>
+                                            <td style="text-align:center!important;color:black!important;width:365px">Discount</td>
                                             <td style="text-align:center!important;color:black!important;width:153px"><input type="text" id="Discount" name="Discount" class="form-control" style="text-align:center" readonly="readonly" /></td>
                                         </tr>
                                         <tr>
-                                            <td style="width:800px"></td>
-                                            <td style="text-align:center!important;color:black!important;width:288px">Setup Fee</td>
+                                            <td style="width:800px;border: none;"></td>
+                                            <td style="text-align:center!important;color:black!important;width:365px">Setup Fee</td>
                                             <td style="text-align:center!important;color:black!important;width:153px"><input type="text" id="setupfee" name="setupfee" class="form-control" value="@Model.SetupFee" style="text-align:center" readonly="readonly" /></td>
                                         </tr>
                                         <tr>
-                                            <td style="width:800px"></td>
-                                            <td style="text-align:center!important;color:black!important;width:288px">VAT</td>
+                                            <td style="width:800px;border: none;"></td>
+                                            <td style="text-align:center!important;color:black!important;width:365px">VAT</td>
                                             <td style="text-align:center!important;color:black!important;width:153px"><input type="text" id="VAT" name="VAT" class="form-control" style="text-align:center" readonly="readonly" /></td>
                                         </tr>
                                         <tr>
-                                            <td style="width:800px"></td>
-                                            <td style="text-align:center!important;color:black!important;width:288px">Total</td>
+                                            <td style="width:800px;border: none;"></td>
+                                            <td style="text-align:center!important;color:black!important;width:365px">Total</td>
                                             <td style="text-align:center!important;color:black!important;width:153px"><input type="text" id="TotalPlanfee" name="TotalPlanfee" class="form-control" style="text-align:center" readonly="readonly" /></td>
                                         </tr>
                                         </tbody>
@@ -613,10 +596,11 @@ html {
         var subscriptionamount = "";
         if (selValue == "YEARLY") 
         {
-            var amountpercentage = (@Model.Amount / 100) * 10;
+            var amountpercentage = (@Model.Amount / 100) * @Model.Discount;
             var final_amount_percentage = @Model.Amount - amountpercentage;
             subscriptionamount = final_amount_percentage * 12;
-            $("#Discount").val(amountpercentage * 12);
+            var dis = amountpercentage * 12;
+            $("#Discount").val(dis.toFixed(2));
         }
         else if (selValue == "DAILY") {
             $("#Discount").val('0');
@@ -653,11 +637,11 @@ html {
             $("#VAT").val(calculate_vat);
         }
         $("#planamount").val(@Model.Amount);
-        $("#subamount").val(subscriptionamount);
-        $("#subamount2").val(subscriptionamount);
+        $("#subamount").val(subscriptionamount.toFixed(2));
+        $("#subamount2").val(subscriptionamount.toFixed(2));
         var subscriptionSetupFee = @Model.SetupFee;
         var totalamount = parseFloat(subscriptionamount) + parseFloat(subscriptionSetupFee) + parseFloat(calculate_vat);
-        $("#TotalPlanfee").val(totalamount);
-        $("#TotalPlanfee2").val(totalamount);
+        $("#TotalPlanfee").val(totalamount.toFixed(2));
+        $("#TotalPlanfee2").val(totalamount.toFixed(2));
     });
 </script>

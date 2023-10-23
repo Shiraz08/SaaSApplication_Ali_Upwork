@@ -23,8 +23,9 @@
                                     <th>Currency</th>
                                     <th>Country</th>
                                     <th>Frequency</th>
-                                    <th>Subscription Amount</th>
-                                    <th>VAT Percentage</th>
+                                    <th>Amount</th>
+                                    <th>VAT %</th>
+                                    <th>Discount %</th>
                                     <th>Status</th>
                                     <th>Added Date</th>
                                     <th>Action</th>
@@ -49,6 +50,18 @@
                                                 else
                                                 {
                                                     <span>@user.VAT%</span>
+                                                }
+                                            }
+                                        </td>
+                                        <td style="text-align:center!important">
+                                            @{
+                                                if (user.Discount == null)
+                                                {
+                                                    <span>0%</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>@user.Discount%</span>
                                                 }
                                             }
                                         </td>

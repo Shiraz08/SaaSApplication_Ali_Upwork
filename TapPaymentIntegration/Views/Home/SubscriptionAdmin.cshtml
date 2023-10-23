@@ -186,25 +186,7 @@
 {
     <center><h4><span class="error" style="color:red!important">@msg</span></h4></center>
 }
-<div id="header-carousel" class="carousel slide carousel-fade" data-ride="carousel">
-    <div class="carousel-inner">
-        <div class="carousel-item position-relative active" style="min-height:83vh;">
-            <img class="position-absolute w-100 h-100" src="~/website/img/whatsapp image 2023-09-22 at 6.33.41 pm (2).jpeg" style="object-fit: cover;" />
-            <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
-                <div class="p-3" style="max-width: 900px;">
-                    <h6 class="text-white text-uppercase mb-3 animate__animated animate__fadeInDown" style="letter-spacing: 3px;font-size:17px">
-                        Your All-in-One Gym Management Software
-                    </h6>
-                    <h3 class="display-3 text-capitalize text-white mb-3">Tamarran</h3>
-                    <p class="mx-md-5 px-5">
-                        Say hello to streamlined operations, data-driven insights, and an elevated member experience
-                    </p>
-                    <a class="btn btn-outline-light py-3 px-4 mt-3 animate__animated animate__fadeInUp" href="#pricing">Get Started</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <br />
 <br />
@@ -406,10 +388,11 @@
         var selValue = $(this).val();
         var subscriptionamount = "";
         if (selValue == "YEARLY") {
-            var amountpercentage = (@Model.Amount / 100) * 10;
+            var amountpercentage = (@Model.Amount / 100) * @Model.Discount;
                 var final_amount_percentage = @Model.Amount - amountpercentage;
             subscriptionamount = final_amount_percentage * 12;
-            $("#Discount").val(amountpercentage * 12);
+            var dis = amountpercentage * 12;
+            $("#Discount").val(dis.toFixed(2));
         }
         else if (selValue == "DAILY") {
             $("#Discount").val('0');
@@ -443,11 +426,11 @@
             $("#VAT").val(calculate_vat);
         }
         $("#planamount").val(@Model.Amount);
-        $("#subamount").val(subscriptionamount);
-        $("#subamount2").val(subscriptionamount);
+        $("#subamount").val(subscriptionamount.toFixed(2));
+        $("#subamount2").val(subscriptionamount.toFixed(2));
         var subscriptionSetupFee = @Model.SetupFee;
         var totalamount = parseInt(subscriptionamount) + parseInt(subscriptionSetupFee) + parseInt(calculate_vat);
-        $("#TotalPlanfee").val(totalamount);
-        $("#TotalPlanfee2").val(totalamount);
+        $("#TotalPlanfee").val(totalamount.toFixed(2));
+        $("#TotalPlanfee2").val(totalamount.toFixed(2));
     });
 </script>

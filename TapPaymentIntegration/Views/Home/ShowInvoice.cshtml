@@ -18,6 +18,8 @@
                         <table id="example1" class="table table-bordered table-striped table-responsive-xl">
                             <thead>
                                 <tr style="text-align:center!important">
+                                    <th>GYM Name</th>
+                                    <th>Country</th>
                                     <th>Subscription Name</th>
                                     <th>Invoice Start Date</th>
                                     <th>Invoice End Date</th>
@@ -33,6 +35,8 @@
                                 @foreach (var user in Model)
                                 {
                                     <tr>
+                                        <td style="text-align:center!important">@user.GymName</td>
+                                        <td style="text-align:center!important">@user.Country</td>
                                         <td style="text-align:center!important">@user.SubscriptionName</td>
                                         <td style="text-align:center!important">
                                             @{

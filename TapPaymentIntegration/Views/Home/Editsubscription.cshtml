@@ -47,14 +47,18 @@
                             <div class="form-group">
                                 <label>Country:&nbsp;<span style="color:red!important"><b>*</b></span></label>
                                 <div class="input-group mb-3">
-                                    <select name="Countries" class="form-control" id="Countries" tabindex="4" required="required">
-                                        <option value=" " label="Please Select a Country">Please Select a Country</option>
-                                        <option value="Bahrain" label="Bahrain">Bahrain</option>
-                                        <option value="KSA" label="KSA">KSA</option>
-                                        <option value="Kuwait" label="Kuwait">Kuwait</option>
-                                        <option value="UAE" label="UAE">UAE</option>
-                                        <option value="Qatar" label="Qatar">Qatar</option>
-                                        <option value="Oman" label="Oman">Oman</option>
+                                    <select name="Countries" class="form-control" id="Countries" tabindex="4" required asp-for="Countries">
+                                        <option value=" " label="Select a Country" selected="selected">Select a Country</option>
+                                        @if (Model.Countries == "Bahrain")
+                                        {
+                                            <option value="Bahrain" label="Bahrain" selected="selected">Bahrain</option>
+                                            <option value="KSA" label="KSA">KSA</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="Bahrain" label="Bahrain">Bahrain</option>
+                                            <option value="KSA" label="KSA" selected="selected">KSA</option>
+                                        }
                                     </select>
                                 </div>
                             </div>
@@ -69,6 +73,18 @@
                             <div class="form-group">
                                 <label>Amount:&nbsp;<span style="color:red!important"><b>*</b></span></label>
                                 <input type="text" class="form-control" id="Amount" name="Amount" tabindex="7" required="required" value="@Model.Amount" />
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>VAT:&nbsp;<span style="color:red!important"><b>*</b></span></label>
+                                <input type="number" class="form-control" id="VAT" value="@Model.VAT" name="VAT" required="required" min="0" oninput="validity.valid||(value='');" value="0" />
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label>Discount:&nbsp;<span style="color:red!important"><b>*</b></span></label>
+                                <input type="number" class="form-control" id="Discount"   value="@Model.Discount" name="Discount" required="required" min="0" oninput="validity.valid||(value='');" value="0" />
                             </div>
                         </div>
                         <div class="col-md-3">

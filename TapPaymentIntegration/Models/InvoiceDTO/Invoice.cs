@@ -20,6 +20,8 @@ namespace TapPaymentIntegration.Models.InvoiceDTO
         public string Description { get; set;}
         public bool IsDeleted { get; set; } 
         public string AddedBy { get; set; }
+        public string GymName { get; set; }
+        public string Country { get; set; }
         public DateTime AddedDate { get; set; }
         public string ModifiedBy { get; set; } 
         public DateTime ModifiedDate { get; set; }

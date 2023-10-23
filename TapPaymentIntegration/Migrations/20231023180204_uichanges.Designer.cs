@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TapPaymentIntegration.Data;
 
@@ -11,9 +12,10 @@ using TapPaymentIntegration.Data;
 namespace TapPaymentIntegration.Migrations
 {
     [DbContext(typeof(TapPaymentIntegrationContext))]
-    partial class TapPaymentIntegrationContextModelSnapshot : ModelSnapshot
+    [Migration("20231023180204_uichanges")]
+    partial class uichanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -380,9 +382,6 @@ namespace TapPaymentIntegration.Migrations
                     b.Property<int>("ChargeResponseId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Country")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Currency")
                         .HasColumnType("nvarchar(max)");
 
@@ -390,9 +389,6 @@ namespace TapPaymentIntegration.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Discount")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("GymName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("InvoiceEndDate")

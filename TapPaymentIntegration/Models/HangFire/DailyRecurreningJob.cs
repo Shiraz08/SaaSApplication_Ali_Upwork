@@ -137,6 +137,8 @@ namespace TapPaymentIntegration.Models.HangFire
                                     SubscriptionName = getsubinfo.Name,
                                     UserId = getuserinfo.Id,
                                     ChargeId = deserialized_CreateCharge.id,
+                                    GymName = getuserinfo.GYMName,
+                                    Country = getsubinfo.Countries
                                 };
                                 _context.invoices.Add(invoice);
                                 _context.SaveChanges();
@@ -227,6 +229,8 @@ namespace TapPaymentIntegration.Models.HangFire
                                     SubscriptionName = getsubinfo.Name,
                                     UserId = getuserinfo.Id,
                                     ChargeId = deserialized_CreateCharge.id,
+                                    GymName = getuserinfo.GYMName,
+                                    Country = getsubinfo.Countries
                                 };
                                 _context.invoices.Add(invoice);
                                 _context.SaveChanges();
@@ -266,6 +270,8 @@ namespace TapPaymentIntegration.Models.HangFire
                                     SubscriptionName = getsubinfo.Name,
                                     UserId = getuserinfo.Id,
                                     ChargeId = deserialized_CreateCharge.id,
+                                    GymName = getuserinfo.GYMName,
+                                    Country = getsubinfo.Countries
                                 };
                                 _context.invoices.Add(invoice);
                                 _context.SaveChanges();
@@ -355,6 +361,8 @@ namespace TapPaymentIntegration.Models.HangFire
                                     SubscriptionName = getsubinfo.Name,
                                     UserId = getuserinfo.Id,
                                     ChargeId = deserialized_CreateCharge.id,
+                                    GymName = getuserinfo.GYMName,
+                                    Country = getsubinfo.Countries
                                 };
                                 _context.invoices.Add(invoice);
                                 _context.SaveChanges();
@@ -394,6 +402,8 @@ namespace TapPaymentIntegration.Models.HangFire
                                     SubscriptionName = getsubinfo.Name,
                                     UserId = getuserinfo.Id,
                                     ChargeId = deserialized_CreateCharge.id,
+                                    GymName = getuserinfo.GYMName,
+                                    Country = getsubinfo.Countries
                                 };
                                 _context.invoices.Add(invoice);
                                 _context.SaveChanges();
@@ -483,6 +493,8 @@ namespace TapPaymentIntegration.Models.HangFire
                                     SubscriptionName = getsubinfo.Name,
                                     UserId = getuserinfo.Id,
                                     ChargeId = deserialized_CreateCharge.id,
+                                    GymName = getuserinfo.GYMName,
+                                    Country = getsubinfo.Countries
                                 };
                                 _context.invoices.Add(invoice);
                                 _context.SaveChanges();
@@ -522,6 +534,8 @@ namespace TapPaymentIntegration.Models.HangFire
                                     SubscriptionName = getsubinfo.Name,
                                     UserId = getuserinfo.Id,
                                     ChargeId = deserialized_CreateCharge.id,
+                                    GymName = getuserinfo.GYMName,
+                                    Country = getsubinfo.Countries
                                 };
                                 _context.invoices.Add(invoice);
                                 _context.SaveChanges();
@@ -611,6 +625,8 @@ namespace TapPaymentIntegration.Models.HangFire
                                     SubscriptionName = getsubinfo.Name,
                                     UserId = getuserinfo.Id,
                                     ChargeId = deserialized_CreateCharge.id,
+                                    GymName = getuserinfo.GYMName,
+                                    Country = getsubinfo.Countries
                                 };
                                 _context.invoices.Add(invoice);
                                 _context.SaveChanges();
@@ -650,6 +666,8 @@ namespace TapPaymentIntegration.Models.HangFire
                                     SubscriptionName = getsubinfo.Name,
                                     UserId = getuserinfo.Id,
                                     ChargeId = deserialized_CreateCharge.id,
+                                    GymName = getuserinfo.GYMName,
+                                    Country = getsubinfo.Countries
                                 };
                                 _context.invoices.Add(invoice);
                                 _context.SaveChanges();
@@ -739,6 +757,8 @@ namespace TapPaymentIntegration.Models.HangFire
                                     SubscriptionName = getsubinfo.Name,
                                     UserId = getuserinfo.Id,
                                     ChargeId = deserialized_CreateCharge.id,
+                                    GymName = getuserinfo.GYMName,
+                                    Country = getsubinfo.Countries
                                 };
                                 _context.invoices.Add(invoice);
                                 _context.SaveChanges();
@@ -778,6 +798,8 @@ namespace TapPaymentIntegration.Models.HangFire
                                     SubscriptionName = getsubinfo.Name,
                                     UserId = getuserinfo.Id,
                                     ChargeId = deserialized_CreateCharge.id,
+                                    GymName = getuserinfo.GYMName,
+                                    Country = getsubinfo.Countries
                                 };
                                 _context.invoices.Add(invoice);
                                 _context.SaveChanges();
@@ -867,6 +889,8 @@ namespace TapPaymentIntegration.Models.HangFire
                                     SubscriptionName = getsubinfo.Name,
                                     UserId = getuserinfo.Id,
                                     ChargeId = deserialized_CreateCharge.id,
+                                    GymName = getuserinfo.GYMName,
+                                    Country = getsubinfo.Countries
                                 };
                                 _context.invoices.Add(invoice);
                                 _context.SaveChanges();

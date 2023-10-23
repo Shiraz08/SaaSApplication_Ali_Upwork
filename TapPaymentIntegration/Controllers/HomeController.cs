@@ -788,6 +788,8 @@ namespace TapPaymentIntegration.Controllers
                                 SubscriptionName = subscriptions.Name,
                                 UserId = users.Id,
                                 ChargeId = tap_id,
+                                GymName = users.GYMName,
+                                Country = subscriptions.Countries
                             };
                             _context.invoices.Add(invoices);
                             _context.SaveChanges();
@@ -1147,6 +1149,8 @@ namespace TapPaymentIntegration.Controllers
                             SubscriptionName = subscriptions.Name,
                             UserId = users.Id,
                             ChargeId = tap_id,
+                            GymName = users.GYMName,
+                            Country = subscriptions.Countries
                         };
                         _context.invoices.Add(invoices);
                         _context.SaveChanges();
@@ -1461,6 +1465,8 @@ namespace TapPaymentIntegration.Controllers
                     SubscriptionName = subscriptions.Name,
                     UserId = max_user_id,
                     ChargeId = "",
+                    GymName = applicationUser.GYMName,
+                    Country = subscriptions.Countries
                 };
                 _context.invoices.Add(invoices);
                 _context.SaveChanges();
