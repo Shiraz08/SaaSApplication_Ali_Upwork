@@ -133,7 +133,7 @@ html {
         cursor: pointer;
         display: block;
         float: left;
-        font-family: "Helvetica Neue", Helvetica, sans-serif;
+        font-family: "Silka";
         font-size: 15px;
         font-stretch: 100%;
         font-style: normal;
@@ -216,15 +216,38 @@ html {
                                     <input type="hidden" value="@Model.SubscriptionId" name="SubscriptionId" id="SubscriptionId" />
                                     <div class="form-group">
                                         <label style="color:black!important">Frequency:&nbsp;<span style="color:red!important"><b>*</b></span></label>
-                                        <select class="form-control" id="Frequency" name="Frequency" tabindex="1" required="required">
-                                        <option value="0">Please Select Frequency</option>
-                                        <option value="DAILY">Daily</option>
-                                        <option value="WEEKLY">Weekly</option>
-                                        <option value="MONTHLY">Monthly</option>
-                                        <option value="QUARTERLY">Quarterly</option>
-                                        <option value="HALFYEARLY">Semi Annual</option>
-                                        <option value="YEARLY">Annually</option>
-                                        </select>
+                                        @{
+                                            <select class="form-control" id="Frequency" name="Frequency" tabindex="1" required="required">
+                                                <option value="0">Please Select Frequency</option>
+                                                @foreach (var item in Model.Frequency.Split(','))
+                                            {
+                                                if (item == "DAILY")
+                                                {
+                                                        <option value="DAILY">Daily</option>
+                                                }
+                                                else if (item == "WEEKLY")
+                                                {
+                                                        <option value="WEEKLY">Weekly</option>
+                                                }
+                                                else if (item == "MONTHLY")
+                                                {
+                                                        <option value="MONTHLY">Monthly</option>
+                                                }
+                                                else if (item == "QUARTERLY")
+                                                {
+                                                        <option value="QUARTERLY">Quarterly</option>
+                                                }
+                                                else if (item == "HALFYEARLY")
+                                                {
+                                                        <option value="HALFYEARLY">Semi Annual</option>
+                                                }
+                                                else if (item == "YEARLY")
+                                                {
+                                                        <option value="YEARLY">Annually</option>
+                                                }                            
+                                            }
+                                            </select>
+                                        }
                                     </div>
                                 </div>
                             </div>
@@ -294,7 +317,7 @@ html {
                             </div>
 
                             <div class="input-group mb-3 group-end">
-                                <a class="btn btn-danger btnPrevious">Previous</a>
+                                <a class="btn btn-danger btnPrevious"id="Previous">Previous</a>
                                 <a class="btn btn-success btnNext">Next</a>
                             </div>
                         </div>
@@ -309,7 +332,7 @@ html {
                                         @{
                                             if (Model.Currency == "BHD")
                                             {
-                                                <option value="Debit Card">Debit Card</option>
+                                                    <option value="Debit Card">Debit Card</option>
                                             }
                                         }
                                     </select>
@@ -329,8 +352,8 @@ html {
                                 </div>
                                 <!-- Tap pay button -->
                                 <div class="input-group mb-3 group-end" style="margin-top:15px!important">
-                                    <a class="btn btn-danger btnPrevious">Previous</a>
-                                    <button class="btn btn-success" type="submit">Proceed</button>
+                                    <a class="btn btn-danger btnPrevious"id="Previous">Previous</a>
+                                    <button class="btn btn-success" type="submit" id="Proceed">Proceed</button>
                                 </div>
                             </form>
                         </div>
@@ -338,12 +361,12 @@ html {
                             @{
                                 if (Model.Currency == "BHD")
                                 {
-                                        <br />
-                                        <h3><center>Pay with Benefit</center></h3>
-                                        <div class="input-group mb-3 group-end">
-                                        <a class="btn btn-danger btnPrevious">Previous</a>
-                                            <button class="btn btn-success" type="button" onclick="tapBanafit();">Proceed</button>
-                                        </div>
+                                            <br />
+                                            <h3><center>Pay with Benefit</center></h3>
+                                            <div class="input-group mb-3 group-end">
+                                            <a class="btn btn-danger btnPrevious" id="Previous">Previous</a>
+                                            <button class="btn btn-success" type="button" onclick="tapBanafit();" id="Proceed">Proceed</button>
+                                            </div>
                                 }
                             }
                         </div>
@@ -435,6 +458,7 @@ html {
 
     function tapTokenHandler(id) 
     {
+        showLoader();
         var currentUrl = window.location.href;
         var Frequency = $('select#Frequency option:selected').val();
         var TotalPlanfee = $('#TotalPlanfee').val();
@@ -471,6 +495,7 @@ html {
         });
     }
     function tapBanafit() {
+        showLoader();
         var currentUrl = window.location.href;
         var Frequency = $('select#Frequency option:selected').val();
         var TotalPlanfee = $('#TotalPlanfee').val();
@@ -505,6 +530,7 @@ html {
         });
     }
     function tapmada() {
+        showLoader();
         var currentUrl = window.location.href;
         var Frequency = $('select#Frequency option:selected').val();
         var TotalPlanfee = $('#TotalPlanfee').val();
@@ -577,6 +603,10 @@ html {
             {
                 $('.nav-tabs .active').parent().prev('li').find('a').trigger('click');
             }
+            else
+            {
+                $("#frequencyspanvalue").text($('#Frequency option:selected').val());
+            }
             
         });
     });
@@ -634,7 +664,7 @@ html {
         {
             var roundoff_totalamount = Math.round(totala);
             calculate_vat = (totala / 100) * @Model.VAT;
-            $("#VAT").val(calculate_vat);
+            $("#VAT").val(calculate_vat.toFixed(2));
         }
         $("#planamount").val(@Model.Amount);
         $("#subamount").val(subscriptionamount.toFixed(2));

@@ -68,7 +68,7 @@
                                       <td>
                                             @if (user.SubscribeID > 0 && user.Tap_CustomerID != null)
                                         {
-                                           <a class="btn btn-danger" asp-controller="Home" asp-action="UnSubscribeSubscription" asp-route-id="@user.Id">Unsubscribe</a>
+                                                <a class="btn btn-danger" href="~/Home/UnSubscribeSubscription?id=@user.Id" class="btn bg-danger mr-1" onclick="return confirm('Are you sure you want to cancel your subscription with Tamarran?');">Unsubscribe</a>
                                         }
                                       </td>
                                     </tr>

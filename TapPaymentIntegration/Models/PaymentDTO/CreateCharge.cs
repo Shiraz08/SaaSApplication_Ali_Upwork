@@ -43,7 +43,7 @@ namespace TapPaymentIntegration.Models.PaymentDTO
     public class Transaction
     {
         public string timezone { get; set; }
-        public string created { get; set; }
+        public long created { get; set; }
         public string url { get; set; }
         public Expiry expiry { get; set; }
         public bool asynchronous { get; set; }

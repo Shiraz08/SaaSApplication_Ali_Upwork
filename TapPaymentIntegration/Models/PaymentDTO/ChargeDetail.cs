@@ -1,5 +1,6 @@
 ﻿using TapPaymentIntegration.Areas.Identity.Data;
 using TapPaymentIntegration.Models.Card;
+using TapPaymentIntegration.Models.InvoiceDTO;
 
 namespace TapPaymentIntegration.Models.PaymentDTO
 {
@@ -40,6 +41,13 @@ namespace TapPaymentIntegration.Models.PaymentDTO
         public bool auto_reversed { get; set; }
         public PaymentAgreement payment_agreement { get; set; }
         public Subscriptions Subscriptions { get; set; }
+        public string Frequency { get; set; }
+        public string finalamount { get; set; }
+        public string VAT { get; set; }
+        public string InvoiceID { get; set; }
+        public string Paymentname { get; set; }
+        public long Created_date { get; set; }
+
 
     }
     public class Security

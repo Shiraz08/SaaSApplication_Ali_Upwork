@@ -52,12 +52,12 @@
                         </div>
                         <!-- /.col -->
                         <div class="col-sm-4 invoice-col">
-                            <b>Invoice No: Inv_@ViewBag.InvoiceID</b><br>
+                            <b>Invoice No: Inv_@Model.InvoiceID</b><br>
                             <br>
                             <b>Order ID: @Model.reference.order</b><br>
                             <b>Transaction ID: @Model.reference.transaction</b><br>
                             @{
-                                double ticks = double.Parse(Model.transaction.created);
+                                double ticks = double.Parse(Convert.ToString(Model.Created_date));
                                 TimeSpan time = TimeSpan.FromMilliseconds(ticks);
                                 DateTime paydate = new DateTime(time.Ticks);
                                 <b>Pay Date: @paydate</b>
@@ -84,7 +84,7 @@
                                         <td>@Model.Subscriptions.Name</td>
                                         <td>@Model.Subscriptions.Currency</td>
                                         <td>@Model.Subscriptions.Amount</td>
-                                        <td>@ViewBag.Frequency</td>
+                                        <td>@Model.Frequency</td>
                                         <td>@Model.Subscriptions.Countries</td>
                                     </tr>
                                 </tbody>
@@ -99,19 +99,22 @@
                         <div class="col-6">
                             <p class="lead">Payment Methods:</p>
                             @{
-                                if (Model.card.scheme == "VISA")
+                                if(Model.card != null)
                                 {
-                                    <img src="~/adminpanel/dist/img/credit/visa.png" alt="Visa">
+                                    if (Model.card.scheme == "VISA")
+                                    {
+                                        <img src="~/adminpanel/dist/img/credit/visa.png" alt="Visa">
+                                    }
+                                    else if (Model.card.scheme == "MASTERCARD")
+                                    {
+                                        <img src="~/adminpanel/dist/img/credit/mastercard.png" alt="Mastercard">
+                                    }
+                                    else if (Model.card.scheme == "MADA")
+                                    {
+                                        <img src="~/adminpanel/dist/img/credit/mada.png" alt="Mastercard" style="height: 44px;">
+                                    }
                                 }
-                                else if (Model.card.scheme == "MASTERCARD")
-                                {
-                                    <img src="~/adminpanel/dist/img/credit/mastercard.png" alt="Mastercard">
-                                }
-                                else if (Model.card.scheme == "MADA")
-                                {
-                                    <img src="~/adminpanel/dist/img/credit/mada.png" alt="Mastercard" style="height: 44px;">
-                                }
-                                else if (Model.card.scheme == "BENEFIT")
+                                if (Model.Paymentname == "BENEFIT")
                                 {
                                     <img src="~/adminpanel/dist/img/credit/benefit.png" alt="Mastercard" style="height: 44px;">
                                 }
@@ -124,7 +127,7 @@
                                     <tr>
                                         <th style="width:50%">Subtotal:</th>
                                         @{
-                                            var finalamount =decimal.Round(Convert.ToDecimal(@ViewBag.finalamount),2);
+                                            var finalamount =decimal.Round(Convert.ToDecimal(@Model.finalamount),2);
                                             <td style="text-align:center!important">@Model.Subscriptions.Currency @finalamount</td>
                                         }
 
@@ -132,7 +135,7 @@
                                     <tr>
                                         <th>VAT </th>
                                         @{
-                                            var vats = decimal.Round(Convert.ToDecimal(@ViewBag.VAT), 2);
+                                            var vats = decimal.Round(Convert.ToDecimal(@Model.VAT), 2);
                                             <td style="text-align:center!important">@Model.Subscriptions.Currency @vats</td>
                                         }
                                     </tr>
@@ -143,7 +146,7 @@
                                     <tr>
                                         <th>Total:</th>
                                         @{
-                                            var total = Convert.ToInt32(@Model.amount);
+                                            var total =decimal.Round(Convert.ToDecimal(Model.amount) ,2);
                                             <td style="text-align:center!important">@Model.Subscriptions.Currency @total</td>
                                         }
                                     </tr>

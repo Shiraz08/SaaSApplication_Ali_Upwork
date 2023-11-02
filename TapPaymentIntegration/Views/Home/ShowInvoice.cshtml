@@ -18,6 +18,7 @@
                         <table id="example1" class="table table-bordered table-striped table-responsive-xl">
                             <thead>
                                 <tr style="text-align:center!important">
+                                    <th>Invoice No</th>
                                     <th>GYM Name</th>
                                     <th>Country</th>
                                     <th>Subscription Name</th>
@@ -26,7 +27,7 @@
                                     <th>Subscription Currency</th>
                                     <th>Subscription Amount</th>
                                     <th>VAT</th>
-                                    <th>Discont</th>
+                                    <th>Discount</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -35,6 +36,12 @@
                                 @foreach (var user in Model)
                                 {
                                     <tr>
+                                        <td style="text-align:center!important">
+                                            @{
+                                                var valw = "Inv" + @user.InvoiceId;
+                                                <span>@valw</span>
+                                            }
+                                        </td>
                                         <td style="text-align:center!important">@user.GymName</td>
                                         <td style="text-align:center!important">@user.Country</td>
                                         <td style="text-align:center!important">@user.SubscriptionName</td>
@@ -69,7 +76,7 @@
                                             }
                                             else
                                             {
-                                                <a class="btn btn-success" href="@Url.Action("ViewInvoice","Home",new {id = user.ChargeId, sub_id = user.SubscriptionId, userid = user.UserId,invoiceid = user.InvoiceId})">Invoice Detail</a>
+                                                <a class="btn btn-success" href="@Url.Action("ViewInvoice","Home",new {id = user.ChargeId, sub_id = user.SubscriptionId, userid = user.UserId,invoiceid = user.InvoiceId})">View Invoice</a>
                                             }
                                         </td>
                                     </tr>

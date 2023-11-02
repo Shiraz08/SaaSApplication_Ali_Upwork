@@ -269,7 +269,7 @@
 						<div class="col-lg-4 col-sm-6 col-xs-12 wow fadeInUp" data-wow-duration="1s" data-wow-delay="0.1s" data-wow-offset="0" style="visibility: visible; animation-duration: 1s; animation-delay: 0.1s; animation-name: fadeInUp;">
 							<div class="pricing_design">
 								<div class="single-pricing">
-									<div class="price-head">
+									<div class="price-head" style="overflow:auto!important">
 										<h2>@item.Name</h2>
 										<h1>@item.Amount</h1>
 										<span>/@item.Frequency</span>
@@ -282,24 +282,13 @@
 									<div class="pricing-price">
 									</div>
 									@{
-										if (item.SubscriptionId == Convert.ToInt32(subid) && user.Tap_CustomerID != null)
+										@if (SignInManager.IsSignedIn(User))
 										{
-											
-										}
-									    if (item.SubscriptionId != Convert.ToInt32(subid) && user.Tap_CustomerID == null)
-										{
-											@if (SignInManager.IsSignedIn(User))
-											{
-												<a href="@Url.Action("Subscription","Home", new {id= item.SubscriptionId, userid = user.Id})" class="price_btn">Purchase Plan</a>
-											}
-											else
-											{
-												<a href="@Url.Action("AddGymCustomer","Home", new {id= item.SubscriptionId})" class="price_btn">Purchase Plan</a>
-											}
+											<a href="@Url.Action("Subscription","Home", new {id= item.SubscriptionId, userid = user.Id})" class="price_btn">Purchase Plan</a>
 										}
 										else
 										{
-											<span class="price_btn">AlReady Purchase</span>
+											<a href="@Url.Action("AddGymCustomer","Home", new {id= item.SubscriptionId})" class="price_btn">Purchase Plan</a>
 										}
 									}
 								</div>

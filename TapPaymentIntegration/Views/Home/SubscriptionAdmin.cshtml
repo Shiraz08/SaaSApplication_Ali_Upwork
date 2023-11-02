@@ -134,7 +134,7 @@
         cursor: pointer;
         display: block;
         float: left;
-        font-family: "Helvetica Neue", Helvetica, sans-serif;
+        font-family: "Silka";
         font-size: 15px;
         font-stretch: 100%;
         font-style: normal;
@@ -191,7 +191,7 @@
 <br />
 <br />
 
-<section class="content col-lg-12">
+<section class="content col-lg-12" style="padding-bottom:215px!important">
     <div class="container-fluid flex-row justify-content-center align-items-center col-md-8">
         <div class="card card-secondary" style="border:1px solid #efd41c!important">
             <div class="card-header">
@@ -207,22 +207,54 @@
                 <input type="hidden" value="@ViewBag.userid" name="userid" id="userid" />
                 <input type="hidden" value="@ViewBag.After_vat_totalamount" name="After_vat_totalamount" id="After_vat_totalamount" />
                 <div class="tab-content" id="myTabContent">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label style="color:black!important">Payment Card:&nbsp;<span style="color:red!important"><b>*</b></span></label>
+                                <select class="form-control" id="PaymentCard" name="PaymentCard" tabindex="1" required="required" onchange="CardSelect();">
+                                    <option value="0">Please Select Card</option>
+                                    <option value="Credit Card">Credit Card</option>
+                                    @{
+                                        if (Model.Currency == "BHD")
+                                        {
+                                            <option value="Debit Card">Debit Card</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                     <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
-                        <center><h5>Please Refresh your Page if Payment Screen did not load</h5></center>
-                        <form id="form-container" method="post" action="/Home/CreateInvoice">
-                            <!-- Tap element will be here -->
-                            <div id="element-container"></div>
-                            <div id="error-handler" role="alert"></div>
-                            <div style=" display: none">
-                                <div id="success" style=" display: none;;position: relative;float: left;">
-                                    Success! token <span id="token"></span>
+                        <div class="d-none" id="creditcard">
+                            <center><h5>Please Refresh your Page if Payment Screen did not load</h5></center>
+                            <form id="form-container" method="post" action="/Home/CreateInvoice">
+                                <!-- Tap element will be here -->
+                                <div id="element-container"></div>
+                                <div id="error-handler" role="alert"></div>
+                                <div style=" display: none">
+                                    <div id="success" style=" display: none;;position: relative;float: left;">
+                                        Success! token <span id="token"></span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="input-group mb-3 group-end" style="margin-top:15px!important">
-                                <a class="btn btn-danger btnPrevious">Previous</a>
-                                <button class="btn btn-success" type="submit">Proceed</button>
-                            </div>
-                        </form>
+                                <div class="input-group mb-3 group-end" style="margin-top:15px!important">
+                                    <a class="btn btn-danger btnPrevious">Previous</a>
+                                    <button class="btn btn-success" type="submit">Proceed</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="d-none" id="debitcard">
+                            @{
+                                if (Model.Currency == "BHD")
+                                {
+                                    <br />
+                                    <h3><center>Pay with Benefit</center></h3>
+                                    <div class="input-group mb-3 group-end">
+                                        <a class="btn btn-danger btnPrevious">Previous</a>
+                                        <button class="btn btn-success" type="button" onclick="tapBanafit();" id="Proceed">Proceed</button>
+                                    </div>
+                                }
+                            }
+                        </div>
                     </div>
                 </div>
                 @*}*@
@@ -310,7 +342,7 @@
     });
 
     function tapTokenHandler(id) {
-        debugger
+        showLoader();
         var currentUrl = window.location.href;
         var Frequency = $('select#Frequency option:selected').val();
         var TotalPlanfee = $('#After_vat_totalamount').val();
@@ -347,6 +379,88 @@
                 $('#result').html(response);
             }
         });
+    }
+    function tapBanafit() {
+        showLoader();
+        var currentUrl = window.location.href;
+        var Frequency = $('select#Frequency option:selected').val();
+        var TotalPlanfee = $('#TotalPlanfee').val();
+        var VAT = $('#VAT').val();
+        var SubscriptionId = $('#SubscriptionId').val();
+        var Currenturl = currentUrl;
+        var formd = new FormData();
+        formd.append("Frequency", Frequency);
+        formd.append("TotalPlanfee", TotalPlanfee);
+        formd.append("SubscriptionId", SubscriptionId);
+        formd.append("Token", "BENEFIT");
+        formd.append("VAT", VAT);
+        formd.append("Currenturl", Currenturl);
+        $.ajax({
+            type: 'POST',
+            url: '/Home/CreateInvoiceBenefit',
+            processData: false,
+            contentType: false,
+            data: formd,
+            success: function (response) {
+                if (response.status == true) {
+                    window.location.href = response.URL;
+                }
+                else {
+                    alert(response.URL);
+                }
+
+            },
+            failure: function (response) {
+                $('#result').html(response);
+            }
+        });
+    }
+    function tapmada() {
+        showLoader();
+        var currentUrl = window.location.href;
+        var Frequency = $('select#Frequency option:selected').val();
+        var TotalPlanfee = $('#TotalPlanfee').val();
+        var VAT = $('#VAT').val();
+        var SubscriptionId = $('#SubscriptionId').val();
+        var Currenturl = currentUrl;
+        var formd = new FormData();
+        formd.append("Frequency", Frequency);
+        formd.append("TotalPlanfee", TotalPlanfee);
+        formd.append("SubscriptionId", SubscriptionId);
+        formd.append("Token", "src_sa.mada");
+        formd.append("VAT", VAT);
+        formd.append("Currenturl", Currenturl);
+        $.ajax({
+            type: 'POST',
+            url: '/Home/CreateInvoiceMada',
+            processData: false,
+            contentType: false,
+            data: formd,
+            success: function (response) {
+                if (response.status == true) {
+                    window.location.href = response.URL;
+                }
+                else {
+                    alert(response.URL);
+                }
+
+            },
+            failure: function (response) {
+                $('#result').html(response);
+            }
+        });
+    }
+    function CardSelect() {
+        debugger
+        var card = $('select#PaymentCard option:selected').val();
+        if (card === "Credit Card") {
+            $("#debitcard").addClass("d-none");
+            $("#creditcard").removeClass("d-none");
+        }
+        else if (card === "Debit Card") {
+            $("#creditcard").addClass("d-none");
+            $("#debitcard").removeClass("d-none");
+        }
     }
 </script>
 <script>
@@ -423,7 +537,7 @@
         else {
             var roundoff_totalamount = Math.round(totala);
             calculate_vat = (roundoff_totalamount / 100) * @Model.VAT;
-            $("#VAT").val(calculate_vat);
+            $("#VAT").val(calculate_vat.toFixed(2));
         }
         $("#planamount").val(@Model.Amount);
         $("#subamount").val(subscriptionamount.toFixed(2));

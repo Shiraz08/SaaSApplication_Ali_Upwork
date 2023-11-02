@@ -48,7 +48,7 @@ namespace TapPaymentIntegration.Models.InvoiceDTO
 
     public class Item
     {
-        public int amount { get; set; }
+        public string amount { get; set; }
         public string currency { get; set; }
         public string description { get; set; }
         public Discount discount { get; set; }
@@ -65,11 +65,9 @@ namespace TapPaymentIntegration.Models.InvoiceDTO
 
     public class Order
     {
-        public int amount { get; set; }
+        public string amount { get; set; }
         public string currency { get; set; }
         public List<Item> items { get; set; }
-        public Shipping shipping { get; set; }
-        public List<Tax> tax { get; set; }
     }
 
 

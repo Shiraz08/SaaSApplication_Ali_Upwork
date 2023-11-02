@@ -59,14 +59,11 @@
                         </select>
                 </div>
                 <div class="input-group mb-3">
-                    <select class="form-control" id="Frequency" name="Frequency" tabindex="1" required="required">
-                        <option value="">Please Select Frequency</option>
-                        <option value="DAILY">Daily</option>
-                        <option value="WEEKLY">Weekly</option>
-                        <option value="MONTHLY">Monthly</option>
-                        <option value="QUARTERLY">Quarterly</option>
-                        <option value="HALFYEARLY">Semi Annual</option>
-                        <option value="YEARLY">Annually</option>
+                    @Html.DropDownList("SubscribeID" ,(IEnumerable  <SelectListItem>)ViewBag.SubscriptionList, "Please Select Plan",new {  @class="form-control",@required="required",@onchange="fillfrequencyDropdown();"})
+                </div>
+                <div class="input-group mb-3">
+                    <select class="form-control" id="Frequency" name="Frequency" required="required">
+                        <option value="" label="Select a Frequency">Select a Frequency</option>
                     </select>
                 </div>
                 <div class="input-group mb-3">
@@ -76,9 +73,6 @@
                             <span class="fas fa-city"></span>
                         </div>
                     </div>
-                </div>
-                <div class="input-group mb-3">
-                    @Html.DropDownList("SubscribeID" ,(IEnumerable  <SelectListItem>)ViewBag.SubscriptionList, new {  @class="form-control",@required="required"})
                 </div>
                 <div class="input-group mb-3">
                     <input id="password-field" type="password" class="form-control" asp-for="Password" placeholder="Enter The Password" required="required">
@@ -126,5 +120,42 @@
                 $('#password-field').attr("type", "password");
             }
         });
+
+        function fillfrequencyDropdown()
+        {
+            var val = $("#SubscribeID").val();
+            if (val != "") 
+            {
+                var formd = new FormData();
+                formd.append("Frequency", val);
+                $.ajax({
+                    type: "POST",
+                    url: "/Home/getFrequency",
+                    processData: false,
+                    contentType: false,
+                    data: formd,
+                    success: function (data) {
+                        var dropdown = $('#Frequency');
+                        dropdown.empty();
+                        var result = data.Frequency;
+                        var array = result.split(",");
+                        debugger
+                        var dllist = $('#Frequency');
+
+                        $.each(array, function (i) {
+                            dllist.append(
+                                $('<option></option>').val(array[i]).html(array[i]));
+
+                        });
+                    }
+                });
+            }
+            else 
+            {
+            var dropdown = $('#Frequency');
+            dropdown.empty();
+            }
+
+    }
     </script>
  

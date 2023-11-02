@@ -31,15 +31,15 @@
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
+                                <input type="hidden" value="@Model.Frequency" id="txt_fre">
                                 <label>Frequency:&nbsp;<span style="color:red!important"><b>*</b></span></label>
-                                <select class="form-control" id="Frequency" name="Frequency" tabindex="2" required="required">
-                                    <option value="">Please Select a Frequency</option>
-                                    <option value="Daily">Daily</option>
-                                    <option value="Weekly">Weekly</option>
-                                    <option value="Monthly">Monthly</option>
-                                    <option value="Quarterly">Quarterly</option>
-                                    <option value="Semi Annual">Semi Annual</option>
-                                    <option value="Annually">Annually</option>
+                                <select class="form-control select2" multiple="multiple" data-placeholder="Select a Frequency" id="Frequency" name="Frequency" tabindex="2" required="required">
+                                    <option value="DAILY">Daily</option>
+                                    <option value="WEEKLY">Weekly</option>
+                                    <option value="MONTHLY">Monthly</option>
+                                    <option value="QUARTERLY">Quarterly</option>
+                                    <option value="HALFYEARLY">Semi Annual</option>
+                                    <option value="YEARLY">Annually</option>
                                 </select>
                             </div>
                         </div>
@@ -66,7 +66,7 @@
                         <div class="col-md-3">
                             <div class="form-group">
                                 <label>Setup Fee:&nbsp;<span style="color:red!important"><b>*</b></span></label>
-                                <input type="number" class="form-control" id="SetupFee" name="SetupFee" tabindex="5" required="required" value="@Model.SetupFee" />
+                                <input type="text" class="form-control" id="SetupFee" name="SetupFee" tabindex="5" required="required" value="@Model.SetupFee" />
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -92,6 +92,9 @@
                                 <button class="btn btn-success mt-2" type="submit" tabindex="6">Update Subscription</button>
                             </div>
                         </div>
+                        <p class="mb-1">
+                            <div asp-validation-summary="All" class="text-danger"></div>
+                        </p>
                     </div>
                 }
             </div>
@@ -103,6 +106,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js" integrity="sha512-rstIgDs0xPgmG6RX1Aba4KV5cWJbAMcvRCVmglpam9SoHZiUCyQVDdH2LPlxoHtrv17XWblE/V/PP+Tr04hbtA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
     $(document).ready(function () {
+        $('.select2').select2();
+        
+        var items = ($('#txt_fre').val().split(','));
+        $('#Frequency').val(items).trigger('change');
         $("form").validate();
     });
 </script>
