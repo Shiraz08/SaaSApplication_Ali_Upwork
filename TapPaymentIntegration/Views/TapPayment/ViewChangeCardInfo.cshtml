@@ -53,7 +53,7 @@
                                         <td style="text-align:center!important">
                                             @{
                                                 DateTime dateTime = Convert.ToDateTime(user.ChangeCardDate);
-                                                @dateTime.ToShortDateString()
+                                                @dateTime.ToString("dd/MM/yyyy")
                                             }
                                         </td>
                                     </tr>

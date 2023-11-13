@@ -48,7 +48,7 @@
                                                 <td style="text-align:center!important">
                                                     @{
                                                         DateTime dateTime = Convert.ToDateTime(user.PaymentDate);
-                                                        @dateTime.ToShortDateString() @dateTime.ToShortTimeString();
+                                                        @dateTime.ToString("dd/MM/yyyy") @dateTime.ToShortTimeString();
                                                     }
                                                 </td>
                                             </tr>

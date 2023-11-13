@@ -205,6 +205,7 @@
                 <input type="hidden" value="@Model.SubscriptionId" name="SubscriptionId" id="SubscriptionId" />
                 <input type="hidden" value="@ViewBag.Invoiceid" name="Invoiceid" id="Invoiceid" />
                 <input type="hidden" value="@ViewBag.userid" name="userid" id="userid" />
+                <input type="hidden" value="@ViewBag.Frequency" name="Frequency" id="Frequency" />
                 <input type="hidden" value="@ViewBag.After_vat_totalamount" name="After_vat_totalamount" id="After_vat_totalamount" />
                 <div class="tab-content" id="myTabContent">
                     <div class="row">
@@ -344,8 +345,10 @@
     function tapTokenHandler(id) {
         showLoader();
         var currentUrl = window.location.href;
-        var Frequency = $('select#Frequency option:selected').val();
+        var Frequency = $('#Frequency').val();
         var TotalPlanfee = $('#After_vat_totalamount').val();
+        var fval = parseFloat(TotalPlanfee);
+        var convert_val = fval.toFixed(2);
         var VAT = $('#VAT').val();
         var SubscriptionId = $('#SubscriptionId').val();
         var Invoiceid = $('#Invoiceid').val();
@@ -353,7 +356,7 @@
         var Currenturl = currentUrl;
         var formd = new FormData();
         formd.append("Frequency", Frequency);
-        formd.append("TotalPlanfee", TotalPlanfee);
+        formd.append("TotalPlanfee", convert_val.toString());
         formd.append("SubscriptionId", SubscriptionId);
         formd.append("Token", id);
         formd.append("VAT", VAT);
@@ -383,14 +386,16 @@
     function tapBanafit() {
         showLoader();
         var currentUrl = window.location.href;
-        var Frequency = $('select#Frequency option:selected').val();
-        var TotalPlanfee = $('#TotalPlanfee').val();
+        var Frequency = $('#Frequency').val();
+        var TotalPlanfee = $('#After_vat_totalamount').val();
+        var fval = parseFloat(TotalPlanfee);
+        var convert_val = fval.toFixed(2);
         var VAT = $('#VAT').val();
         var SubscriptionId = $('#SubscriptionId').val();
         var Currenturl = currentUrl;
         var formd = new FormData();
         formd.append("Frequency", Frequency);
-        formd.append("TotalPlanfee", TotalPlanfee);
+        formd.append("TotalPlanfee", convert_val.toString());
         formd.append("SubscriptionId", SubscriptionId);
         formd.append("Token", "BENEFIT");
         formd.append("VAT", VAT);
@@ -418,14 +423,16 @@
     function tapmada() {
         showLoader();
         var currentUrl = window.location.href;
-        var Frequency = $('select#Frequency option:selected').val();
-        var TotalPlanfee = $('#TotalPlanfee').val();
+        var Frequency = $('#Frequency').val();
+        var TotalPlanfee = $('#After_vat_totalamount').val();
+        var fval = parseFloat(TotalPlanfee);
+        var convert_val = fval.toFixed(2);
         var VAT = $('#VAT').val();
         var SubscriptionId = $('#SubscriptionId').val();
         var Currenturl = currentUrl;
         var formd = new FormData();
         formd.append("Frequency", Frequency);
-        formd.append("TotalPlanfee", TotalPlanfee);
+        formd.append("TotalPlanfee", convert_val.toString());
         formd.append("SubscriptionId", SubscriptionId);
         formd.append("Token", "src_sa.mada");
         formd.append("VAT", VAT);

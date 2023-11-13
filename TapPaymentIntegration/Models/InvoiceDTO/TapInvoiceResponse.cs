@@ -11,7 +11,7 @@ namespace TapPaymentIntegration.Models.InvoiceDTO
         public string id { get; set; }
         public string method { get; set; }
         public string status { get; set; }
-        public int amount { get; set; }
+        public decimal amount { get; set; }
         public string currency { get; set; }
         public long created { get; set; }
         public long updated { get; set; }
@@ -62,7 +62,7 @@ namespace TapPaymentIntegration.Models.InvoiceDTO
         public string name { get; set; }
         public string image { get; set; }
         public string currency { get; set; }
-        public int amount { get; set; }
+        public decimal amount { get; set; }
         public int quantity { get; set; }
         public Discount discount { get; set; }
         public string merchant_id { get; set; }
@@ -74,12 +74,12 @@ namespace TapPaymentIntegration.Models.InvoiceDTO
         public bool live_mode { get; set; }
         public string api_version { get; set; }
         public string currency { get; set; }
-        public int amount { get; set; }
+        public decimal amount { get; set; }
         public string status { get; set; }
         public List<Items> items { get; set; }
         public List<Tax> tax { get; set; }
         public Shipping shipping { get; set; }
-        public int itemAmount { get; set; }
+        public decimal itemAmount { get; set; }
         public long created { get; set; }
         public string merchant_id { get; set; }
     }

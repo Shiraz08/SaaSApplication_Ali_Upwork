@@ -4,7 +4,7 @@ namespace TapPaymentIntegration.Models.PaymentDTO
 {
     public class FillChargeModel
     {
-        public int amount { get; set; }
+        public string amount { get; set; }
         public string currency { get; set; }
         public bool customer_initiated { get; set; }
         public bool threeDSecure { get; set; }

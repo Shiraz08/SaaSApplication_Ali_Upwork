@@ -48,13 +48,13 @@
                                         <td style="text-align:center!important">
                                             @{
                                                 DateTime sdateTime = Convert.ToDateTime(user.InvoiceStartDate);
-                                                <span>@sdateTime.ToShortDateString()</span>
+                                                <span>@sdateTime.ToString("dd/MM/yyyy")</span>
                                             }
                                         </td>
                                         <td style="text-align:center!important">
                                             @{
                                                 DateTime edateTime = Convert.ToDateTime(user.InvoiceEndDate);
-                                                <span>@edateTime.ToShortDateString()</span>
+                                                <span>@edateTime.ToString("dd/MM/yyyy")</span>
                                             }
                                         </td>
                                         <td style="text-align:center!important">@user.Currency</td>

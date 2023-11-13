@@ -10,7 +10,7 @@ namespace TapPaymentIntegration.Models.InvoiceDTO
         public string ChargeId { get; set; } 
         public int SubscriptionId { get; set; }
         public string SubscriptionName { get; set; }
-        public int SubscriptionAmount { get; set; } 
+        public double SubscriptionAmount { get; set; } 
         public string UserId { get; set;}
         public string Status { get; set;}
         public string Currency { get; set;}

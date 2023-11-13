@@ -103,7 +103,7 @@ namespace TapPaymentIntegration.Controllers
             //Add Change Card Info
             ChangeCardInfo changeCardInfo = new ChangeCardInfo();
             changeCardInfo.Email = userinfo.Email;
-            changeCardInfo.ChangeCardDate = DateTime.Now;
+            changeCardInfo.ChangeCardDate = DateTime.UtcNow;
             changeCardInfo.UserName = userinfo.FullName;
             changeCardInfo.SubscriptionName = subinfo.Name;
             changeCardInfo.OldCardName = userinfo.PaymentSource;

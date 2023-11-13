@@ -16,6 +16,7 @@
         public string Country { get; set; }
         public string City { get; set; }
         public string Currency { get; set; }
+        public string StepFee { get; set; } 
         public int SubscribeID { get; set; }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TapPaymentIntegration.Data;
 
@@ -11,9 +12,10 @@ using TapPaymentIntegration.Data;
 namespace TapPaymentIntegration.Migrations
 {
     [DbContext(typeof(TapPaymentIntegrationContext))]
-    partial class TapPaymentIntegrationContextModelSnapshot : ModelSnapshot
+    [Migration("20231105124935_sss")]
+    partial class sss
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -187,9 +189,6 @@ namespace TapPaymentIntegration.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("First_Six")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Frequency")
                         .HasColumnType("nvarchar(max)");
 
@@ -197,9 +196,6 @@ namespace TapPaymentIntegration.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("GYMName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Last_Four")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
@@ -505,25 +501,6 @@ namespace TapPaymentIntegration.Migrations
                     b.HasKey("RecurringChargeId");
 
                     b.ToTable("recurringCharges");
-                });
-
-            modelBuilder.Entity("TapPaymentIntegration.Models.Subscription.UserSubscriptions", b =>
-                {
-                    b.Property<int>("UserSubscriptionsId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserSubscriptionsId"), 1L, 1);
-
-                    b.Property<int>("SubID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Userid")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("UserSubscriptionsId");
-
-                    b.ToTable("userSubscriptions");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

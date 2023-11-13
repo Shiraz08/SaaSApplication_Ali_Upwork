@@ -12,7 +12,7 @@ namespace TapPaymentIntegration.Models.InvoiceDTO
         public string id { get; set; }
         public string method { get; set; }
         public string status { get; set; }
-        public int amount { get; set; }
+        public decimal amount { get; set; }
         public string currency { get; set; }
         public long created { get; set; }
         public long updated { get; set; }

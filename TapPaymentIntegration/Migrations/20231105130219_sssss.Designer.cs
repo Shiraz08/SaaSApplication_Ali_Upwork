@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TapPaymentIntegration.Data;
 
@@ -11,9 +12,10 @@ using TapPaymentIntegration.Data;
 namespace TapPaymentIntegration.Migrations
 {
     [DbContext(typeof(TapPaymentIntegrationContext))]
-    partial class TapPaymentIntegrationContextModelSnapshot : ModelSnapshot
+    [Migration("20231105130219_sssss")]
+    partial class sssss
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -187,9 +189,6 @@ namespace TapPaymentIntegration.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("First_Six")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Frequency")
                         .HasColumnType("nvarchar(max)");
 
@@ -197,9 +196,6 @@ namespace TapPaymentIntegration.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("GYMName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Last_Four")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
