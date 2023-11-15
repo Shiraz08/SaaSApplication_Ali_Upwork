@@ -34,5 +34,6 @@ public class ApplicationUser : IdentityUser
     public string Tap_Card_ID { get; set; }
     public string First_Six { get; set; }
     public string Last_Four { get; set; }
+    public string Benefit_Invoice { get; set; }
 }
 

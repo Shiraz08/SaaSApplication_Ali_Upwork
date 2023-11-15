@@ -37,8 +37,7 @@ namespace TapPaymentIntegration.Models.HangFire
         public async System.Threading.Tasks.Task AutoChargeJob() 
         {
             CreateCharge deserialized_CreateCharge = null;
-            //var recurringCharges_list = _context.recurringCharges.Where(x => x.JobRunDate.Date == DateTime.UtcNow.Date && x.IsRun == false).ToList();
-           var recurringCharges_list = _context.recurringCharges.Where(x => x.JobRunDate.Date == DateTime.UtcNow.AddDays(1).Date && x.IsRun == false).ToList();
+            var recurringCharges_list = _context.recurringCharges.Where(x => x.JobRunDate.Date == DateTime.UtcNow.Date && x.IsRun == false).ToList();
             foreach (var item in recurringCharges_list)
             {
                 string[] result = item.ChargeId.Split('_').ToArray();
@@ -940,7 +939,6 @@ namespace TapPaymentIntegration.Models.HangFire
         {
             CreateCharge deserialized_CreateCharge = null;
             var recurringCharges_list = _context.recurringCharges.Where(x => x.JobRunDate.Date == DateTime.UtcNow.Date && x.IsRun == false).ToList();
-            //var recurringCharges_list = _context.recurringCharges.Where(x => x.JobRunDate.Date == DateTime.UtcNow.AddDays(1).Date && x.IsRun == false).ToList();
             foreach (var item in recurringCharges_list)
             {
                 string[] result = item.ChargeId.Split('_').ToArray();
@@ -1086,12 +1084,12 @@ namespace TapPaymentIntegration.Models.HangFire
                                 itemss.image = "";
                                 itemss.quantity = 1;
                                 itemss.name = "Invoice Amount";
-                                itemss.amount = Convert.ToString(after_vat_totalamount);
+                                itemss.amount = Math.Round(after_vat_totalamount, 2).ToString("0.00");
                                 itemss.currency = getsubinfo.Currency;
                                 items.Add(itemss);
 
                                 Order order = new Order();
-                                order.amount = Convert.ToString(after_vat_totalamount);
+                                order.amount = Math.Round(after_vat_totalamount, 2).ToString("0.00");
                                 order.currency = getsubinfo.Currency;
                                 order.items = items;
 
@@ -1170,7 +1168,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     recurringCharge.SubscriptionId = getsubinfo.SubscriptionId;
                                     recurringCharge.UserID = getuserinfo.Id;
                                     recurringCharge.Tap_CustomerId = getuserinfo.Tap_CustomerID;
-                                    recurringCharge.ChargeId = deserialized_CreateCharge.id;
+                                    recurringCharge.ChargeId = myDeserializedClass.id;
                                     recurringCharge.JobRunDate = invoice.InvoiceEndDate;
                                     recurringCharge.Invoice = "Inv" + max_invoice_id;
                                     _context.recurringCharges.Add(recurringCharge);
@@ -1368,12 +1366,12 @@ namespace TapPaymentIntegration.Models.HangFire
                                 itemss.image = "";
                                 itemss.quantity = 1;
                                 itemss.name = "Invoice Amount";
-                                itemss.amount = Convert.ToString(after_vat_totalamount);
+                                itemss.amount = Math.Round(after_vat_totalamount, 2).ToString("0.00");
                                 itemss.currency = getsubinfo.Currency;
                                 items.Add(itemss);
 
                                 Order order = new Order();
-                                order.amount = Convert.ToString(after_vat_totalamount);
+                                order.amount = Math.Round(after_vat_totalamount, 2).ToString("0.00");
                                 order.currency = getsubinfo.Currency;
                                 order.items = items;
 
@@ -1452,7 +1450,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     recurringCharge.SubscriptionId = getsubinfo.SubscriptionId;
                                     recurringCharge.UserID = getuserinfo.Id;
                                     recurringCharge.Tap_CustomerId = getuserinfo.Tap_CustomerID;
-                                    recurringCharge.ChargeId = deserialized_CreateCharge.id;
+                                    recurringCharge.ChargeId = myDeserializedClass.id;
                                     recurringCharge.JobRunDate = invoice.InvoiceEndDate.AddDays(1);
                                     recurringCharge.Invoice = "Inv" + max_invoice_id;
                                     _context.recurringCharges.Add(recurringCharge);
@@ -1652,12 +1650,12 @@ namespace TapPaymentIntegration.Models.HangFire
                                 itemss.image = "";
                                 itemss.quantity = 1;
                                 itemss.name = "Invoice Amount";
-                                itemss.amount = Convert.ToString(after_vat_totalamount);
+                                itemss.amount = Math.Round(after_vat_totalamount, 2).ToString("0.00");
                                 itemss.currency = getsubinfo.Currency;
                                 items.Add(itemss);
 
                                 Order order = new Order();
-                                order.amount = Convert.ToString(after_vat_totalamount);
+                                order.amount = Math.Round(after_vat_totalamount, 2).ToString("0.00");
                                 order.currency = getsubinfo.Currency;
                                 order.items = items;
 
@@ -1936,12 +1934,12 @@ namespace TapPaymentIntegration.Models.HangFire
                                 itemss.image = "";
                                 itemss.quantity = 1;
                                 itemss.name = "Invoice Amount";
-                                itemss.amount = Convert.ToString(after_vat_totalamount);
+                                itemss.amount = Math.Round(after_vat_totalamount, 2).ToString("0.00");
                                 itemss.currency = getsubinfo.Currency;
                                 items.Add(itemss);
 
                                 Order order = new Order();
-                                order.amount = Convert.ToString(after_vat_totalamount);
+                                order.amount = Math.Round(after_vat_totalamount, 2).ToString("0.00");
                                 order.currency = getsubinfo.Currency;
                                 order.items = items;
 
@@ -2219,12 +2217,12 @@ namespace TapPaymentIntegration.Models.HangFire
                                 itemss.image = "";
                                 itemss.quantity = 1;
                                 itemss.name = "Invoice Amount";
-                                itemss.amount = Convert.ToString(after_vat_totalamount);
+                                itemss.amount = Math.Round(after_vat_totalamount, 2).ToString("0.00");
                                 itemss.currency = getsubinfo.Currency;
                                 items.Add(itemss);
 
                                 Order order = new Order();
-                                order.amount = Convert.ToString(after_vat_totalamount);
+                                order.amount = Math.Round(after_vat_totalamount, 2).ToString("0.00");
                                 order.currency = getsubinfo.Currency;
                                 order.items = items;
 
@@ -2502,12 +2500,12 @@ namespace TapPaymentIntegration.Models.HangFire
                                 itemss.image = "";
                                 itemss.quantity = 1;
                                 itemss.name = "Invoice Amount";
-                                itemss.amount = Convert.ToString(after_vat_totalamount);
+                                itemss.amount = Math.Round(after_vat_totalamount, 2).ToString("0.00");
                                 itemss.currency = getsubinfo.Currency;
                                 items.Add(itemss);
 
                                 Order order = new Order();
-                                order.amount = Convert.ToString(after_vat_totalamount);
+                                order.amount = Math.Round(after_vat_totalamount, 2).ToString("0.00");
                                 order.currency = getsubinfo.Currency;
                                 order.items = items;
 
@@ -2650,13 +2648,11 @@ namespace TapPaymentIntegration.Models.HangFire
                                     var bodyemail = EmailBodyFill.EmailBodyForBenefitPaymentRequest(getsubinfo, getuserinfo, myDeserializedClass.url);
                                     _ = _emailSender.SendEmailWithFIle(bytes, getuserinfo.Email, "Tamarran - Automatic Payment Request", bodyemail);
                                 }
-
                             }
                         }
                     }
                 }
             }
-
         }
     }
 }

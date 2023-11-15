@@ -19,6 +19,7 @@ using SixLabors.ImageSharp.Drawing;
 using static System.Net.Mime.MediaTypeNames;
 using System.Web;
 using TapPaymentIntegration.Models.Subscription;
+using TapPaymentIntegration.Migrations;
 
 namespace TapPaymentIntegration.Controllers
 {
@@ -49,8 +50,8 @@ namespace TapPaymentIntegration.Controllers
         //public readonly string KSA_Test_Key = "sk_test_1SU5woL8vZe6JXrBHipQu9Dn";
         //public readonly string KSA_Merchant_Key = "22116401";
 
-        public readonly string RedirectURL = "https://tappayment.niralahyderabadirestaurant.com";
-       // public readonly string RedirectURL = "https://localhost:7279";
+         public readonly string RedirectURL = "https://tappayment.niralahyderabadirestaurant.com";
+        //public readonly string RedirectURL = "https://localhost:7279";
         public HomeController(IWebHostEnvironment Environment, ILogger<HomeController> logger, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, TapPaymentIntegrationContext context, IUserStore<ApplicationUser> userStore)
         {
             _logger = logger;
@@ -441,7 +442,7 @@ namespace TapPaymentIntegration.Controllers
 
                     Charge charge = new Charge();
                     charge.receipt = receipt;
-                    charge.statement_descriptor = "test";
+                    charge.statement_descriptor = Invoiceid.ToString();
 
                     List<string> p_methods = new List<string>();
                     p_methods.Add(Token);
@@ -1106,7 +1107,7 @@ namespace TapPaymentIntegration.Controllers
                 if (Deserialized_savecard.status == "PAID")
                 {
                     var Frequency = HttpContext.Session.GetString("Frequency");
-                    var Invoiceid = HttpContext.Session.GetString("Invoiceid");
+                    var Invoiceid = log_user.Benefit_Invoice;
                     if (Deserialized_savecard.id != null)
                     {
                         //Create Invoice
@@ -1158,6 +1159,13 @@ namespace TapPaymentIntegration.Controllers
                             Vat = (decimal)((totala / Convert.ToInt32(subscriptions.VAT)) * 100) / 100;
                         }
                         decimal after_vat_totalamount = finalamount + Convert.ToDecimal(subscriptions.SetupFee) + Vat;
+                        //Remove Old Invoice
+                        if(Invoiceid != "")
+                        {
+                            var getoldinvoice = _context.invoices.Where(x => x.InvoiceId == Convert.ToInt32(Invoiceid)).FirstOrDefault();
+                            _context.Remove(getoldinvoice);
+                            _context.SaveChanges();
+                        }
                         Invoice invoices = new Invoice
                         {
                             InvoiceStartDate = DateTime.UtcNow,
@@ -1440,6 +1448,32 @@ namespace TapPaymentIntegration.Controllers
             Guid guid = Guid.NewGuid();
             string str = guid.ToString();
             applicationUser.Id = str;
+
+            Invoice invoices = new Invoice
+            {
+                InvoiceStartDate = DateTime.UtcNow,
+                InvoiceEndDate = DateTime.UtcNow,
+                Currency = subscriptions.Currency,
+                AddedDate = DateTime.UtcNow,
+                VAT = "0",
+                Discount = "0",
+                AddedBy = "Super Admin",
+                SubscriptionAmount = 0,
+                SubscriptionId = Convert.ToInt32(subscriptions.SubscriptionId),
+                Status = "Un-Paid",
+                IsDeleted = false,
+                Description = "Invoice Create - Frequency(" + applicationUser.Frequency + ")",
+                SubscriptionName = subscriptions.Name,
+                UserId = "",
+                ChargeId = "",
+                GymName = applicationUser.GYMName,
+                Country = subscriptions.Countries
+            };
+            _context.invoices.Add(invoices);
+            _context.SaveChanges();
+
+            int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
+            applicationUser.Benefit_Invoice = max_invoice_id.ToString();
             var result = await _userManager.CreateAsync(applicationUser, applicationUser.Password);
             if (result.Succeeded)
             {
@@ -1491,29 +1525,7 @@ namespace TapPaymentIntegration.Controllers
                     Vat = (decimal)((totala / Convert.ToInt32(subscriptions.VAT)) * 100) / 100;
                 }
                 decimal after_vat_totalamount = finalamount + Convert.ToDecimal(subscriptions.SetupFee) + Vat;
-                Invoice invoices = new Invoice
-                {
-                    InvoiceStartDate = DateTime.UtcNow,
-                    InvoiceEndDate = DateTime.UtcNow,
-                    Currency = subscriptions.Currency,
-                    AddedDate = DateTime.UtcNow,
-                    VAT = Vat.ToString(),
-                    Discount = Discount.ToString(),
-                    AddedBy = "Super Admin",
-                    SubscriptionAmount = Convert.ToDouble(decimal.Round(after_vat_totalamount)),
-                    SubscriptionId = Convert.ToInt32(subscriptions.SubscriptionId),
-                    Status = "Un-Paid",
-                    IsDeleted = false,
-                    Description = "Invoice Create - Frequency(" + applicationUser.Frequency + ")",
-                    SubscriptionName = subscriptions.Name,
-                    UserId = max_user_id,
-                    ChargeId = "",
-                    GymName = applicationUser.GYMName,
-                    Country = subscriptions.Countries
-                };
-                _context.invoices.Add(invoices);
-                _context.SaveChanges();
-                int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
+
                 // Send Email
                 string body = string.Empty;
                 _environment.WebRootPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
@@ -1570,6 +1582,10 @@ namespace TapPaymentIntegration.Controllers
 
                 var invoiceinfo = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).FirstOrDefault();
                 invoiceinfo.InvoiceLink = RedirectURL + callbackUrl;
+                invoiceinfo.VAT = Vat.ToString();
+                invoiceinfo.Discount = Discount.ToString();
+                invoiceinfo.AddedBy = "Super Admin";
+                invoiceinfo.SubscriptionAmount = Convert.ToDouble(decimal.Round(after_vat_totalamount));
                 _context.invoices.Update(invoiceinfo);
                 _context.SaveChanges();
                 return RedirectToAction("ViewCustomer", "Home");
