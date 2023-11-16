@@ -203,7 +203,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                         body = body.Replace("{VAT}", "0.00");
                                         body = body.Replace("{Total}", amount.ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{InvoiceAmount}", amount.ToString() + " " + getsubinfo.Currency);
-                                        var without_vat = Convert.ToDecimal(finalamount) + Convert.ToDecimal(getsubinfo.SetupFee);
+                                        var without_vat = Convert.ToDecimal(finalamount);
                                         body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + getsubinfo.Currency);
                                     }
                                     else
@@ -211,7 +211,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                         body = body.Replace("{VAT}", decimal.Round(Convert.ToDecimal(Vat), 2).ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{Total}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{InvoiceAmount}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + getsubinfo.Currency);
-                                        var without_vat = Convert.ToDecimal(finalamount) + Convert.ToDecimal(getsubinfo.SetupFee);
+                                        var without_vat = Convert.ToDecimal(finalamount);
                                         body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + getsubinfo.Currency);
                                     }
                                     var bytes = (new NReco.PdfGenerator.HtmlToPdfConverter()).GeneratePdf(body);
@@ -340,7 +340,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                         body = body.Replace("{VAT}", "0.00");
                                         body = body.Replace("{Total}", amount.ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{InvoiceAmount}", amount.ToString() + " " + getsubinfo.Currency);
-                                        var without_vat = Convert.ToDecimal(finalamount) + Convert.ToDecimal(getsubinfo.SetupFee);
+                                        var without_vat = Convert.ToDecimal(finalamount);
                                         body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + getsubinfo.Currency);
                                     }
                                     else
@@ -348,7 +348,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                         body = body.Replace("{VAT}", decimal.Round(Convert.ToDecimal(Vat), 2).ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{Total}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{InvoiceAmount}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + getsubinfo.Currency);
-                                        var without_vat = Convert.ToDecimal(finalamount) + Convert.ToDecimal(getsubinfo.SetupFee);
+                                        var without_vat = Convert.ToDecimal(finalamount);
                                         body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + getsubinfo.Currency);
                                     }
                                     var bytes = (new NReco.PdfGenerator.HtmlToPdfConverter()).GeneratePdf(body);
@@ -476,7 +476,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                         body = body.Replace("{VAT}", "0.00");
                                         body = body.Replace("{Total}", amount.ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{InvoiceAmount}", amount.ToString() + " " + getsubinfo.Currency);
-                                        var without_vat = Convert.ToDecimal(finalamount) + Convert.ToDecimal(getsubinfo.SetupFee);
+                                        var without_vat = Convert.ToDecimal(finalamount);
                                         body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + getsubinfo.Currency);
                                     }
                                     else
@@ -484,7 +484,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                         body = body.Replace("{VAT}", decimal.Round(Convert.ToDecimal(Vat), 2).ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{Total}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{InvoiceAmount}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + getsubinfo.Currency);
-                                        var without_vat = Convert.ToDecimal(finalamount) + Convert.ToDecimal(getsubinfo.SetupFee);
+                                        var without_vat = Convert.ToDecimal(finalamount);
                                         body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + getsubinfo.Currency);
                                     }
                                     var bytes = (new NReco.PdfGenerator.HtmlToPdfConverter()).GeneratePdf(body);
@@ -612,7 +612,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                         body = body.Replace("{VAT}", "0.00");
                                         body = body.Replace("{Total}", amount.ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{InvoiceAmount}", amount.ToString() + " " + getsubinfo.Currency);
-                                        var without_vat = Convert.ToDecimal(finalamount) + Convert.ToDecimal(getsubinfo.SetupFee);
+                                        var without_vat = Convert.ToDecimal(finalamount);
                                         body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + getsubinfo.Currency);
                                     }
                                     else
@@ -620,7 +620,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                         body = body.Replace("{VAT}", decimal.Round(Convert.ToDecimal(Vat), 2).ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{Total}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{InvoiceAmount}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + getsubinfo.Currency);
-                                        var without_vat = Convert.ToDecimal(finalamount) + Convert.ToDecimal(getsubinfo.SetupFee);
+                                        var without_vat = Convert.ToDecimal(finalamount);
                                         body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + getsubinfo.Currency);
                                     }
                                     var bytes = (new NReco.PdfGenerator.HtmlToPdfConverter()).GeneratePdf(body);
@@ -748,7 +748,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                         body = body.Replace("{VAT}", "0.00");
                                         body = body.Replace("{Total}", amount.ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{InvoiceAmount}", amount.ToString() + " " + getsubinfo.Currency);
-                                        var without_vat = Convert.ToDecimal(finalamount) + Convert.ToDecimal(getsubinfo.SetupFee);
+                                        var without_vat = Convert.ToDecimal(finalamount);
                                         body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + getsubinfo.Currency);
                                     }
                                     else
@@ -756,7 +756,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                         body = body.Replace("{VAT}", decimal.Round(Convert.ToDecimal(Vat), 2).ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{Total}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{InvoiceAmount}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + getsubinfo.Currency);
-                                        var without_vat = Convert.ToDecimal(finalamount) + Convert.ToDecimal(getsubinfo.SetupFee);
+                                        var without_vat = Convert.ToDecimal(finalamount);
                                         body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + getsubinfo.Currency);
                                     }
                                     var bytes = (new NReco.PdfGenerator.HtmlToPdfConverter()).GeneratePdf(body);
@@ -884,7 +884,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                         body = body.Replace("{VAT}", "0.00");
                                         body = body.Replace("{Total}", amount.ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{InvoiceAmount}", amount.ToString() + " " + getsubinfo.Currency);
-                                        var without_vat = Convert.ToDecimal(finalamount) + Convert.ToDecimal(getsubinfo.SetupFee);
+                                        var without_vat = Convert.ToDecimal(finalamount);
                                         body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + getsubinfo.Currency);
                                     }
                                     else
@@ -892,7 +892,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                         body = body.Replace("{VAT}", decimal.Round(Convert.ToDecimal(Vat), 2).ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{Total}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{InvoiceAmount}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + getsubinfo.Currency);
-                                        var without_vat = Convert.ToDecimal(finalamount) + Convert.ToDecimal(getsubinfo.SetupFee);
+                                        var without_vat = Convert.ToDecimal(finalamount);
                                         body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + getsubinfo.Currency);
                                     }
                                     var bytes = (new NReco.PdfGenerator.HtmlToPdfConverter()).GeneratePdf(body);
@@ -1217,7 +1217,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                         body = body.Replace("{VAT}", "0.00");
                                         body = body.Replace("{Total}", amount.ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{InvoiceAmount}", amount.ToString() + " " + getsubinfo.Currency);
-                                        var without_vat = Convert.ToDecimal(finalamount) + Convert.ToDecimal(getsubinfo.SetupFee);
+                                        var without_vat = Convert.ToDecimal(finalamount);
                                         body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + getsubinfo.Currency);
                                     }
                                     else
@@ -1225,7 +1225,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                         body = body.Replace("{VAT}", decimal.Round(Convert.ToDecimal(Vat), 2).ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{Total}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{InvoiceAmount}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + getsubinfo.Currency);
-                                        var without_vat = Convert.ToDecimal(finalamount) + Convert.ToDecimal(getsubinfo.SetupFee);
+                                        var without_vat = Convert.ToDecimal(finalamount);
                                         body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + getsubinfo.Currency);
                                     }
                                     var bytes = (new NReco.PdfGenerator.HtmlToPdfConverter()).GeneratePdf(body);
@@ -1499,7 +1499,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                         body = body.Replace("{VAT}", "0.00");
                                         body = body.Replace("{Total}", amount.ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{InvoiceAmount}", amount.ToString() + " " + getsubinfo.Currency);
-                                        var without_vat = Convert.ToDecimal(finalamount) + Convert.ToDecimal(getsubinfo.SetupFee);
+                                        var without_vat = Convert.ToDecimal(finalamount);
                                         body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + getsubinfo.Currency);
                                     }
                                     else
@@ -1507,7 +1507,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                         body = body.Replace("{VAT}", decimal.Round(Convert.ToDecimal(Vat), 2).ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{Total}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{InvoiceAmount}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + getsubinfo.Currency);
-                                        var without_vat = Convert.ToDecimal(finalamount) + Convert.ToDecimal(getsubinfo.SetupFee);
+                                        var without_vat = Convert.ToDecimal(finalamount);
                                         body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + getsubinfo.Currency);
                                     }
                                     var bytes = (new NReco.PdfGenerator.HtmlToPdfConverter()).GeneratePdf(body);
@@ -1783,7 +1783,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                         body = body.Replace("{VAT}", "0.00");
                                         body = body.Replace("{Total}", amount.ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{InvoiceAmount}", amount.ToString() + " " + getsubinfo.Currency);
-                                        var without_vat = Convert.ToDecimal(finalamount) + Convert.ToDecimal(getsubinfo.SetupFee);
+                                        var without_vat = Convert.ToDecimal(finalamount);
                                         body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + getsubinfo.Currency);
                                     }
                                     else
@@ -1791,7 +1791,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                         body = body.Replace("{VAT}", decimal.Round(Convert.ToDecimal(Vat), 2).ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{Total}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{InvoiceAmount}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + getsubinfo.Currency);
-                                        var without_vat = Convert.ToDecimal(finalamount) + Convert.ToDecimal(getsubinfo.SetupFee);
+                                        var without_vat = Convert.ToDecimal(finalamount);
                                         body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + getsubinfo.Currency);
                                     }
                                     var bytes = (new NReco.PdfGenerator.HtmlToPdfConverter()).GeneratePdf(body);
@@ -2067,7 +2067,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                         body = body.Replace("{VAT}", "0.00");
                                         body = body.Replace("{Total}", amount.ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{InvoiceAmount}", amount.ToString() + " " + getsubinfo.Currency);
-                                        var without_vat = Convert.ToDecimal(finalamount) + Convert.ToDecimal(getsubinfo.SetupFee);
+                                        var without_vat = Convert.ToDecimal(finalamount);
                                         body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + getsubinfo.Currency);
                                     }
                                     else
@@ -2075,7 +2075,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                         body = body.Replace("{VAT}", decimal.Round(Convert.ToDecimal(Vat), 2).ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{Total}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{InvoiceAmount}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + getsubinfo.Currency);
-                                        var without_vat = Convert.ToDecimal(finalamount) + Convert.ToDecimal(getsubinfo.SetupFee);
+                                        var without_vat = Convert.ToDecimal(finalamount);
                                         body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + getsubinfo.Currency);
                                     }
                                     var bytes = (new NReco.PdfGenerator.HtmlToPdfConverter()).GeneratePdf(body);
@@ -2350,7 +2350,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                         body = body.Replace("{VAT}", "0.00");
                                         body = body.Replace("{Total}", amount.ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{InvoiceAmount}", amount.ToString() + " " + getsubinfo.Currency);
-                                        var without_vat = Convert.ToDecimal(finalamount) + Convert.ToDecimal(getsubinfo.SetupFee);
+                                        var without_vat = Convert.ToDecimal(finalamount);
                                         body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + getsubinfo.Currency);
                                     }
                                     else
@@ -2358,7 +2358,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                         body = body.Replace("{VAT}", decimal.Round(Convert.ToDecimal(Vat), 2).ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{Total}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{InvoiceAmount}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + getsubinfo.Currency);
-                                        var without_vat = Convert.ToDecimal(finalamount) + Convert.ToDecimal(getsubinfo.SetupFee);
+                                        var without_vat = Convert.ToDecimal(finalamount);
                                         body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + getsubinfo.Currency);
                                     }
                                     var bytes = (new NReco.PdfGenerator.HtmlToPdfConverter()).GeneratePdf(body);
@@ -2633,7 +2633,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                         body = body.Replace("{VAT}", "0.00");
                                         body = body.Replace("{Total}", amount.ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{InvoiceAmount}", amount.ToString() + " " + getsubinfo.Currency);
-                                        var without_vat = Convert.ToDecimal(finalamount) + Convert.ToDecimal(getsubinfo.SetupFee);
+                                        var without_vat = Convert.ToDecimal(finalamount);
                                         body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + getsubinfo.Currency);
                                     }
                                     else
@@ -2641,7 +2641,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                         body = body.Replace("{VAT}", decimal.Round(Convert.ToDecimal(Vat), 2).ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{Total}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + getsubinfo.Currency);
                                         body = body.Replace("{InvoiceAmount}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + getsubinfo.Currency);
-                                        var without_vat = Convert.ToDecimal(finalamount) + Convert.ToDecimal(getsubinfo.SetupFee);
+                                        var without_vat = Convert.ToDecimal(finalamount);
                                         body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + getsubinfo.Currency);
                                     }
                                     var bytes = (new NReco.PdfGenerator.HtmlToPdfConverter()).GeneratePdf(body);
