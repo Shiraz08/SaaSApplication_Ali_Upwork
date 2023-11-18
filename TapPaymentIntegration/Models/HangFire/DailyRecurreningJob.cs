@@ -1185,7 +1185,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     var incoice_info = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).FirstOrDefault();
                                     string body = string.Empty;
                                     _environment.WebRootPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-                                    string contentRootPath = _environment.WebRootPath + "/htmltopdfRecurrening.html";
+                                    string contentRootPath = _environment.WebRootPath + "/htmltopdfP.html";
                                     string contentRootPath1 = _environment.WebRootPath + "/css/bootstrap.min.css";
                                     //Generate PDF
                                     using (StreamReader reader = new StreamReader(contentRootPath))
@@ -1196,7 +1196,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     body = body.Replace("{title}", "Tamarran Payment Invoice");
                                     body = body.Replace("{currentdate}",DateTime.UtcNow.ToString("dd-MM-yyyy"));
 
-                                    body = body.Replace("{InvocieStatus}", "Payment Captured");
+                                    body = body.Replace("{InvocieStatus}", "Unpaid");
                                     body = body.Replace("{InvoiceID}", "Inv" + max_invoice_id);
 
 
@@ -1467,7 +1467,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     var incoice_info = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).FirstOrDefault();
                                     string body = string.Empty;
                                     _environment.WebRootPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-                                    string contentRootPath = _environment.WebRootPath + "/htmltopdfRecurrening.html";
+                                    string contentRootPath = _environment.WebRootPath + "/htmltopdfP.html";
                                     string contentRootPath1 = _environment.WebRootPath + "/css/bootstrap.min.css";
                                     //Generate PDF
                                     using (StreamReader reader = new StreamReader(contentRootPath))
@@ -1478,7 +1478,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     body = body.Replace("{title}", "Tamarran Payment Invoice");
                                     body = body.Replace("{currentdate}",DateTime.UtcNow.ToString("dd-MM-yyyy"));
 
-                                    body = body.Replace("{InvocieStatus}", "Payment Captured");
+                                    body = body.Replace("{InvocieStatus}", "Unpaid");
                                     body = body.Replace("{InvoiceID}", "Inv" + max_invoice_id);
 
 
@@ -1751,7 +1751,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     var incoice_info = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).FirstOrDefault();
                                     string body = string.Empty;
                                     _environment.WebRootPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-                                    string contentRootPath = _environment.WebRootPath + "/htmltopdfRecurrening.html";
+                                    string contentRootPath = _environment.WebRootPath + "/htmltopdfP.html";
                                     string contentRootPath1 = _environment.WebRootPath + "/css/bootstrap.min.css";
                                     //Generate PDF
                                     using (StreamReader reader = new StreamReader(contentRootPath))
@@ -1762,7 +1762,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     body = body.Replace("{title}", "Tamarran Payment Invoice");
                                     body = body.Replace("{currentdate}",DateTime.UtcNow.ToString("dd-MM-yyyy"));
 
-                                    body = body.Replace("{InvocieStatus}", "Payment Captured");
+                                    body = body.Replace("{InvocieStatus}", "Unpaid");
                                     body = body.Replace("{InvoiceID}", "Inv" + max_invoice_id);
 
 
@@ -2035,7 +2035,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     var incoice_info = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).FirstOrDefault();
                                     string body = string.Empty;
                                     _environment.WebRootPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-                                    string contentRootPath = _environment.WebRootPath + "/htmltopdfRecurrening.html";
+                                    string contentRootPath = _environment.WebRootPath + "/htmltopdfP.html";
                                     string contentRootPath1 = _environment.WebRootPath + "/css/bootstrap.min.css";
                                     //Generate PDF
                                     using (StreamReader reader = new StreamReader(contentRootPath))
@@ -2046,7 +2046,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     body = body.Replace("{title}", "Tamarran Payment Invoice");
                                     body = body.Replace("{currentdate}",DateTime.UtcNow.ToString("dd-MM-yyyy"));
 
-                                    body = body.Replace("{InvocieStatus}", "Payment Captured");
+                                    body = body.Replace("{InvocieStatus}", "Unpaid");
                                     body = body.Replace("{InvoiceID}", "Inv" + max_invoice_id);
 
 
@@ -2318,7 +2318,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     var incoice_info = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).FirstOrDefault();
                                     string body = string.Empty;
                                     _environment.WebRootPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-                                    string contentRootPath = _environment.WebRootPath + "/htmltopdfRecurrening.html";
+                                    string contentRootPath = _environment.WebRootPath + "/htmltopdfP.html";
                                     string contentRootPath1 = _environment.WebRootPath + "/css/bootstrap.min.css";
                                     //Generate PDF
                                     using (StreamReader reader = new StreamReader(contentRootPath))
@@ -2329,7 +2329,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     body = body.Replace("{title}", "Tamarran Payment Invoice");
                                     body = body.Replace("{currentdate}",DateTime.UtcNow.ToString("dd-MM-yyyy"));
 
-                                    body = body.Replace("{InvocieStatus}", "Payment Captured");
+                                    body = body.Replace("{InvocieStatus}", "Unpaid");
                                     body = body.Replace("{InvoiceID}", "Inv" + max_invoice_id);
 
 
@@ -2601,7 +2601,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     var incoice_info = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).FirstOrDefault();
                                     string body = string.Empty;
                                     _environment.WebRootPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-                                    string contentRootPath = _environment.WebRootPath + "/htmltopdfRecurrening.html";
+                                    string contentRootPath = _environment.WebRootPath + "/htmltopdfP.html";
                                     string contentRootPath1 = _environment.WebRootPath + "/css/bootstrap.min.css";
                                     //Generate PDF
                                     using (StreamReader reader = new StreamReader(contentRootPath))
@@ -2612,7 +2612,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     body = body.Replace("{title}", "Tamarran Payment Invoice");
                                     body = body.Replace("{currentdate}",DateTime.UtcNow.ToString("dd-MM-yyyy"));
 
-                                    body = body.Replace("{InvocieStatus}", "Payment Captured");
+                                    body = body.Replace("{InvocieStatus}", "Unpaid");
                                     body = body.Replace("{InvoiceID}", "Inv" + max_invoice_id);
 
 

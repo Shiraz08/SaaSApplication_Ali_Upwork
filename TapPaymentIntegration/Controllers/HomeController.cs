@@ -979,6 +979,7 @@ namespace TapPaymentIntegration.Controllers
 
                             Invoice invoice_info = _context.invoices.Where(x => x.InvoiceId == Convert.ToInt32(Invoiceid)).FirstOrDefault();
                             invoice_info.ChargeId = tap_id;
+                            invoice_info.UserId = users.Id;
                             invoice_info.Status = "Payment Captured";
                             invoice_info.ChargeResponseId = getchargesresposemodel;
                             _context.invoices.Update(invoice_info);
@@ -1580,11 +1581,14 @@ namespace TapPaymentIntegration.Controllers
                 var bodyemail = EmailBodyFill.EmailBodyForPaymentRequest(applicationUser, websiteurl);
                 _ = _emailSender.SendEmailWithFIle(bytes, applicationUser.Email, subject, bodyemail);
 
+
+                var adduser = _context.Users.Where(x => x.Email == applicationUser.Email).FirstOrDefault();
                 var invoiceinfo = _context.invoices.Where(x => x.InvoiceId == max_invoice_id).FirstOrDefault();
                 invoiceinfo.InvoiceLink = RedirectURL + callbackUrl;
                 invoiceinfo.VAT = Vat.ToString();
                 invoiceinfo.Discount = Discount.ToString();
                 invoiceinfo.AddedBy = "Super Admin";
+                invoiceinfo.UserId = adduser.Id;
                 invoiceinfo.SubscriptionAmount = Convert.ToDouble(decimal.Round(after_vat_totalamount));
                 _context.invoices.Update(invoiceinfo);
                 _context.SaveChanges();
