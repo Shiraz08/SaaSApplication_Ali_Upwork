@@ -1161,7 +1161,7 @@ namespace TapPaymentIntegration.Controllers
                         }
                         decimal after_vat_totalamount = finalamount + Convert.ToDecimal(subscriptions.SetupFee) + Vat;
                         //Remove Old Invoice
-                        if(Invoiceid != "")
+                        if(Invoiceid != null)
                         {
                             var getoldinvoice = _context.invoices.Where(x => x.InvoiceId == Convert.ToInt32(Invoiceid)).FirstOrDefault();
                             _context.Remove(getoldinvoice);
