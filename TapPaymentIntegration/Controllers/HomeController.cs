@@ -867,7 +867,7 @@ namespace TapPaymentIntegration.Controllers
                             body = body.Replace("{Discount}", Discount.ToString());
                             body = body.Replace("{SubscriptionPeriod}", userinfo.Frequency);
                             body = body.Replace("{SetupFee}", subscriptions.SetupFee + " " + subscriptions.Currency);
-                            int amount = Convert.ToInt32(finalamount) + Convert.ToInt32(Math.Round(decimal.Round(Convert.ToDecimal(subscriptions.SetupFee), 1), 0, MidpointRounding.AwayFromZero)); 
+                            int amount = Convert.ToInt32(finalamount) + Convert.ToInt32(Math.Round(decimal.Round(Convert.ToDecimal(subscriptions.SetupFee), 2), 0, MidpointRounding.AwayFromZero)); 
                             body = body.Replace("{SubscriptionAmount}", decimal.Round(Convert.ToDecimal(finalamount), 2).ToString() + " " + subscriptions.Currency);
                             //Calculate VAT
                             if (subscriptions.VAT == null || subscriptions.VAT == "0")
@@ -1256,7 +1256,7 @@ namespace TapPaymentIntegration.Controllers
                         body = body.Replace("{Discount}", Discount.ToString());
                         body = body.Replace("{SubscriptionPeriod}", userinfo.Frequency);
                         body = body.Replace("{SetupFee}", subscriptions.SetupFee + " " + subscriptions.Currency);
-                        int amount = Convert.ToInt32(finalamount) + Convert.ToInt32(Math.Round(decimal.Round(Convert.ToDecimal(subscriptions.SetupFee), 1), 0, MidpointRounding.AwayFromZero));
+                        int amount = Convert.ToInt32(finalamount) + Convert.ToInt32(Math.Round(decimal.Round(Convert.ToDecimal(subscriptions.SetupFee), 2), 0, MidpointRounding.AwayFromZero));
                         body = body.Replace("{SubscriptionAmount}", decimal.Round(Convert.ToDecimal(finalamount), 2).ToString() + " " + subscriptions.Currency);
                         //Calculate VAT
                         if (subscriptions.VAT == null || subscriptions.VAT == "0")
