@@ -23,7 +23,7 @@ namespace TapPaymentIntegration.Models.HangFire
         private readonly IUserStore<ApplicationUser> _userStore;
         private IWebHostEnvironment _environment;
         EmailSender _emailSender = new EmailSender();
-        public readonly string RedirectURL = "https://tappayment.niralahyderabadirestaurant.com";
+        public readonly string RedirectURL = "https://billing.tamarran.co";
         //public readonly string RedirectURL = "https://localhost:7279";
         public DailyRecurreningJob(IWebHostEnvironment Environment, ILogger<HomeController> logger, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, TapPaymentIntegrationContext context, IUserStore<ApplicationUser> userStore)
         { 

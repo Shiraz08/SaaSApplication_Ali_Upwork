@@ -50,7 +50,7 @@ namespace TapPaymentIntegration.Controllers
         //public readonly string KSA_Test_Key = "sk_test_1SU5woL8vZe6JXrBHipQu9Dn";
         //public readonly string KSA_Merchant_Key = "22116401";
 
-        public readonly string RedirectURL = "https://tappayment.niralahyderabadirestaurant.com";
+        public readonly string RedirectURL = "https://billing.tamarran.co";
         //public readonly string RedirectURL = "https://localhost:7279";
         public HomeController(IWebHostEnvironment Environment, ILogger<HomeController> logger, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, TapPaymentIntegrationContext context, IUserStore<ApplicationUser> userStore)
         {
