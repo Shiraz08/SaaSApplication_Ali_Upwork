@@ -1557,20 +1557,21 @@ namespace TapPaymentIntegration.Controllers
                 int amount = Convert.ToInt32(finalamount) + Convert.ToInt32(Math.Round(decimal.Round(Convert.ToDecimal(subscriptions.SetupFee), 1), 0, MidpointRounding.AwayFromZero));
                 body = body.Replace("{SubscriptionAmount}", decimal.Round(Convert.ToDecimal(finalamount), 2).ToString() + " " + subscriptions.Currency);
                 //Calculate VAT
+
                 if (subscriptions.VAT == null || subscriptions.VAT == "0")
                 {
                     body = body.Replace("{VAT}", "0.00" + " " + subscriptions.Currency);
                     body = body.Replace("{Total}", amount.ToString() + " " + subscriptions.Currency);
-                    body = body.Replace("{InvoiceAmount}", amount.ToString() + " " + subscriptions.Currency);
                     var without_vat = Convert.ToDecimal(finalamount) + Convert.ToDecimal(subscriptions.SetupFee);
+                    body = body.Replace("{InvoiceAmount}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + subscriptions.Currency);
                     body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + subscriptions.Currency);
                 }
                 else
                 {
-                    body = body.Replace("{VAT}", decimal.Round(Convert.ToDecimal(Vat), 2).ToString() + " " + subscriptions.Currency);
-                    body = body.Replace("{Total}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + subscriptions.Currency);
-                    body = body.Replace("{InvoiceAmount}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + subscriptions.Currency);
                     var without_vat = Convert.ToDecimal(finalamount) + Convert.ToDecimal(subscriptions.SetupFee);
+                    body = body.Replace("{VAT}", decimal.Round(Convert.ToDecimal(Vat), 2).ToString() + " " + subscriptions.Currency);
+                    body = body.Replace("{Total}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + subscriptions.Currency);
+                    body = body.Replace("{InvoiceAmount}", decimal.Round(Convert.ToDecimal(after_vat_totalamount), 2).ToString() + " " + subscriptions.Currency);
                     body = body.Replace("{Totalinvoicewithoutvat}", decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + subscriptions.Currency);
                 }
                 var bytes = (new NReco.PdfGenerator.HtmlToPdfConverter()).GeneratePdf(body);
