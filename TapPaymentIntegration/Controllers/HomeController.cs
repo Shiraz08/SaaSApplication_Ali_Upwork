@@ -32,30 +32,30 @@ namespace TapPaymentIntegration.Controllers
 
         #region  Live Keys
 
-        // Baharin
-        public readonly string BHD_Public_Key = "pk_live_7MqbnXVzGkRBaO3KWEmwN8i1";
-        public readonly string BHD_Test_Key = "sk_live_85POWSybstdevAiMxYaGHNp3";
-        public readonly string BHD_Merchant_Key = "";
-        //KSA
-        public readonly string KSA_Public_Key = "pk_live_MWDV5szwGbxeUBdHnJZLk9S2";
-        public readonly string KSA_Test_Key = "sk_live_VDJ1UxM2Arq6ONbz9ptGXhoj";
-        public readonly string KSA_Merchant_Key = "22116401";
+        //// Baharin
+        //public readonly string BHD_Public_Key = "pk_live_7MqbnXVzGkRBaO3KWEmwN8i1";
+        //public readonly string BHD_Test_Key = "sk_live_85POWSybstdevAiMxYaGHNp3";
+        //public readonly string BHD_Merchant_Key = "";
+        ////KSA
+        //public readonly string KSA_Public_Key = "pk_live_MWDV5szwGbxeUBdHnJZLk9S2";
+        //public readonly string KSA_Test_Key = "sk_live_VDJ1UxM2Arq6ONbz9ptGXhoj";
+        //public readonly string KSA_Merchant_Key = "22116401";
 
         #endregion
 
         #region Localhost Testing keys
 
-        //public readonly string BHD_Public_Key = "pk_test_7sAiZNXvdpKax26RuJMwbIen";
-        //public readonly string BHD_Test_Key = "sk_test_Tgoy8HbxdQ40l6Ea9SIDci7B";
-        //public readonly string BHD_Merchant_Key = "";
-        //public readonly string KSA_Public_Key = "pk_test_j3yKfvbxws8khDpFQOX5JeWc";
-        //public readonly string KSA_Test_Key = "sk_test_1SU5woL8vZe6JXrBHipQu9Dn";
-        //public readonly string KSA_Merchant_Key = "22116401";
+        public readonly string BHD_Public_Key = "pk_test_7sAiZNXvdpKax26RuJMwbIen";
+        public readonly string BHD_Test_Key = "sk_test_Tgoy8HbxdQ40l6Ea9SIDci7B";
+        public readonly string BHD_Merchant_Key = "";
+        public readonly string KSA_Public_Key = "pk_test_j3yKfvbxws8khDpFQOX5JeWc";
+        public readonly string KSA_Test_Key = "sk_test_1SU5woL8vZe6JXrBHipQu9Dn";
+        public readonly string KSA_Merchant_Key = "22116401";
 
         #endregion
 
-        public readonly string RedirectURL = "http://billing.tamarran.com";
-        // public readonly string RedirectURL = "https://localhost:7279";
+        //public readonly string RedirectURL = "http://billing.tamarran.com";
+        public readonly string RedirectURL = "https://localhost:7279";
         public const string subscriptionErrorMessage = "subscription is In-Active";
 
         public HomeController(IWebHostEnvironment Environment, ILogger<HomeController> logger, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, TapPaymentIntegrationContext context, IUserStore<ApplicationUser> userStore)
