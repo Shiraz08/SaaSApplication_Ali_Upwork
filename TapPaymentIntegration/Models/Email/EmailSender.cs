@@ -6,8 +6,8 @@ namespace TapPaymentIntegration.Models.Email
 {
     public class EmailSender : IEmailSender
     {
-        
-        public async Task SendEmailWithFIle(byte[]? bytesArray,string emails, string subject, string message)
+
+        public async Task SendEmailWithFIle(byte[]? bytesArray, string emails, string subject, string message, string attachmentTitle = "Invoice")
         {
             try
             {
@@ -27,10 +27,10 @@ namespace TapPaymentIntegration.Models.Email
                 }
                 mail.Subject = subject;
                 mail.IsBodyHtml = true;
-                mail.CC.Add(new MailAddress("accounts@tamarran.com"));  
-                mail.Bcc.Add(new MailAddress("ali.zayer@tamarran.com")); 
+                mail.CC.Add(new MailAddress("accounts@tamarran.com"));
+                mail.Bcc.Add(new MailAddress("ali.zayer@tamarran.com"));
                 mail.Body = message;
-                mail.Attachments.Add(new Attachment(new MemoryStream(bytesArray), "Invoice.pdf"));
+                mail.Attachments.Add(new Attachment(new MemoryStream(bytesArray), $"{attachmentTitle}.pdf"));
                 client.Send(mail);
             }
             catch (Exception ex)
@@ -38,7 +38,7 @@ namespace TapPaymentIntegration.Models.Email
                 // log exception
             }
             await Task.CompletedTask;
-        } 
+        }
         public async Task SendEmailAsync(string emails, string subject, string message)
         {
             try
