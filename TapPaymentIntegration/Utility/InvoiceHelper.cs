@@ -82,6 +82,7 @@ namespace TapPaymentIntegration.Utility
                 var without_vat = Convert.ToDecimal(finalAmount) + Convert.ToDecimal(subscriptionsSetupFee);
                 invoiceAmount = decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + subscriptionsCurrency;
                 Totalinvoicewithoutvat = decimal.Round(Convert.ToDecimal(without_vat), 2).ToString() + " " + subscriptionsCurrency;
+                after_vat_total_amount = decimal.Round((finalAmount + Convert.ToDecimal(subscriptionsSetupFee) + vat), 2);
             }
             ///If selected subscription contain VAT Amount.
             else
