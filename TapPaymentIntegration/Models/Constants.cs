@@ -3,10 +3,10 @@
   public static class Constants
   {
 #if !DEBUG
-    public static readonly string RedirectURL = "https://tap.softsolutionlogix.com";
+    public static readonly string RedirectURL = "https://test.softsolutionlogix.com";
 #endif
 #if DEBUG
-        public static readonly string RedirectURL = "https://localhost:7279";
+        public static readonly string RedirectURL = "https://test.softsolutionlogix.com";
 #endif
     public const string SubscriptionErrorMessage = "subscription is In-Active";
 
