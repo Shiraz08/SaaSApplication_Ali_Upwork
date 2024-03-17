@@ -1,13 +1,15 @@
 ﻿using Microsoft.AspNetCore.Identity.UI.Services;
+using System;
+using System.IO;
 using System.Net;
 using System.Net.Mail;
-using TapPaymentIntegration.Models;
+using System.Threading.Tasks;
 
 namespace TapPaymentIntegration.Models.Email
 {
     public class EmailSender : IEmailSender
     {
-        public async Task SendEmailWithFIle(byte[]? bytesArray, string emails, string subject, string message, string attachmentTitle = "Invoice")
+        public async Task SendEmailWithFIle(byte[] bytesArray, string emails, string subject, string message, string attachmentTitle = "Invoice")
         {
             try
             {

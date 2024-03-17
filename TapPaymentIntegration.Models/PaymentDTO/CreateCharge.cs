@@ -1,9 +1,4 @@
-﻿using Azure;
-using Hangfire.Server;
-using Microsoft.CodeAnalysis;
-using Microsoft.Extensions.Hosting;
-using System.Composition;
-using System.Diagnostics;
+﻿using System.Collections.Generic;
 using TapPaymentIntegration.Models.Card;
 
 namespace TapPaymentIntegration.Models.PaymentDTO

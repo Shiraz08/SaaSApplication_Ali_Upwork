@@ -1,4 +1,5 @@
-﻿using TapPaymentIntegration.Areas.Identity.Data;
+﻿using System.Collections.Generic;
+using TapPaymentIntegration.Areas.Identity.Data;
 using TapPaymentIntegration.Models.Card;
 using TapPaymentIntegration.Models.PaymentDTO;
 

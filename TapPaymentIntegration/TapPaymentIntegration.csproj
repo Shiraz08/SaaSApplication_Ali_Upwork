@@ -52,4 +52,9 @@
     <Folder Include="Migrations\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TapPaymentIntegration.Models\TapPaymentIntegration.Models.csproj" />
+    <ProjectReference Include="..\TapPaymentIntegration.Shared\TapPaymentIntegration.Shared.csproj" />
+  </ItemGroup>
+
 </Project>

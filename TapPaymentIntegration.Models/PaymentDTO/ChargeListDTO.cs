@@ -1,4 +1,7 @@
-﻿namespace TapPaymentIntegration.Models.PaymentDTO
+﻿using System;
+using System.Collections.Generic;
+
+namespace TapPaymentIntegration.Models.PaymentDTO
 {
     public class ChargeListDTO
     {

@@ -1,4 +1,5 @@
-﻿using TapPaymentIntegration.Models.Card;
+﻿using System.Collections.Generic;
+using TapPaymentIntegration.Models.Card;
 using TapPaymentIntegration.Models.PaymentDTO;
 
 namespace TapPaymentIntegration.Models.InvoiceDTO
