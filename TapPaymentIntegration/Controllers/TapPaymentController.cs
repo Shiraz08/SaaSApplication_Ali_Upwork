@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using TapPaymentIntegration.Areas.Identity.Data;
 using TapPaymentIntegration.Data;
+using TapPaymentIntegration.Models;
 using TapPaymentIntegration.Models.Card;
 using TapPaymentIntegration.Models.UserDTO;
 
@@ -15,9 +16,6 @@ namespace TapPaymentIntegration.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private TapPaymentIntegrationContext _context;
         private readonly IUserStore<ApplicationUser> _userStore;
-        // Change Your URL's Here
-        public readonly string RedirectURL = "https://billing.tamarran.com";
-        //public readonly string RedirectURL = "https://localhost:7279";
         private Task<ApplicationUser> GetCurrentUserAsync() => _userManager.GetUserAsync(HttpContext.User);
         public TapPaymentController(ILogger<HomeController> logger, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, TapPaymentIntegrationContext context, IUserStore<ApplicationUser> userStore)
         {
@@ -74,7 +72,7 @@ namespace TapPaymentIntegration.Controllers
                 var request = new HttpRequestMessage(HttpMethod.Post, "https://api.tap.company/v2/card/verify");
                 request.Headers.Add("authorization", "Bearer " + userinfo.SecertKey);
                 request.Headers.Add("accept", "application/json");
-                var complete_url = RedirectURL + "TapPayment/ChangeCardResponse";
+                var complete_url = Constants.RedirectURL + "TapPayment/ChangeCardResponse";
                 var content = new StringContent("{\"currency\":\""+ subinfo.Currency + "\",\"threeDSecure\":true,\"save_card\":true,\"metadata\":{\"udf1\":\"test1\",\"udf2\":\"test2\"},\"customer\":{\"first_name\":\""+userinfo.FullName+"\",\"middle_name\":\"\",\"last_name\":\"\",\"email\":\""+ userinfo.Email+ "\",\"phone\":{\"country_code\":\""+ countrycode + "\",\"number\":\""+userinfo.PhoneNumber+"\"}},\"source\":{\"id\":\""+ Token + "\"},\"redirect\":{\"url\":\""+ complete_url + "\"}}", null, "application/json");
                 request.Content = content;
                 var response = await client.SendAsync(request);

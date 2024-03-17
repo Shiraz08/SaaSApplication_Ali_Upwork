@@ -22,8 +22,6 @@ namespace TapPaymentIntegration.Models.HangFire
         private readonly IUserStore<ApplicationUser> _userStore;
         private IWebHostEnvironment _environment;
         EmailSender _emailSender = new EmailSender();
-        public readonly string RedirectURL = "https://billing.tamarran.com";
-        //public readonly string RedirectURL = "https://localhost:7279";
 
         public DailyRecurreningJob(IWebHostEnvironment Environment, ILogger<HomeController> logger, SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager, TapPaymentIntegrationContext context, IUserStore<ApplicationUser> userStore)
         {
@@ -204,7 +202,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
                                     var nameinvoice = "Inv" + max_invoice_id;
 
-                                    var bodyemail = EmailBodyFill.EmailBodyForSubscriptionrenewalinTamarranfailed(getsubinfo, getuserinfo, nameinvoice, RedirectURL);
+                                    var bodyemail = EmailBodyFill.EmailBodyForSubscriptionrenewalinTamarranfailed(getsubinfo, getuserinfo, nameinvoice, Constants.RedirectURL);
                                     _ = _emailSender.SendEmailAsync(user_Email, "Tamarran - Your subscription renewal in Tamarran failed", bodyemail);
                                 }
                             }
@@ -340,7 +338,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     _context.SaveChanges();
                                     int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
                                     var nameinvoice = "Inv" + max_invoice_id;
-                                    var bodyemail = EmailBodyFill.EmailBodyForSubscriptionrenewalinTamarranfailed(getsubinfo, getuserinfo, nameinvoice, RedirectURL);
+                                    var bodyemail = EmailBodyFill.EmailBodyForSubscriptionrenewalinTamarranfailed(getsubinfo, getuserinfo, nameinvoice, Constants.RedirectURL);
                                     _ = _emailSender.SendEmailAsync(user_Email, "Tamarran - Your subscription renewal in Tamarran failed", bodyemail);
                                 }
                             }
@@ -476,7 +474,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     _context.SaveChanges();
                                     int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
                                     var nameinvoice = "Inv" + max_invoice_id;
-                                    var bodyemail = EmailBodyFill.EmailBodyForSubscriptionrenewalinTamarranfailed(getsubinfo, getuserinfo, nameinvoice, RedirectURL);
+                                    var bodyemail = EmailBodyFill.EmailBodyForSubscriptionrenewalinTamarranfailed(getsubinfo, getuserinfo, nameinvoice, Constants.RedirectURL);
                                     _ = _emailSender.SendEmailAsync(user_Email, "Tamarran - Your subscription renewal in Tamarran failed", bodyemail);
                                 }
                             }
@@ -612,7 +610,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     _context.SaveChanges();
                                     int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
                                     var nameinvoice = "Inv" + max_invoice_id;
-                                    var bodyemail = EmailBodyFill.EmailBodyForSubscriptionrenewalinTamarranfailed(getsubinfo, getuserinfo, nameinvoice, RedirectURL);
+                                    var bodyemail = EmailBodyFill.EmailBodyForSubscriptionrenewalinTamarranfailed(getsubinfo, getuserinfo, nameinvoice, Constants.RedirectURL);
                                     _ = _emailSender.SendEmailAsync(user_Email, "Tamarran - Your subscription renewal in Tamarran failed", bodyemail);
                                 }
                             }
@@ -748,7 +746,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     _context.SaveChanges();
                                     int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
                                     var nameinvoice = "Inv" + max_invoice_id;
-                                    var bodyemail = EmailBodyFill.EmailBodyForSubscriptionrenewalinTamarranfailed(getsubinfo, getuserinfo, nameinvoice, RedirectURL);
+                                    var bodyemail = EmailBodyFill.EmailBodyForSubscriptionrenewalinTamarranfailed(getsubinfo, getuserinfo, nameinvoice, Constants.RedirectURL);
                                     _ = _emailSender.SendEmailAsync(user_Email, "Tamarran - Your subscription renewal in Tamarran failed", bodyemail);
                                 }
                             }
@@ -884,7 +882,7 @@ namespace TapPaymentIntegration.Models.HangFire
                                     _context.SaveChanges();
                                     int max_invoice_id = _context.invoices.Max(x => x.InvoiceId);
                                     var nameinvoice = "Inv" + max_invoice_id;
-                                    var bodyemail = EmailBodyFill.EmailBodyForSubscriptionrenewalinTamarranfailed(getsubinfo, getuserinfo, nameinvoice, RedirectURL);
+                                    var bodyemail = EmailBodyFill.EmailBodyForSubscriptionrenewalinTamarranfailed(getsubinfo, getuserinfo, nameinvoice, Constants.RedirectURL);
                                     _ = _emailSender.SendEmailAsync(user_Email, "Tamarran - Your subscription renewal in Tamarran failed", bodyemail);
                                 }
                             }
@@ -898,6 +896,7 @@ namespace TapPaymentIntegration.Models.HangFire
         {
             CreateCharge deserialized_CreateCharge = null;
             var recurringCharges_list = _context.recurringCharges.Where(x => x.JobRunDate.Date == DateTime.UtcNow.Date && x.IsRun == false).ToList();
+            //var recurringCharges_list = _context.recurringCharges.Where(x => x.IsRun == false).ToList();
             foreach (var item in recurringCharges_list)
             {
                 string[] result = item.ChargeId.Split('_').ToArray();
@@ -905,7 +904,7 @@ namespace TapPaymentIntegration.Models.HangFire
                 {
                     var getsubinfo = _context.subscriptions.Where(x => x.SubscriptionId == item.SubscriptionId).FirstOrDefault();
                     var getuserinfo = _context.Users.Where(x => x.Id == item.UserID).FirstOrDefault();
-                    if (getuserinfo != null)
+                    if (getuserinfo != null && getuserinfo.Country == "Bahrain")
                     {
                         if (getuserinfo.SubscribeID > 0 && getuserinfo.Status == true)
                         {
@@ -983,10 +982,10 @@ namespace TapPaymentIntegration.Models.HangFire
                                 decimal after_vat_totalamount = finalamount + Vat;
 
                                 Redirect redirect = new Redirect();
-                                redirect.url = RedirectURL + "/Home/CardVerifyBenefit";
+                                redirect.url = Constants.RedirectURL + "/Home/CardVerifyBenefit";
 
                                 Post post = new Post();
-                                post.url = RedirectURL + "/Home/CardVerifyBenefits";
+                                post.url = Constants.RedirectURL + "/Home/CardVerifyBenefits";
 
                                 var countrycode = "";
                                 if (getuserinfo.Country == "Bahrain")
@@ -1267,10 +1266,10 @@ namespace TapPaymentIntegration.Models.HangFire
                                 decimal after_vat_totalamount = finalamount + Convert.ToDecimal(getsubinfo.SetupFee) + Vat;
 
                                 Redirect redirect = new Redirect();
-                                redirect.url = RedirectURL + "/Home/CardVerifyBenefit";
+                                redirect.url = Constants.RedirectURL + "/Home/CardVerifyBenefit";
 
                                 Post post = new Post();
-                                post.url = RedirectURL + "/Home/CardVerifyBenefits";
+                                post.url = Constants.RedirectURL + "/Home/CardVerifyBenefits";
 
                                 var countrycode = "";
                                 if (getuserinfo.Country == "Bahrain")
@@ -1551,10 +1550,10 @@ namespace TapPaymentIntegration.Models.HangFire
                                 decimal after_vat_totalamount = finalamount + Convert.ToDecimal(getsubinfo.SetupFee) + Vat;
 
                                 Redirect redirect = new Redirect();
-                                redirect.url = RedirectURL + "/Home/CardVerifyBenefit";
+                                redirect.url = Constants.RedirectURL + "/Home/CardVerifyBenefit";
 
                                 Post post = new Post();
-                                post.url = RedirectURL + "/Home/CardVerifyBenefits";
+                                post.url = Constants.RedirectURL + "/Home/CardVerifyBenefits";
 
                                 var countrycode = "";
                                 if (getuserinfo.Country == "Bahrain")
@@ -1835,10 +1834,10 @@ namespace TapPaymentIntegration.Models.HangFire
                                 decimal after_vat_totalamount = finalamount + Convert.ToDecimal(getsubinfo.SetupFee) + Vat;
 
                                 Redirect redirect = new Redirect();
-                                redirect.url = RedirectURL + "/Home/CardVerifyBenefit";
+                                redirect.url = Constants.RedirectURL + "/Home/CardVerifyBenefit";
 
                                 Post post = new Post();
-                                post.url = RedirectURL + "/Home/CardVerifyBenefits";
+                                post.url = Constants.RedirectURL + "/Home/CardVerifyBenefits";
 
                                 var countrycode = "";
                                 if (getuserinfo.Country == "Bahrain")
@@ -2118,10 +2117,10 @@ namespace TapPaymentIntegration.Models.HangFire
                                 decimal after_vat_totalamount = finalamount + Convert.ToDecimal(getsubinfo.SetupFee) + Vat;
 
                                 Redirect redirect = new Redirect();
-                                redirect.url = RedirectURL + "/Home/CardVerifyBenefit";
+                                redirect.url = Constants.RedirectURL + "/Home/CardVerifyBenefit";
 
                                 Post post = new Post();
-                                post.url = RedirectURL + "/Home/CardVerifyBenefits";
+                                post.url = Constants.RedirectURL + "/Home/CardVerifyBenefits";
 
                                 var countrycode = "";
                                 if (getuserinfo.Country == "Bahrain")
@@ -2401,10 +2400,10 @@ namespace TapPaymentIntegration.Models.HangFire
                                 decimal after_vat_totalamount = finalamount + Convert.ToDecimal(getsubinfo.SetupFee) + Vat;
 
                                 Redirect redirect = new Redirect();
-                                redirect.url = RedirectURL + "/Home/CardVerifyBenefit";
+                                redirect.url = Constants.RedirectURL + "/Home/CardVerifyBenefit";
 
                                 Post post = new Post();
-                                post.url = RedirectURL + "/Home/CardVerifyBenefits";
+                                post.url = Constants.RedirectURL + "/Home/CardVerifyBenefits";
 
                                 var countrycode = "";
                                 if (getuserinfo.Country == "Bahrain")

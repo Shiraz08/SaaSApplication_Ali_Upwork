@@ -1358,6 +1358,14 @@ namespace TapPaymentIntegration.Controllers
         [HttpPost]
         public async Task<IActionResult> AddCustomer(ApplicationUser applicationUser)
         {
+#if !DEBUG
+
+            if (!CreateAssessmentSample.createAssessment(applicationUser.recaptchaToken, nameof(AddCustomer)))
+            {
+                ModelState.AddModelError(string.Empty, "Kindly validate yourself through Captcha..!");
+            }
+
+#endif
             var resultuser = await _userManager.FindByEmailAsync(applicationUser.UserName);
             if (resultuser != null)
             {
@@ -2024,6 +2032,14 @@ namespace TapPaymentIntegration.Controllers
         [HttpPost]
         public async Task<IActionResult> AddGymCustomer(ApplicationUser applicationUser)
         {
+#if !DEBUG
+
+            if(!CreateAssessmentSample.createAssessment(applicationUser.recaptchaToken, nameof(AddGymCustomer)))
+            {
+                ModelState.AddModelError(string.Empty, "Kindly validate yourself through Captcha..!");
+            }
+
+#endif
             var subid = applicationUser.SubscribeID;
             var resultuser = await _userManager.FindByEmailAsync(applicationUser.UserName);
             if (resultuser != null)
@@ -2136,7 +2152,7 @@ namespace TapPaymentIntegration.Controllers
                          });
             return View(users);
         }
-        #endregion
+#endregion
 
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using TapPaymentIntegration.Areas.Identity.Data;
+using TapPaymentIntegration.Models;
 using TapPaymentIntegration.Models.Email;
 using TapPaymentIntegration.Models.Roles;
 

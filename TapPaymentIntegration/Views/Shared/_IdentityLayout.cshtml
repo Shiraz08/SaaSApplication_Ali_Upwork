@@ -1,4 +1,11 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration con;
+@{
+    
+    string googleCaptchaKey = con.GetSection("GoogleCaptcha")["SiteKey"];
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -14,6 +21,7 @@
     <!-- Theme style -->
     <link rel="stylesheet" href="~/AdminPanel/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="~/AdminPanel/plugins/toastr/toastr.min.css">
+    <script src="https://www.google.com/recaptcha/enterprise.js?render=@googleCaptchaKey"></script>
 </head>
 <body class="hold-transition login-page">
 

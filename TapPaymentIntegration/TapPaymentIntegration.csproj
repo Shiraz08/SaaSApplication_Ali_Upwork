@@ -14,9 +14,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.5" />
-    <PackageReference Include="Hangfire.Core" Version="1.8.5" />
-    <PackageReference Include="Hangfire.SqlServer" Version="1.8.5" />
+    <PackageReference Include="Google.Cloud.RecaptchaEnterprise.V1" Version="2.10.0" />
+    <PackageReference Include="Hangfire.AspNetCore" Version="1.8.11" />
+    <PackageReference Include="Hangfire.Core" Version="1.8.11" />
+    <PackageReference Include="Hangfire.SqlServer" Version="1.8.11" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.54" />
     <PackageReference Include="IronPdf" Version="2023.9.8" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics" Version="2.2.0" />
@@ -44,6 +45,7 @@
     <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="6.0.21" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.16" />
     <PackageReference Include="NReco.PdfGenerator" Version="1.2.1" />
+    <PackageReference Include="reCAPTCH.MVC" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup>

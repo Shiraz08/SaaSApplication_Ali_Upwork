@@ -1,5 +1,8 @@
 ﻿@model TapPaymentIntegration.Areas.Identity.Data.ApplicationUser
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration con;
 @{
+    string googleCaptchaKey = con.GetSection("GoogleCaptcha")["SiteKey"];
     ViewData["Title"] = "Add GYM Customer";
     Layout = "~/Views/Shared/_IdentityLayout.cshtml";
 }
@@ -76,6 +79,10 @@
                         </div>
                     </div>
                 </div>
+                <div class="input-group mb-3">
+                    <div class="g-recaptcha" data-sitekey="@googleCaptchaKey"></div>
+                </div>
+                <input type="hidden" id="recaptchaResponse" name="token" asp-for="recaptchaToken" />
                 <div class="row">
                     <div class="col-8">
                         <div class="icheck-primary">
@@ -87,7 +94,7 @@
                     </div>
                     <!-- /.col -->
                     <div class="col-4">
-                        <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
+                        <button type="submit" class="btn btn-primary btn-block" id="SignUp">Sign Up</button>
                     </div>
                     <!-- /.col -->
                 </div>
@@ -114,4 +121,12 @@
             $('#password-field').attr("type", "password");
         }
     });
+
+    function onClick(e) {
+        debugger;
+        e.preventDefault();
+        grecaptcha.enterprise.ready(async () => {
+            document.getElementById('recaptchaResponse').value = await grecaptcha.enterprise.execute('@googleCaptchaKey', { action: 'AddGymCustomer' });
+        });
+    }
 </script>

@@ -1,6 +1,9 @@
 ﻿@page
 @model LoginModel
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration con;
 @{
+    string googleCaptchaKey = con.GetSection("GoogleCaptcha")["SiteKey"];
     ViewData["Title"] = "Log in";
     Layout = "~/Views/Shared/_IdentityLayout.cshtml";
 }
@@ -43,7 +46,7 @@
                     </div>
                     <!-- /.col -->
                     <div class="col-4">
-                        <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+                        <button type="submit" id="loginBtn" class="btn btn-primary btn-block">Sign In</button>
                     </div>
                     <!-- /.col -->
                 </div>
@@ -75,5 +78,5 @@
             }
         });
     </script>
-  
+
 

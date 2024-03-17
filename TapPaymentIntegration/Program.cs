@@ -1,5 +1,6 @@
 using Hangfire;
 using Hangfire.SqlServer;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,7 @@ using TapPaymentIntegration.Models.HangFire;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("TapPaymentIntegrationContextConnection") ?? throw new InvalidOperationException("Connection string 'TapPaymentIntegrationContextConnection' not found.");
 builder.Services.AddDbContext<TapPaymentIntegrationContext>(options =>options.UseSqlServer(connectionString));
-builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true).AddRoles<IdentityRole>().AddEntityFrameworkStores<TapPaymentIntegrationContext>();
+builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false).AddRoles<IdentityRole>().AddEntityFrameworkStores<TapPaymentIntegrationContext>();
 builder.Services.AddDbContext<TapPaymentIntegrationContext>(options =>
 {
     options.UseSqlServer(connectionString);
@@ -22,6 +23,11 @@ builder.Services.AddDbContext<TapPaymentIntegrationContext>(options =>
 });
 
 // Add other services
+builder.Services.AddAntiforgery();
+builder.Services.AddControllers().AddNewtonsoftJson();
+builder.Services.AddDataProtection()
+                .SetApplicationName("BillingTamarran")
+                .PersistKeysToFileSystem(new System.IO.DirectoryInfo(@"/var/38be6598-5608-4b68-9e5e-bc825c61c522/"));
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 // Configure Ajax settings
@@ -80,6 +86,7 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
+
 app.UseDeveloperExceptionPage();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
