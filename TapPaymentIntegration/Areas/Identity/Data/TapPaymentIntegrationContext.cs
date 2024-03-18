@@ -15,6 +15,12 @@ public class TapPaymentIntegrationContext : IdentityDbContext<ApplicationUser>
         : base(options)
     {
     }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.EnableDetailedErrors();
+    }
+
     public DbSet<Subscriptions> subscriptions { get; set; }
     public DbSet<ChargeResponse>  chargeResponses { get; set; }
     public DbSet<Invoice>  invoices { get; set; }

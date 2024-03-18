@@ -19,7 +19,6 @@ namespace TapPaymentIntegration.Areas.Identity.Data
         public string GYMName { get; set; }
         public string FullName { get; set; }
         public string UserType { get; set; }
-        [Required]
         public string Frequency { get; set; }
         public string PublicKey { get; set; }
         public string VAT { get; set; }
@@ -27,10 +26,8 @@ namespace TapPaymentIntegration.Areas.Identity.Data
         public string MarchantID { get; set; }
         public bool Status { get; set; }
         public int SubscribeID { get; set; }
-        [Required]
         public string Country { get; set; }
         public string City { get; set; }
-        [Required]
         public string Currency { get; set; }
         public string Tap_CustomerID { get; set; }
         public string Tap_Subscription_ID { get; set; }

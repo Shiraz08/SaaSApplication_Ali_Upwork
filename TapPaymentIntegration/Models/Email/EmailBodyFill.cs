@@ -3,6 +3,7 @@ using System.Net;
 using TapPaymentIntegration.Areas.Identity.Data;
 using System.Buffers.Text;
 using System.Net.NetworkInformation;
+using TapPaymentIntegration.Models.Subscription;
 
 namespace TapPaymentIntegration.Models.Email
 {

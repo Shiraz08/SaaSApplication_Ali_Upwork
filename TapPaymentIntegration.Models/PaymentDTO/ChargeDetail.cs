@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
-using TapPaymentIntegration.Areas.Identity.Data;
+using TapPaymentIntegration.Models.PaymentDTO;
 using TapPaymentIntegration.Models.Card;
 using TapPaymentIntegration.Models.InvoiceDTO;
+using TapPaymentIntegration.Models.Subscription;
 
 namespace TapPaymentIntegration.Models.PaymentDTO
 {

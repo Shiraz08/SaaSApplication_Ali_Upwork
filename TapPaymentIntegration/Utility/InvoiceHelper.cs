@@ -1,4 +1,5 @@
 ﻿using TapPaymentIntegration.Areas.Identity.Data;
+using TapPaymentIntegration.Models.Subscription;
 
 namespace TapPaymentIntegration.Utility
 {

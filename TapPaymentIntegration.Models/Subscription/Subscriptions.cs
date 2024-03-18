@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace TapPaymentIntegration.Areas.Identity.Data
+namespace TapPaymentIntegration.Models.Subscription
 {
     public class Subscriptions
     {

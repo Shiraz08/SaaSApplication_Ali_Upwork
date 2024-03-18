@@ -128,10 +128,5 @@ namespace TapPaymentIntegration.Models
 
             return true;
         }
-
-        public static void Main(string[] args)
-        {
-            //new CreateAssessmentSample().createAssessment();
-        }
     }
 }
